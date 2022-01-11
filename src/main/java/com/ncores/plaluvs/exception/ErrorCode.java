@@ -20,7 +20,11 @@ public enum ErrorCode {
     PASSWORD_NOT_EQUAL(HttpStatus.FORBIDDEN, "비밀번호와 비밀번화 확인과 일치하지 않습니다."),
     PASSWORD_FAIL(HttpStatus.FORBIDDEN, "적합하지 않는 비밀번호입니다."),
 
-    USER_NOT_FOUND(HttpStatus.FORBIDDEN, "유저를 찾을 수 없습니다.");
+    USER_NOT_FOUND(HttpStatus.FORBIDDEN, "유저를 찾을 수 없습니다."),
+    USER_NOT_LOGIN(HttpStatus.UNAUTHORIZED, "로그인 상태가 아닙니다."),
+
+    DATA_EMPTY(HttpStatus.FORBIDDEN, "데이터가 없습니다."),
+    GENDER_NOT_EXIST(HttpStatus.CONFLICT, "적합한 성별 유형이 아닙니다.");
 
 
     private final HttpStatus httpStatus;

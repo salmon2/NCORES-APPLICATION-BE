@@ -16,6 +16,9 @@ public class RestApiExceptionHandler {
         ErrorCode errorCode = ex.getErrorCode();
         String errorMessage = ex.getMessage();
 
+        log.info("errorCode : {}", errorCode);
+        log.info("errorMessage : {}", errorMessage);
+
         return new ResponseEntity<>(errorMessage ,errorCode.getHttpStatus());
 
     }

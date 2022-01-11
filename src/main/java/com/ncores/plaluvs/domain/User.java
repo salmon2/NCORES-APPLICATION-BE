@@ -1,13 +1,15 @@
 package com.ncores.plaluvs.domain;
 
+import com.ncores.plaluvs.exception.ErrorCode;
+import com.ncores.plaluvs.exception.PlaluvsException;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.transaction.Transactional;
 
 @Getter
-@Setter
 @Entity
 @NoArgsConstructor
 public class User {
@@ -36,5 +38,20 @@ public class User {
         this.password = password;
         this.nickname = nickname;
         this.role = role;
+    }
+
+
+    @Transactional
+    public void changeAge(Long age){
+        this.age = age;
+    }
+
+    public void changeGender(String gender) throws PlaluvsException {
+        Gender findGender = Gender.findGender(gender);
+
+        if (findGender == null)
+            throw new PlaluvsException(ErrorCode.GENDER_NOT_EXIST);
+
+        this.gender = findGender;
     }
 }

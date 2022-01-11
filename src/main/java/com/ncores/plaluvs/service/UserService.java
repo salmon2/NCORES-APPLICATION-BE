@@ -7,11 +7,13 @@ import com.ncores.plaluvs.domain.dto.*;
 import com.ncores.plaluvs.exception.ErrorCode;
 import com.ncores.plaluvs.exception.PlaluvsException;
 import com.ncores.plaluvs.repository.UserRepository;
+import com.ncores.plaluvs.security.UserDetailsImpl;
 import com.ncores.plaluvs.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Service
@@ -22,6 +24,7 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
 
 
+    @Transactional
     public User registerUser(SignUpRequestDto requestDto) throws PlaluvsException {
         emailCheck(requestDto.getEmail());
         nicknameCheck(requestDto.getNickname());
@@ -122,5 +125,24 @@ public class UserService {
         );
 
         return signInResponseDto;
+    }
+
+    @Transactional
+    public void setAge(PatchAgeRequestDto requestDto, UserDetailsImpl userDetails) throws PlaluvsException {
+        User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(
+                () -> new PlaluvsException(ErrorCode.USER_NOT_FOUND)
+        );
+
+        user.changeAge(requestDto.getAge());
+    }
+
+
+    @Transactional
+    public void setGender(PatchGenderRequestDto requestDto, UserDetailsImpl userDetails) throws PlaluvsException {
+        User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(
+                () -> new PlaluvsException(ErrorCode.USER_NOT_FOUND)
+        );
+
+        user.changeGender(requestDto.getGender());
     }
 }

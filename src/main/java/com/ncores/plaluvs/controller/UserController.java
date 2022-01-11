@@ -1,7 +1,7 @@
 package com.ncores.plaluvs.controller;
 
 
-import com.ncores.plaluvs.controller.dto.SignInResponseDto;
+import com.ncores.plaluvs.domain.dto.SignInResponseDto;
 import com.ncores.plaluvs.domain.User;
 import com.ncores.plaluvs.domain.dto.*;
 import com.ncores.plaluvs.exception.PlaluvsException;
@@ -13,9 +13,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @Slf4j
@@ -58,6 +55,7 @@ public class UserController {
         return new ResponseEntity<>("등록 가능한 password 입니다.", HttpStatus.OK);
     }
 
+    //로그인
     @PostMapping("/user/login")
     public ResponseEntity<?> login(@RequestBody SignInRequestDto requestDto) throws PlaluvsException {
         SignInResponseDto signInResponseDto = userService.signIn(requestDto);
@@ -67,6 +65,8 @@ public class UserController {
 
         return new ResponseEntity<>(signInResponseDto, httpHeaders, HttpStatus.OK);
     }
+
+
 
 }
 

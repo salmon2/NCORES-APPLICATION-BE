@@ -1,4 +1,4 @@
-package com.ncores.plaluvs.controller.dto;
+package com.ncores.plaluvs.domain.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,6 +1,6 @@
 package com.ncores.plaluvs.service;
 
-import com.ncores.plaluvs.controller.dto.SignInResponseDto;
+import com.ncores.plaluvs.domain.dto.SignInResponseDto;
 import com.ncores.plaluvs.domain.User;
 import com.ncores.plaluvs.domain.UserRoleEnum;
 import com.ncores.plaluvs.domain.dto.*;

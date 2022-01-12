@@ -1,8 +1,10 @@
 package com.ncores.plaluvs.security;
 
 
-import com.ncores.plaluvs.domain.User;
-import com.ncores.plaluvs.domain.UserRoleEnum;
+import com.ncores.plaluvs.domain.user.User;
+import com.ncores.plaluvs.domain.user.UserRoleEnum;
+import com.ncores.plaluvs.exception.ErrorCode;
+import com.ncores.plaluvs.exception.PlaluvsException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -64,4 +66,11 @@ public class UserDetailsImpl implements UserDetails {
 
         return authorities;
     }
+
+    public static void UserCheck(UserDetailsImpl userDetails) throws PlaluvsException {
+        if ( userDetails == null) {
+            throw new PlaluvsException(ErrorCode.USER_NOT_LOGIN);
+        }
+    }
+
 }

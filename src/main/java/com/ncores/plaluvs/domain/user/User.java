@@ -1,18 +1,22 @@
-package com.ncores.plaluvs.domain;
+package com.ncores.plaluvs.domain.user;
 
+import com.ncores.plaluvs.domain.SkinTrouble;
+import com.ncores.plaluvs.domain.SkinType;
 import com.ncores.plaluvs.exception.ErrorCode;
 import com.ncores.plaluvs.exception.PlaluvsException;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import javax.persistence.*;
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
 @NoArgsConstructor
-public class User {
+public class
+User {
     @GeneratedValue
     @Id
     private Long id;
@@ -33,6 +37,13 @@ public class User {
     @Enumerated(value = EnumType.STRING)
     private UserRoleEnum role;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private SkinType skinType;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<SkinTrouble> skinTrouble = new ArrayList<>();
+
+
     public User(String username, String password, String nickname,  UserRoleEnum role) {
         this.username = username;
         this.password = password;
@@ -41,7 +52,6 @@ public class User {
     }
 
 
-    @Transactional
     public void changeAge(Long age){
         this.age = age;
     }
@@ -53,5 +63,9 @@ public class User {
             throw new PlaluvsException(ErrorCode.GENDER_NOT_EXIST);
 
         this.gender = findGender;
+    }
+
+    public void setSkinType(SkinType skinType) {
+        this.skinType = skinType;
     }
 }

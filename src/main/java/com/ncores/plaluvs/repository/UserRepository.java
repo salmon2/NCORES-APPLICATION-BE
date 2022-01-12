@@ -1,7 +1,7 @@
 package com.ncores.plaluvs.repository;
 
 
-import com.ncores.plaluvs.domain.User;
+import com.ncores.plaluvs.domain.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import org.springframework.stereotype.Repository;

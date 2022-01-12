@@ -1,4 +1,4 @@
-package com.ncores.plaluvs.domain;
+package com.ncores.plaluvs.domain.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -6,8 +6,8 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum Gender {
-    Male("Male"),
-    Female("Female");
+    MALE("Male"),
+    FEMALE("Female");
 
     private String text;
 

@@ -1,13 +1,11 @@
 package com.ncores.plaluvs.controller;
 
 
-import com.ncores.plaluvs.domain.dto.SignInResponseDto;
-import com.ncores.plaluvs.domain.User;
-import com.ncores.plaluvs.domain.dto.*;
+import com.ncores.plaluvs.domain.dto.user.*;
+import com.ncores.plaluvs.domain.user.User;
 import com.ncores.plaluvs.exception.ErrorCode;
 import com.ncores.plaluvs.exception.PlaluvsException;
 import com.ncores.plaluvs.security.UserDetailsImpl;
-import com.ncores.plaluvs.security.jwt.JwtTokenProvider;
 import com.ncores.plaluvs.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

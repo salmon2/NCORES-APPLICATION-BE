@@ -10,5 +10,4 @@ public class PlaluvsApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(PlaluvsApplication.class, args);
 	}
-
 }

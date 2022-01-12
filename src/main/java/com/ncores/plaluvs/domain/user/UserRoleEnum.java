@@ -1,4 +1,4 @@
-package com.ncores.plaluvs.domain;
+package com.ncores.plaluvs.domain.user;
 
 public enum UserRoleEnum {
     USER(Authority.USER), // 사용자 권한

@@ -1,12 +1,10 @@
 package com.ncores.plaluvs;
 
 
-import com.ncores.plaluvs.domain.User;
-import com.ncores.plaluvs.domain.UserRoleEnum;
+import com.ncores.plaluvs.domain.user.User;
+import com.ncores.plaluvs.domain.user.UserRoleEnum;
 import com.ncores.plaluvs.repository.UserRepository;
-import com.ncores.plaluvs.service.UserService;
 import lombok.NoArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
@@ -14,7 +12,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
-import java.util.List;
 
 @NoArgsConstructor
 @Component

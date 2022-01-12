@@ -1,9 +1,8 @@
 package com.ncores.plaluvs.service;
 
-import com.ncores.plaluvs.domain.dto.SignInResponseDto;
-import com.ncores.plaluvs.domain.User;
-import com.ncores.plaluvs.domain.UserRoleEnum;
-import com.ncores.plaluvs.domain.dto.*;
+import com.ncores.plaluvs.domain.dto.user.*;
+import com.ncores.plaluvs.domain.user.User;
+import com.ncores.plaluvs.domain.user.UserRoleEnum;
 import com.ncores.plaluvs.exception.ErrorCode;
 import com.ncores.plaluvs.exception.PlaluvsException;
 import com.ncores.plaluvs.repository.UserRepository;

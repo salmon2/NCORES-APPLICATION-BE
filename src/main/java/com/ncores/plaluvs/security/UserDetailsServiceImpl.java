@@ -5,7 +5,7 @@ import com.ncores.plaluvs.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
-import com.ncores.plaluvs.domain.User;
+import com.ncores.plaluvs.domain.user.User;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

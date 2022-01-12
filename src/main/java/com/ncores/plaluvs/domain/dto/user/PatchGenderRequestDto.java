@@ -1,5 +1,4 @@
-package com.ncores.plaluvs.domain.dto;
-
+package com.ncores.plaluvs.domain.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,7 +9,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SignInRequestDto {
-    private String email;
-    private String password;
+public class PatchGenderRequestDto {
+    private String gender;
 }

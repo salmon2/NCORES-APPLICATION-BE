@@ -30,5 +30,6 @@ public class CrawlingItemDto {
         this.category = (ArrayList<String>)map.get("category");
         this.tags = (ArrayList<String>)map.get("tags");
         this.elements = (ArrayList<Map<String, String>>)map.get("elements");
+
     }
 }

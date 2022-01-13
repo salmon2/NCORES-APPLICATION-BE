@@ -1,11 +1,16 @@
 package com.ncores.plaluvs.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ncores.plaluvs.crawling.CrawlingItemDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static javax.persistence.FetchType.LAZY;
 
@@ -22,16 +27,21 @@ public class Elements {
     private String english;
     private String purpose;
 
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "item_id")
-    @JsonIgnore
-    private Item item;
+    @OneToMany(mappedBy = "elements", fetch = LAZY, cascade = CascadeType.ALL)
+    List<ItemElements> itemElementsList = new ArrayList<>();
 
-    public Elements(String level, String korean, String english, String purpose, Item item) {
+
+    public Elements(String level, String korean, String english, String purpose) {
         this.level = level;
         this.korean = korean;
         this.english = english;
         this.purpose = purpose;
-        this.item = item;
+    }
+
+    public Elements(Map<String, String> value) {
+        this.level = value.get("level");
+        this.korean = value.get("korean");
+        this.english = value.get("english");
+        this.purpose = value.get("purpose");
     }
 }

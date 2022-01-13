@@ -24,7 +24,9 @@ public enum ErrorCode {
     USER_NOT_LOGIN(HttpStatus.UNAUTHORIZED, "로그인 상태가 아닙니다."),
 
     DATA_EMPTY(HttpStatus.FORBIDDEN, "데이터가 없습니다."),
-    GENDER_NOT_EXIST(HttpStatus.CONFLICT, "적합한 성별 유형이 아닙니다.");
+    GENDER_NOT_EXIST(HttpStatus.CONFLICT, "적합한 성별 유형이 아닙니다."),
+
+    AGE_SMALL(HttpStatus.FORBIDDEN, "4자리 이상의 년도가 아닙니다.");
 
 
     private final HttpStatus httpStatus;

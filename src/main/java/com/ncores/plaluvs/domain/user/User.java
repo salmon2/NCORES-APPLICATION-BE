@@ -2,6 +2,7 @@ package com.ncores.plaluvs.domain.user;
 
 import com.ncores.plaluvs.domain.SkinTrouble;
 import com.ncores.plaluvs.domain.SkinType;
+import com.ncores.plaluvs.domain.UserItem;
 import com.ncores.plaluvs.exception.ErrorCode;
 import com.ncores.plaluvs.exception.PlaluvsException;
 import lombok.Getter;
@@ -43,6 +44,9 @@ User {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<SkinTrouble> skinTrouble = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<UserItem> userItemList = new ArrayList<>();
+
 
     public User(String username, String password, String nickname,  UserRoleEnum role) {
         this.username = username;
@@ -51,17 +55,14 @@ User {
         this.role = role;
     }
 
-
     public void changeAge(Long age){
         this.age = age;
     }
 
     public void changeGender(String gender) throws PlaluvsException {
         Gender findGender = Gender.findGender(gender);
-
         if (findGender == null)
             throw new PlaluvsException(ErrorCode.GENDER_NOT_EXIST);
-
         this.gender = findGender;
     }
 

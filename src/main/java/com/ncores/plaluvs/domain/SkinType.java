@@ -1,6 +1,7 @@
 package com.ncores.plaluvs.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ncores.plaluvs.domain.dto.OilStatusRequestDto;
 import com.ncores.plaluvs.domain.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,5 +29,9 @@ public class SkinType {
     public SkinType(OilIndicate oilIndicate, User user) {
         this.oilIndicate = oilIndicate;
         this.user = user;
+    }
+
+    public void updateSkinType(OilIndicate oilIndicate) {
+        this.oilIndicate = oilIndicate;
     }
 }

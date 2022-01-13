@@ -4,9 +4,10 @@ package com.ncores.plaluvs.crawling;
 import com.ncores.plaluvs.domain.Category;
 import com.ncores.plaluvs.domain.Elements;
 import com.ncores.plaluvs.domain.Item;
-import com.ncores.plaluvs.exception.PlaluvsException;
+import com.ncores.plaluvs.domain.ItemElements;
 import com.ncores.plaluvs.repository.CategoryRepository;
 import com.ncores.plaluvs.repository.ElementsRepository;
+import com.ncores.plaluvs.repository.ItemElementsRepository;
 import com.ncores.plaluvs.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
@@ -15,14 +16,12 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Component;
 
-import javax.swing.text.Element;
 import javax.transaction.Transactional;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -30,17 +29,19 @@ public class ReadJsonFile {
     private final CategoryRepository categoryRepository;
     private final ItemRepository itemRepository;
     private final ElementsRepository elementsRepository;
+    private final ItemElementsRepository itemElementsRepository;
+    private List<CrawlingItemDto>  crawlingItemDtoList = new ArrayList<>();
 
 
     public List<CrawlingItemDto> readJsonFile() throws IOException, ParseException {
         JSONParser jsonParser = new JSONParser();
 
-        FileReader reader = new FileReader("D:\\회사\\plaluvs\\src\\main\\resources\\static\\item_json.json");
+        FileReader reader = new FileReader("C:\\Users\\박기남\\Desktop\\회사\\data\\item_small_json.json");
         JSONObject jsonObject = (JSONObject)jsonParser.parse(reader);
         String str = jsonObject.get("item_list").toString();
 
         JSONArray jsonArray = new JSONArray(str);
-        List<CrawlingItemDto> crawlingItemDtoList = new ArrayList<>();
+
 
         for (int i = 0; i < jsonArray.length(); i++) {
             Map<String, Object> map = jsonArray.getJSONObject(i).toMap();
@@ -51,56 +52,56 @@ public class ReadJsonFile {
         return crawlingItemDtoList;
     }
 
-    public void saveItemToRepository (List<CrawlingItemDto> crawlingItemDtoList) throws PlaluvsException {
+    @Transactional
+    public void saveJsonFile(){
         for (CrawlingItemDto crawlingItemDto : crawlingItemDtoList) {
-            List<String> category = crawlingItemDto.getCategory();
+            Category saveCategory = createCategory(crawlingItemDto.getCategory());
+            Item saveItem = createItem(crawlingItemDto, saveCategory);
 
-            Category findCategory = CreateCategory(category);
-            Item findItem = CreateItem(crawlingItemDto, findCategory);
+            List<Map<String, String>> elements = crawlingItemDto.getElements();
 
-            createdElements(crawlingItemDto.getElements(), findItem);
+            for (Map<String, String> value : elements) {
+                Elements saveElements = createElements(value);
+                createItemElements(saveItem, saveElements);
+            }
 
         }
     }
 
     @Transactional
-    public void createdElements(List<Map<String, String>> crawlingItemDto, Item findItem) {
-        for (Map<String, String> element : crawlingItemDto) {
-            Elements newElements = new Elements(
-                            element.get("level"),
-                            element.get("korean"),
-                            element.get("english"),
-                            element.get("purpose"),
-                            findItem
-            );
-            elementsRepository.save(newElements);
-        }
+    public void createItemElements(Item saveItem, Elements saveElements) {
+        ItemElements itemElements = new ItemElements(saveItem, saveElements);
+        itemElementsRepository.save(itemElements);
     }
 
     @Transactional
-    public Item CreateItem(CrawlingItemDto crawlingItemDto, Category findCategory) {
-        Item item = new Item(crawlingItemDto, findCategory);
-        Item save = itemRepository.save(item);
-        return save;
-
+    public Elements createElements(Map<String, String> value) {
+        Elements findElements = elementsRepository.findByKorean(value.get("korean"));
+        if(findElements == null){
+            findElements = new Elements(value);
+            elementsRepository.save(findElements);
+        }
+        return findElements;
     }
 
     @Transactional
-    public Category CreateCategory(List<String> crawlingCategory) throws PlaluvsException {
-        String mainCategory = crawlingCategory.get(0);
-        Optional<Category> result = categoryRepository.findByCategoryLarge(mainCategory);
+    public Item createItem(CrawlingItemDto crawlingItemDto, Category category) {
+        Item item = new Item(crawlingItemDto, category);
+        Item saveItem = itemRepository.save(item);
 
-        if (!result.isPresent()) {
-            Category resultCategory = new Category(crawlingCategory.get(0));
-            categoryRepository.save(resultCategory);
-            return resultCategory;
+        return saveItem;
+    }
+
+    @Transactional
+    public Category createCategory(List<String> category) {
+
+        Category findCategory = categoryRepository.findByCategoryLarge(category.get(0));
+        if(findCategory == null) {
+            findCategory = new Category(category);
+            categoryRepository.save(findCategory);
         }
-
-        return result.get();
+        return findCategory;
     }
 
 
-    public static void main(String[] args) throws IOException, ParseException {
-
-    }
 }

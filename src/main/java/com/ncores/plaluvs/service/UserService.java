@@ -132,6 +132,11 @@ public class UserService {
                 () -> new PlaluvsException(ErrorCode.USER_NOT_FOUND)
         );
 
+        if(requestDto.getAge() == null)
+            throw new PlaluvsException(ErrorCode.DATA_EMPTY);
+        if(String.valueOf(requestDto.getAge()).length() < 4)
+            throw new PlaluvsException(ErrorCode.AGE_SMALL);
+
         user.changeAge(requestDto.getAge());
     }
 

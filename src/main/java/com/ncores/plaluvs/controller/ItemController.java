@@ -4,6 +4,7 @@ import com.ncores.plaluvs.crawling.CrawlingItemDto;
 import com.ncores.plaluvs.crawling.ReadJsonFile;
 import com.ncores.plaluvs.exception.PlaluvsException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Repository;
@@ -14,13 +15,18 @@ import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class ItemController {
     private final ReadJsonFile readJsonFile;
+
 
     @GetMapping("/item/save")
     public void itemSave() throws PlaluvsException, IOException, ParseException {
         List<CrawlingItemDto> crawlingItemDtoList = readJsonFile.readJsonFile();
-        readJsonFile.saveItemToRepository(crawlingItemDtoList);
+
+        log.info("crawlingItemDtoList = {}", crawlingItemDtoList.get(0).getName());
+        log.info("size = {}", crawlingItemDtoList.size());
+        readJsonFile.saveJsonFile();
     }
 
 }

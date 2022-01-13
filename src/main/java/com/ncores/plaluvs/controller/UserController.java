@@ -75,10 +75,8 @@ public class UserController {
     @PatchMapping("/user/age")
     public ResponseEntity<?> setAge(@RequestBody PatchAgeRequestDto requestDto,
                                     @AuthenticationPrincipal UserDetailsImpl userDetails) throws PlaluvsException {
-        if(userDetails == null){
-            throw new PlaluvsException(ErrorCode.USER_NOT_LOGIN);
-        }
 
+        UserDetailsImpl.UserCheck(userDetails);
 
         userService.setAge(requestDto, userDetails);
 

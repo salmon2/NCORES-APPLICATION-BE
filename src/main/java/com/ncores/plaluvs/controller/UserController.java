@@ -87,10 +87,7 @@ public class UserController {
     @PatchMapping("/user/gender")
     public ResponseEntity<?> setGender(@RequestBody PatchGenderRequestDto requestDto,
                                     @AuthenticationPrincipal UserDetailsImpl userDetails) throws PlaluvsException {
-        if(userDetails == null){
-            throw new PlaluvsException(ErrorCode.USER_NOT_LOGIN);
-        }
-
+        UserDetailsImpl.UserCheck(userDetails);
 
         userService.setGender(requestDto, userDetails);
 

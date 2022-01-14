@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Service
@@ -128,18 +129,20 @@ public class UserService {
 
     @Transactional
     public void setAge(PatchAgeRequestDto requestDto, UserDetailsImpl userDetails) throws PlaluvsException {
+        LocalDate now = LocalDate.now();
+        Long nowYear = Long.valueOf(now.getYear());
+
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(
                 () -> new PlaluvsException(ErrorCode.USER_NOT_FOUND)
         );
 
         if(requestDto.getAge() == null)
             throw new PlaluvsException(ErrorCode.DATA_EMPTY);
-        if(String.valueOf(requestDto.getAge()).length() < 4)
-            throw new PlaluvsException(ErrorCode.AGE_SMALL);
+        if(requestDto.getAge() >= nowYear || requestDto.getAge() < 1920 )
+            throw new PlaluvsException(ErrorCode.AGE_TYPE_NOT_SUITABLE);
 
         user.changeAge(requestDto.getAge());
     }
-
 
     @Transactional
     public void setGender(PatchGenderRequestDto requestDto, UserDetailsImpl userDetails) throws PlaluvsException {

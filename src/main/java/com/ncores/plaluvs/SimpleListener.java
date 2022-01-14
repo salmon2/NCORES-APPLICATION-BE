@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import javax.transaction.Transactional;
 
 @NoArgsConstructor
-@Component
+//@Component
 public class SimpleListener implements ApplicationListener<ApplicationStartedEvent> {
     @Autowired
     private UserRepository userRepository;

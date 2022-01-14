@@ -1,5 +1,6 @@
 package com.ncores.plaluvs.domain.user;
 
+import com.ncores.plaluvs.domain.Photo;
 import com.ncores.plaluvs.domain.SkinTrouble;
 import com.ncores.plaluvs.domain.SkinType;
 import com.ncores.plaluvs.domain.UserItem;
@@ -46,6 +47,9 @@ User {
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<UserItem> userItemList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Photo> photo = new ArrayList<>();
 
 
     public User(String username, String password, String nickname,  UserRoleEnum role) {

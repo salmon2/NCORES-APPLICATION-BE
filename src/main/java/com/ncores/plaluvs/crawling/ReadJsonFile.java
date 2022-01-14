@@ -30,7 +30,14 @@ public class ReadJsonFile {
     private final ItemRepository itemRepository;
     private final ElementsRepository elementsRepository;
     private final ItemElementsRepository itemElementsRepository;
+
     private List<CrawlingItemDto>  crawlingItemDtoList = new ArrayList<>();
+
+    private List<Category> resultCategoryList = new ArrayList<>();
+    private List<Item> resultItemList = new ArrayList<>();
+    private List<Elements> resultElementsList = new ArrayList<>();
+    private List<ItemElements> resultItemElementsList = new ArrayList<>();
+
 
 
     public List<CrawlingItemDto> readJsonFile() throws IOException, ParseException {
@@ -52,11 +59,10 @@ public class ReadJsonFile {
         return crawlingItemDtoList;
     }
 
-    @Transactional
     public void saveJsonFile(){
         for (CrawlingItemDto crawlingItemDto : crawlingItemDtoList) {
-            Category saveCategory = createCategory(crawlingItemDto.getCategory());
-            Item saveItem = createItem(crawlingItemDto, saveCategory);
+            Category category = createCategory(crawlingItemDto.getCategory());
+            Item saveItem = createItem(crawlingItemDto, category);
 
             List<Map<String, String>> elements = crawlingItemDto.getElements();
 
@@ -64,41 +70,39 @@ public class ReadJsonFile {
                 Elements saveElements = createElements(value);
                 createItemElements(saveItem, saveElements);
             }
-
         }
+        categoryRepository.saveAll(resultCategoryList);
+        itemRepository.saveAll(resultItemList);
+        elementsRepository.saveAll(resultElementsList);
+        itemElementsRepository.saveAll(resultItemElementsList);
     }
 
-    @Transactional
     public void createItemElements(Item saveItem, Elements saveElements) {
         ItemElements itemElements = new ItemElements(saveItem, saveElements);
-        itemElementsRepository.save(itemElements);
+        resultItemElementsList.add(itemElements);
     }
 
-    @Transactional
     public Elements createElements(Map<String, String> value) {
         Elements findElements = elementsRepository.findByKorean(value.get("korean"));
         if(findElements == null){
             findElements = new Elements(value);
-            elementsRepository.save(findElements);
+            resultElementsList.add(findElements);
         }
         return findElements;
     }
 
-    @Transactional
     public Item createItem(CrawlingItemDto crawlingItemDto, Category category) {
         Item item = new Item(crawlingItemDto, category);
-        Item saveItem = itemRepository.save(item);
+        resultItemList.add(item);
 
-        return saveItem;
+        return item;
     }
 
-    @Transactional
     public Category createCategory(List<String> category) {
-
         Category findCategory = categoryRepository.findByCategoryLarge(category.get(0));
         if(findCategory == null) {
             findCategory = new Category(category);
-            categoryRepository.save(findCategory);
+            resultCategoryList.add(findCategory);
         }
         return findCategory;
     }

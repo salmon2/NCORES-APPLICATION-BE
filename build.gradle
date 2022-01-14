@@ -42,16 +42,8 @@ dependencies {
 	// https://mvnrepository.com/artifact/org.json/json
 	implementation group: 'org.json', name: 'json', version: '20201115'
 
-	implementation 'org.springframework.cloud:spring-cloud-starter-aws'
-	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.0.1.RELEASE'
-
 }
 
-dependencyManagement { imports
-		{
-			mavenBom 'org.springframework.cloud:spring-cloud-aws:2.2.1.RELEASE'
-		}
-}
 
 
 test {

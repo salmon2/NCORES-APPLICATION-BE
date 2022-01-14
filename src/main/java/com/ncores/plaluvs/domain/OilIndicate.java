@@ -1,7 +1,6 @@
 package com.ncores.plaluvs.domain;
 
 
-import com.ncores.plaluvs.domain.user.Gender;
 import com.ncores.plaluvs.exception.ErrorCode;
 import com.ncores.plaluvs.exception.PlaluvsException;
 import lombok.AllArgsConstructor;

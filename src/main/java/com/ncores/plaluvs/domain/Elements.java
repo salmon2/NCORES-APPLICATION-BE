@@ -31,13 +31,6 @@ public class Elements {
     List<ItemElements> itemElementsList = new ArrayList<>();
 
 
-    public Elements(String level, String korean, String english, String purpose) {
-        this.level = level;
-        this.korean = korean;
-        this.english = english;
-        this.purpose = purpose;
-    }
-
     public Elements(Map<String, String> value) {
         this.level = value.get("level");
         this.korean = value.get("korean");

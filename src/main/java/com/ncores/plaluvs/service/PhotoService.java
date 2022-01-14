@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.ncores.plaluvs.domain.Photo;
 import com.ncores.plaluvs.repository.PhotoRepository;
+import com.ncores.plaluvs.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,12 +28,14 @@ public class PhotoService {
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;  // S3 버킷 이름
 
-    public String upload(MultipartFile multipartFile, String dirName) throws IOException {
+    public String upload(MultipartFile multipartFile, String dirName, UserDetailsImpl userDetails) throws IOException {
         File uploadFile = convert(multipartFile)  // 파일 변환할 수 없으면 에러
                 .orElseThrow(() -> new IllegalArgumentException("error: MultipartFile -> File convert fail"));
 
-
         String uploadURL = upload(uploadFile, dirName);
+        Photo photo = new Photo(userDetails.getUser(), multipartFile.getOriginalFilename(), uploadURL);
+        photoRepository.save(photo);
+
         return uploadURL;
     }
 

@@ -54,8 +54,6 @@ public class Item {
     private List<ItemElements> itemElementsList = new ArrayList<>();
 
 
-
-
     public Item(CrawlingItemDto crawlingItemDto, Category category) {
         this.crawlingId = crawlingItemDto.getId();
         this.itemName = crawlingItemDto.getName();

@@ -17,13 +17,13 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Photo {
+public class Photo extends Timestamped {
     @Id
     @GeneratedValue
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "user_id")
     @JsonIgnore
     User user;
 
@@ -37,4 +37,9 @@ public class Photo {
         }
     }
 
+    public Photo(User user, String original_file_name, String stored_file_path) {
+        this.user = user;
+        this.original_file_name = original_file_name;
+        this.stored_file_path = stored_file_path;
+    }
 }

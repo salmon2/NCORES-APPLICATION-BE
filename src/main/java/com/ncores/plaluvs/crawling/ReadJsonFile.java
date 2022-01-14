@@ -71,6 +71,7 @@ public class ReadJsonFile {
                 createItemElements(saveItem, saveElements);
             }
         }
+
         categoryRepository.saveAll(resultCategoryList);
         itemRepository.saveAll(resultItemList);
         elementsRepository.saveAll(resultElementsList);

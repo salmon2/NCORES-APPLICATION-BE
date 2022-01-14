@@ -31,8 +31,6 @@ public class Photo {
 
     private String stored_file_path;
 
-    private Long file_size;
-
     public static void FileCheck(MultipartFile file) throws PlaluvsException {
         if(file.isEmpty()) {
             throw new PlaluvsException(ErrorCode.DATA_EMPTY);

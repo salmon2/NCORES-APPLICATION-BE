@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Controller
@@ -24,15 +25,16 @@ public class PhotoController {
 
     @PostMapping(value = "/photo")
     public ResponseEntity<?> uploadFile(@RequestParam("image") MultipartFile file)
-            throws PlaluvsException {
+            throws PlaluvsException, IOException {
         log.info("/upload");
         log.info("file = {}", file.getOriginalFilename());
 
         Photo.FileCheck(file);
+        String url = photoService.upload(file, "static");
+        log.info("url = {}", url);
 
 
-
-        return new ResponseEntity<>(file.getOriginalFilename(), HttpStatus.OK);
+        return new ResponseEntity<>(url, HttpStatus.OK);
     }
 
 

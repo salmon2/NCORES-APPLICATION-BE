@@ -65,7 +65,6 @@ public class ReadJsonFile {
 
     public void saveJsonFile(){
         log.info("save data start");
-        int i = 1;
         for (CrawlingItemDto crawlingItemDto : crawlingItemDtoList) {
             Category category = createCategory(crawlingItemDto.getCategory());
             Cosmetic saveCosmetic = createItem(crawlingItemDto, category);
@@ -76,15 +75,10 @@ public class ReadJsonFile {
                 Elements saveElements = createElements(value);
                 createItemElements(saveCosmetic, saveElements);
             }
-
-            if(i% 100 == 0){
-                itemRepository.saveAll(resultCosmeticList);
-                itemElementsRepository.saveAll(resultCosmeticElementsList);
-                break;
-            }
-            i++;
         }
-        log.info("end save data ");
+        itemRepository.saveAll(resultCosmeticList);
+        itemElementsRepository.saveAll(resultCosmeticElementsList);
+        log.info("save data end");
     }
 
     public void createItemElements(Cosmetic saveCosmetic, Elements saveElements) {

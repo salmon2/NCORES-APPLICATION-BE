@@ -1,10 +1,15 @@
 package com.ncores.plaluvs.service;
 
 import com.ncores.plaluvs.controller.user.dto.*;
+import com.ncores.plaluvs.domain.Cosmetic;
+import com.ncores.plaluvs.domain.Elements;
+import com.ncores.plaluvs.domain.dto.ElementsDto;
 import com.ncores.plaluvs.domain.user.User;
 import com.ncores.plaluvs.domain.user.UserRoleEnum;
 import com.ncores.plaluvs.exception.ErrorCode;
 import com.ncores.plaluvs.exception.PlaluvsException;
+import com.ncores.plaluvs.repository.CosmeticRepository;
+import com.ncores.plaluvs.repository.ElementsRepository;
 import com.ncores.plaluvs.repository.UserRepository;
 import com.ncores.plaluvs.security.UserDetailsImpl;
 import com.ncores.plaluvs.security.jwt.JwtTokenProvider;
@@ -14,6 +19,8 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -22,6 +29,9 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
+
+    private final ElementsRepository elementsRepository;
+    private final CosmeticRepository cosmeticRepository;
 
 
     @Transactional
@@ -159,5 +169,31 @@ public class UserService {
         );
 
         user.changeGender(requestDto.getGender());
+    }
+
+    public List<ElementsDto> getUserElements(UserDetailsImpl userDetails) {
+        List<Elements> findElements = elementsRepository.findAll();
+        List<ElementsDto> result = new ArrayList<>();
+
+        for (int i = 0; i < 5; i++) {
+            ElementsDto elementsDto =
+                    new ElementsDto(findElements.get(i).getId(), findElements.get(i).getKorean(),
+                            "https://www.ewg.org/skindeep/squircle/show.svg?score=1&score_min=1",
+                            findElements.get(i).getLevel());
+            result.add(elementsDto);
+        }
+
+        return result;
+    }
+
+    public List<CosmeticDto> getUserCosmetics(UserDetailsImpl userDetails) {
+        List<Cosmetic> findCosmetics = cosmeticRepository.findAll();
+        List<CosmeticDto> result = new ArrayList<>();
+
+        for(int i = 0; i<5; i++){
+            CosmeticDto cosmeticDto = new CosmeticDto(findCosmetics.get(i).getId(), findCosmetics.get(i).getItemName(), findCosmetics.get(i).getItemImg());
+            result.add(cosmeticDto);
+        }
+        return result;
     }
 }

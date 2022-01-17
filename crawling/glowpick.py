@@ -163,6 +163,7 @@ def getProducts(start_num, end_num):
         cosmetic['category'] = categories
         
         time.sleep(0.5)
+        print(cosmetic)
      
         items.append(cosmetic)
         
@@ -188,5 +189,5 @@ def getItemsReviews():
 
 if __name__ == '__main__':
     # 숫자 바꿔서 크롤링 예시 (10001~20000) #145498
-    getProducts(4,10)
+    getProducts(4,15)
 

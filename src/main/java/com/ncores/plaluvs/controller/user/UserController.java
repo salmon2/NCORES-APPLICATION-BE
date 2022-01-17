@@ -2,6 +2,9 @@ package com.ncores.plaluvs.controller.user;
 
 
 import com.ncores.plaluvs.controller.user.dto.*;
+import com.ncores.plaluvs.domain.dto.ElementsDto;
+import com.ncores.plaluvs.domain.dto.PagingResponseDto;
+import com.ncores.plaluvs.domain.dto.SizeResponseDto;
 import com.ncores.plaluvs.domain.user.User;
 import com.ncores.plaluvs.exception.PlaluvsException;
 import com.ncores.plaluvs.security.UserDetailsImpl;
@@ -15,6 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -94,11 +99,21 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-//    @GetMapping("/user/elemnts")
-//    public ResponseEntity<?> userElements(@AuthenticationPrincipal UserDetailsImpl userDetails)
+    @GetMapping("/user/elements/{page}")
+    public ResponseEntity<?> userElements(@PathVariable Long page, @AuthenticationPrincipal UserDetailsImpl userDetails) throws PlaluvsException {
+        UserDetailsImpl.UserCheck(userDetails);
+        List<ElementsDto> result = userService.getUserElements(userDetails);
 
+        return new ResponseEntity<>(new PagingResponseDto<>(result.size(), page.intValue(), 4, result), HttpStatus.OK);
+    }
 
+    @GetMapping("/user/cosmetics/{page}")
+    public ResponseEntity<?> userCosmetic(@PathVariable Long page, @AuthenticationPrincipal UserDetailsImpl userDetails) throws PlaluvsException {
+        //UserDetailsImpl.UserCheck(userDetails);
+        List<CosmeticDto> result = userService.getUserCosmetics(userDetails);
 
+        return new ResponseEntity<>(new SizeResponseDto<>(result.size(), result), HttpStatus.OK);
+    }
 
 
 }

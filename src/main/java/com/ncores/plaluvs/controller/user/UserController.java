@@ -1,12 +1,13 @@
-package com.ncores.plaluvs.controller;
+package com.ncores.plaluvs.controller.user;
 
 
-import com.ncores.plaluvs.domain.dto.user.*;
+import com.ncores.plaluvs.controller.user.dto.*;
 import com.ncores.plaluvs.domain.user.User;
-import com.ncores.plaluvs.exception.ErrorCode;
 import com.ncores.plaluvs.exception.PlaluvsException;
 import com.ncores.plaluvs.security.UserDetailsImpl;
 import com.ncores.plaluvs.service.UserService;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -26,7 +27,6 @@ public class UserController {
     public ResponseEntity<?> registerUser(@RequestBody SignUpRequestDto requestDto) throws PlaluvsException {
         log.info("/signup");
         User user = userService.registerUser(requestDto);
-
         return new ResponseEntity<>(user.getId(), HttpStatus.OK);
     }
 
@@ -93,6 +93,9 @@ public class UserController {
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+//    @GetMapping("/user/elemnts")
+//    public ResponseEntity<?> userElements(@AuthenticationPrincipal UserDetailsImpl userDetails)
 
 
 

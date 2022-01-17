@@ -1,9 +1,7 @@
 package com.ncores.plaluvs.domain;
 
-import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ncores.plaluvs.domain.user.User;
-import jdk.jfr.Enabled;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,7 +14,7 @@ import static javax.persistence.FetchType.LAZY;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class UserItem {
+public class UserCosmetic {
     @Id @GeneratedValue
     Long id;
 
@@ -28,5 +26,5 @@ public class UserItem {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "item_id")
     @JsonIgnore
-    Item item;
+    Cosmetic cosmetic;
 }

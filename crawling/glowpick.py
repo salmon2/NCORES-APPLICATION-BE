@@ -96,7 +96,7 @@ def getProductInfo(driver):
 
 def getProductReviews(id, driver):
     result = []
-    reviews = driver.find_elements_by_class_name('review-list-item')
+    reviews = driver.find_elements_by_class_name('review-list-cosmetic')
     for review in reviews:
         infos = review.find_element_by_class_name('info').find_element_by_class_name('txt').text.split('·')
         age = (int)(infos[0].strip()[:-1])
@@ -112,7 +112,7 @@ def getProductReviews(id, driver):
         else : score = 1
         content = review.find_element_by_class_name('review').text
         
-        review_info = {'item':id, 'age' : age, 'skinType' : skin_type, 'gender':gender, 'score':score, 'content':content}
+        review_info = {'cosmetic':id, 'age' : age, 'skinType' : skin_type, 'gender':gender, 'score':score, 'content':content}
         result.append(review_info)
     return result
 
@@ -158,13 +158,13 @@ def getProducts(start_num, end_num):
                 categories = st_category
         
                 
-        item = getProductInfo(driver)
-        item['id'] = i
-        item['category'] = categories
+        cosmetic = getProductInfo(driver)
+        cosmetic['id'] = i
+        cosmetic['category'] = categories
         
         time.sleep(0.5)
      
-        items.append(item)
+        items.append(cosmetic)
         
 
     writeJsonFile(start_num, end_num, items)
@@ -179,7 +179,7 @@ def getItemsReviews():
     for f_name in file_list:
         with open(file_path + f_name, 'r',encoding='utf-8') as f:
             json_data = json.load(f)
-            if 'item' in f_name:
+            if 'cosmetic' in f_name:
                 items += json_data
             else:
                 reviews += json_data

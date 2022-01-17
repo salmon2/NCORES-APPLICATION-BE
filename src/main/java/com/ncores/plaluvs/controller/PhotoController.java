@@ -29,7 +29,6 @@ public class PhotoController {
 
     @PostMapping(value = "/photo")
     public ResponseEntity<?> uploadFile(
-            HttpServletRequest request,
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestParam("image") MultipartFile file) throws PlaluvsException, IOException {
 

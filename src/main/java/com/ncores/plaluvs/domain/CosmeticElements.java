@@ -13,23 +13,23 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemElements {
+public class CosmeticElements {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     Long id;
 
     @ManyToOne
     @JoinColumn(name = "item_id")
     @JsonIgnore
-    Item item;
+    Cosmetic cosmetic;
 
     @ManyToOne
     @JoinColumn(name = "elements_id")
     @JsonIgnore
     Elements elements;
 
-    public ItemElements(Item item, Elements elements) {
-        this.item = item;
+    public CosmeticElements(Cosmetic cosmetic, Elements elements) {
+        this.cosmetic = cosmetic;
         this.elements = elements;
     }
 }

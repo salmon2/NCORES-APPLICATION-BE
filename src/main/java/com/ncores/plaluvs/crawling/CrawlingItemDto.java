@@ -17,6 +17,7 @@ public class CrawlingItemDto {
     private List<Map<String, String>> elements = new ArrayList<>();
     private String colors;
     private Long id;
+    private String price;
     private List<String> category;
 
     public CrawlingItemDto(Map<String, Object> map) {
@@ -30,6 +31,6 @@ public class CrawlingItemDto {
         this.category = (ArrayList<String>)map.get("category");
         this.tags = (ArrayList<String>)map.get("tags");
         this.elements = (ArrayList<Map<String, String>>)map.get("elements");
-
+        this.price = (String) map.get("price");
     }
 }

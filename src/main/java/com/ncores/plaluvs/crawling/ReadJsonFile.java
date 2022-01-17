@@ -3,20 +3,20 @@ package com.ncores.plaluvs.crawling;
 
 import com.ncores.plaluvs.domain.Category;
 import com.ncores.plaluvs.domain.Elements;
-import com.ncores.plaluvs.domain.Item;
-import com.ncores.plaluvs.domain.ItemElements;
+import com.ncores.plaluvs.domain.Cosmetic;
+import com.ncores.plaluvs.domain.CosmeticElements;
 import com.ncores.plaluvs.repository.CategoryRepository;
 import com.ncores.plaluvs.repository.ElementsRepository;
 import com.ncores.plaluvs.repository.ItemElementsRepository;
 import com.ncores.plaluvs.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Component;
 
-import javax.transaction.Transactional;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,25 +25,29 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class ReadJsonFile {
     private final CategoryRepository categoryRepository;
     private final ItemRepository itemRepository;
     private final ElementsRepository elementsRepository;
     private final ItemElementsRepository itemElementsRepository;
+    private static Long index = 0L;
 
     private List<CrawlingItemDto>  crawlingItemDtoList = new ArrayList<>();
 
     private List<Category> resultCategoryList = new ArrayList<>();
-    private List<Item> resultItemList = new ArrayList<>();
+    private List<Cosmetic> resultCosmeticList = new ArrayList<>();
     private List<Elements> resultElementsList = new ArrayList<>();
-    private List<ItemElements> resultItemElementsList = new ArrayList<>();
-
+    private List<CosmeticElements> resultCosmeticElementsList = new ArrayList<>();
 
 
     public List<CrawlingItemDto> readJsonFile() throws IOException, ParseException {
+        log.info("crawling data start");
         JSONParser jsonParser = new JSONParser();
 
-        FileReader reader = new FileReader("C:\\Users\\박기남\\Desktop\\회사\\data\\item_small_json.json");
+        //FileReader reader = new FileReader("C:\\Users\\박기남\\Desktop\\회사\\data\\item_small_json.json");
+        FileReader reader = new FileReader("D:\\회사\\item_json.json");
+
         JSONObject jsonObject = (JSONObject)jsonParser.parse(reader);
         String str = jsonObject.get("item_list").toString();
 
@@ -60,53 +64,58 @@ public class ReadJsonFile {
     }
 
     public void saveJsonFile(){
+        log.info("save data start");
+        int i = 1;
         for (CrawlingItemDto crawlingItemDto : crawlingItemDtoList) {
             Category category = createCategory(crawlingItemDto.getCategory());
-            Item saveItem = createItem(crawlingItemDto, category);
+            Cosmetic saveCosmetic = createItem(crawlingItemDto, category);
 
             List<Map<String, String>> elements = crawlingItemDto.getElements();
 
             for (Map<String, String> value : elements) {
                 Elements saveElements = createElements(value);
-                createItemElements(saveItem, saveElements);
+                createItemElements(saveCosmetic, saveElements);
             }
-        }
 
-        categoryRepository.saveAll(resultCategoryList);
-        itemRepository.saveAll(resultItemList);
-        elementsRepository.saveAll(resultElementsList);
-        itemElementsRepository.saveAll(resultItemElementsList);
+            if(i% 100 == 0){
+                itemRepository.saveAll(resultCosmeticList);
+                itemElementsRepository.saveAll(resultCosmeticElementsList);
+                break;
+            }
+            i++;
+        }
+        log.info("end save data ");
     }
 
-    public void createItemElements(Item saveItem, Elements saveElements) {
-        ItemElements itemElements = new ItemElements(saveItem, saveElements);
-        resultItemElementsList.add(itemElements);
+    public void createItemElements(Cosmetic saveCosmetic, Elements saveElements) {
+        CosmeticElements cosmeticElements = new CosmeticElements(saveCosmetic, saveElements);
+        resultCosmeticElementsList.add(cosmeticElements);
     }
 
     public Elements createElements(Map<String, String> value) {
         Elements findElements = elementsRepository.findByKorean(value.get("korean"));
-        if(findElements == null){
-            findElements = new Elements(value);
-            resultElementsList.add(findElements);
-        }
+            if(findElements == null){
+                findElements = new Elements(value);
+                elementsRepository.save(findElements);
+            }
+
         return findElements;
     }
 
-    public Item createItem(CrawlingItemDto crawlingItemDto, Category category) {
-        Item item = new Item(crawlingItemDto, category);
-        resultItemList.add(item);
+    public Cosmetic createItem(CrawlingItemDto crawlingItemDto, Category category) {
+        Cosmetic cosmetic = new Cosmetic(crawlingItemDto, category);
+        resultCosmeticList.add(cosmetic);
 
-        return item;
+        return cosmetic;
     }
 
     public Category createCategory(List<String> category) {
         Category findCategory = categoryRepository.findByCategoryLarge(category.get(0));
         if(findCategory == null) {
-            findCategory = new Category(category);
-            resultCategoryList.add(findCategory);
+            findCategory = Category.createCategoryByCrawling(category);
+            categoryRepository.save(findCategory);
         }
         return findCategory;
     }
-
 
 }

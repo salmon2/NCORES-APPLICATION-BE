@@ -1,4 +1,4 @@
-package com.ncores.plaluvs.domain.dto.user;
+package com.ncores.plaluvs.domain.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PatchGenderRequestDto {
-    private String gender;
+public class SizeResponseDto<T> {
+    private int size;
+    private T data;
 }

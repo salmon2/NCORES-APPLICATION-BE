@@ -14,9 +14,9 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Item {
+public class Cosmetic {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     private Long crawlingId;
@@ -39,22 +39,25 @@ public class Item {
     @Column(columnDefinition = "text")
     private String itemDescription;
 
+    private String price;
+
     @Column(columnDefinition = "INT DEFAULT 0")
     private int dibsCnt;
 
-    @OneToMany(mappedBy = "item", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<UserItem> userItemList = new ArrayList<>();
+    @OneToMany(mappedBy = "cosmetic", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<UserCosmetic> userCosmeticList = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "category_id")
     @JsonIgnore
     private Category category;
 
-    @OneToMany(mappedBy = "item", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<ItemElements> itemElementsList = new ArrayList<>();
+    @OneToMany(mappedBy = "cosmetic", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<CosmeticElements> cosmeticElementsList = new ArrayList<>();
 
 
-    public Item(CrawlingItemDto crawlingItemDto, Category category) {
+    public Cosmetic(CrawlingItemDto crawlingItemDto, Category category) {
+        this.price = crawlingItemDto.getPrice();
         this.crawlingId = crawlingItemDto.getId();
         this.itemName = crawlingItemDto.getName();
         this.itemImg = crawlingItemDto.getImage();

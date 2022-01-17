@@ -1,10 +1,13 @@
 package com.ncores.plaluvs;
 
 
+import com.ncores.plaluvs.crawling.CrawlingItemDto;
+import com.ncores.plaluvs.crawling.ReadJsonFile;
 import com.ncores.plaluvs.domain.user.User;
 import com.ncores.plaluvs.domain.user.UserRoleEnum;
 import com.ncores.plaluvs.repository.UserRepository;
 import lombok.NoArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
@@ -12,9 +15,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 @NoArgsConstructor
-//@Component
+@Component
 public class SimpleListener implements ApplicationListener<ApplicationStartedEvent> {
     @Autowired
     private UserRepository userRepository;
@@ -22,6 +26,10 @@ public class SimpleListener implements ApplicationListener<ApplicationStartedEve
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private ReadJsonFile readJsonFile;
+
+    @SneakyThrows
     @Override
     @Transactional
     public void onApplicationEvent(ApplicationStartedEvent event) {
@@ -33,6 +41,9 @@ public class SimpleListener implements ApplicationListener<ApplicationStartedEve
         );
 
         userRepository.save(newUser);
+
+        readJsonFile.readJsonFile();
+        readJsonFile.saveJsonFile();
     }
 
 }

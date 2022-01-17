@@ -1,7 +1,5 @@
 package com.ncores.plaluvs.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ncores.plaluvs.crawling.CrawlingItemDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,16 +17,19 @@ import static javax.persistence.FetchType.LAZY;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Elements {
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     private String level;
+    @Column(length = 100000)
     private String korean;
+    @Column(length = 100000)
     private String english;
+    @Column(length = 100000)
     private String purpose;
 
     @OneToMany(mappedBy = "elements", fetch = LAZY, cascade = CascadeType.ALL)
-    List<ItemElements> itemElementsList = new ArrayList<>();
+    List<CosmeticElements> cosmeticElementsList = new ArrayList<>();
 
 
     public Elements(Map<String, String> value) {

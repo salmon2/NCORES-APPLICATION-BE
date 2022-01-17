@@ -1,6 +1,6 @@
 package com.ncores.plaluvs.service;
 
-import com.ncores.plaluvs.domain.dto.user.*;
+import com.ncores.plaluvs.controller.user.dto.*;
 import com.ncores.plaluvs.domain.user.User;
 import com.ncores.plaluvs.domain.user.UserRoleEnum;
 import com.ncores.plaluvs.exception.ErrorCode;
@@ -56,10 +56,14 @@ public class UserService {
 
 
     private void emailCheck(String email) throws PlaluvsException {
-
         if (email.isEmpty()){
             throw new PlaluvsException(ErrorCode.USERNAME_EMPTY);
         }
+
+        if(email.length() < 8){
+            throw new PlaluvsException(ErrorCode.USERNAME_LENGTH_MIN);
+        }
+
         Optional<User> found = userRepository.findByUsername(email);
         if (found.isPresent()) {
             throw new PlaluvsException(ErrorCode.USERNAME_DUPLICATE);
@@ -67,9 +71,14 @@ public class UserService {
     }
 
     private void nicknameCheck(String nickname) throws PlaluvsException{
-        if (nickname.isEmpty()){
+        if (nickname.isEmpty()) {
             throw new PlaluvsException(ErrorCode.NICKNAME_EMPTY);
         }
+
+        if(nickname.length() >= 8) {
+            throw new PlaluvsException(ErrorCode.NICKNAME_LENGTH_MAX);
+        }
+
         Optional<User> found2 = userRepository.findByNickname(nickname);
         if (found2.isPresent()) {
             throw new PlaluvsException(ErrorCode.NICKNAME_DUPLICATE);
@@ -77,7 +86,6 @@ public class UserService {
     }
 
     private void passwordCheck(String pw, String pwCheck) throws PlaluvsException {
-
         if (pw.isEmpty()){
             throw new PlaluvsException(ErrorCode.PASSWORD_EMPTY);
         }

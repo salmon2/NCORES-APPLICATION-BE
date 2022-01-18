@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SizeResponseDto<T> {
+public class PagingSimpleResponseDto<T> {
     private int size;
     private T data;
 }

@@ -46,7 +46,11 @@ public class ReadJsonFile {
         JSONParser jsonParser = new JSONParser();
 
         //FileReader reader = new FileReader("C:\\Users\\박기남\\Desktop\\회사\\data\\item_small_json.json");
-        FileReader reader = new FileReader("D:\\회사\\item_json.json");
+        //FileReader reader = new FileReader("D:\\회사\\item_json.json");
+        FileReader reader = new FileReader("C:\\Users\\user\\Desktop\\작업\\data\\item_json.json");
+        //FileReader reader = new FileReader("./item_small_json.json");
+
+
 
         JSONObject jsonObject = (JSONObject)jsonParser.parse(reader);
         String str = jsonObject.get("item_list").toString();
@@ -65,6 +69,7 @@ public class ReadJsonFile {
 
     public void saveJsonFile(){
         log.info("save data start");
+        int i = 1;
         for (CrawlingItemDto crawlingItemDto : crawlingItemDtoList) {
             Category category = createCategory(crawlingItemDto.getCategory());
             Cosmetic saveCosmetic = createItem(crawlingItemDto, category);
@@ -75,9 +80,12 @@ public class ReadJsonFile {
                 Elements saveElements = createElements(value);
                 createItemElements(saveCosmetic, saveElements);
             }
+            log.info("index == {}", i);
         }
+
         itemRepository.saveAll(resultCosmeticList);
         itemElementsRepository.saveAll(resultCosmeticElementsList);
+
         log.info("save data end");
     }
 

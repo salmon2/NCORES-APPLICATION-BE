@@ -31,6 +31,11 @@ public class Elements {
     @OneToMany(mappedBy = "elements", fetch = LAZY, cascade = CascadeType.ALL)
     List<CosmeticElements> cosmeticElementsList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "elements", fetch = LAZY, cascade = CascadeType.ALL)
+    List<SkinTypeGoodElements> skinTypeGoodElementsList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "elements", fetch = LAZY, cascade = CascadeType.ALL)
+    List<SkinTypeBadElements> skinTypeBadElementsList = new ArrayList<>();
 
     public Elements(Map<String, String> value) {
         this.level = value.get("level");

@@ -1,8 +1,8 @@
 package com.ncores.plaluvs.domain.user;
 
 import com.ncores.plaluvs.domain.Photo;
-import com.ncores.plaluvs.domain.SkinTrouble;
-import com.ncores.plaluvs.domain.SkinType;
+import com.ncores.plaluvs.domain.skintrouble.SkinTrouble;
+import com.ncores.plaluvs.domain.skintype.SkinType;
 import com.ncores.plaluvs.domain.UserCosmetic;
 import com.ncores.plaluvs.exception.ErrorCode;
 import com.ncores.plaluvs.exception.PlaluvsException;

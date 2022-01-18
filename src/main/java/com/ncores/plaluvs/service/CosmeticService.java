@@ -72,4 +72,23 @@ public class CosmeticService {
 
         return result;
     }
+
+    public List<SimpleCosmeticDto> cosmeticWorry(UserDetailsImpl userDetails) {
+        List<Cosmetic> findCosmetic = cosmeticRepository.findTop5ByOrderByIdAsc();
+        List<SimpleCosmeticDto> result = new ArrayList<>();
+        int i = 0;
+        for (Cosmetic cosmetic : findCosmetic) {
+            SimpleCosmeticDto simpleCosmeticDto = new SimpleCosmeticDto(
+                    cosmetic.getId(),
+                    cosmetic.getItemImg(),
+                    cosmetic.getItemName(),
+                    (i % 2 == 0) ? Boolean.TRUE : Boolean.FALSE
+            );
+            result.add(simpleCosmeticDto);
+            i++;
+        }
+
+        return result;
+
+    }
 }

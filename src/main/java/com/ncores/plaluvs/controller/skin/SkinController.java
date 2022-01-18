@@ -1,8 +1,10 @@
-package com.ncores.plaluvs.controller;
+package com.ncores.plaluvs.controller.skin;
 
+import com.amazonaws.Response;
+import com.ncores.plaluvs.controller.skin.dto.SkinStatusListResponseDto;
+import com.ncores.plaluvs.controller.skin.dto.SkinStatusResponseDto;
 import com.ncores.plaluvs.domain.dto.OilStatusRequestDto;
 import com.ncores.plaluvs.domain.dto.SkinWorryRequestDto;
-import com.ncores.plaluvs.exception.ErrorCode;
 import com.ncores.plaluvs.exception.PlaluvsException;
 import com.ncores.plaluvs.security.UserDetailsImpl;
 import com.ncores.plaluvs.service.SkinService;
@@ -11,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,11 +48,25 @@ public class SkinController {
         UserDetailsImpl.UserCheck(userDetails);
         skinService.skinWorryUpdate(requestDto, userDetails);
 
-
         return null;
     }
 
+    @GetMapping("/skin/status")
+    public ResponseEntity<?> skinStatus(@AuthenticationPrincipal UserDetailsImpl userDetails){
+        log.info("/skin/status");
+        SkinStatusResponseDto skinStatusResponseDto = skinService.skinStatus();
 
+        return new ResponseEntity<>(skinStatusResponseDto, HttpStatus.OK);
+    }
+
+    @GetMapping("/skin/status/list")
+    public ResponseEntity<?> skinStatusList(@AuthenticationPrincipal UserDetailsImpl userDetails){
+        log.info("skin/status/list");
+        SkinStatusListResponseDto result = skinService.skinStatusList();
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
+
+    }
 
 }
 

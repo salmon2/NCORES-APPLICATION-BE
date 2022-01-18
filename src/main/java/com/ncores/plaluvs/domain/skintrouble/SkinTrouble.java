@@ -1,7 +1,6 @@
-package com.ncores.plaluvs.domain;
+package com.ncores.plaluvs.domain.skintrouble;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ncores.plaluvs.domain.dto.OilStatusRequestDto;
 import com.ncores.plaluvs.domain.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,29 +8,27 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+import static javax.persistence.FetchType.LAZY;
+
 @Entity
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
-public class SkinType {
+@AllArgsConstructor
+public class SkinTrouble {
     @Id
     @GeneratedValue
     Long id;
 
     @Enumerated(value = EnumType.STRING)
-    OilIndicate oilIndicate;
+    SkinTroubleEnum trouble;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private User user;
 
-    public SkinType(OilIndicate oilIndicate, User user) {
-        this.oilIndicate = oilIndicate;
+    public SkinTrouble(SkinTroubleEnum trouble, User user) {
+        this.trouble = trouble;
         this.user = user;
-    }
-
-    public void updateSkinType(OilIndicate oilIndicate) {
-        this.oilIndicate = oilIndicate;
     }
 }

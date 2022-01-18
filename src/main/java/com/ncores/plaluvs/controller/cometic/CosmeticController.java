@@ -5,10 +5,9 @@ import com.ncores.plaluvs.controller.cometic.dto.DetailCosmeticDto;
 import com.ncores.plaluvs.controller.cometic.dto.SimpleCosmeticDto;
 import com.ncores.plaluvs.crawling.CrawlingItemDto;
 import com.ncores.plaluvs.crawling.ReadJsonFile;
-import com.ncores.plaluvs.domain.CosmeticElements;
 import com.ncores.plaluvs.domain.Elements;
 import com.ncores.plaluvs.domain.dto.PagingResponseDto;
-import com.ncores.plaluvs.domain.dto.SizeResponseDto;
+import com.ncores.plaluvs.domain.dto.PagingSimpleResponseDto;
 import com.ncores.plaluvs.exception.ErrorCode;
 import com.ncores.plaluvs.exception.PlaluvsException;
 import com.ncores.plaluvs.repository.ElementsRepository;
@@ -45,6 +44,7 @@ public class CosmeticController {
 
         log.info("crawlingItemDtoList = {}", crawlingItemDtoList.get(0).getName());
         log.info("size = {}", crawlingItemDtoList.size());
+
         readJsonFile.saveJsonFile();
     }
 
@@ -54,7 +54,7 @@ public class CosmeticController {
 
         List<SimpleCosmeticDto> result = cosmeticService.cosmeticSimpleRecommends(key, userDetails);
 
-        return new ResponseEntity<>(new SizeResponseDto(result.size(), result), HttpStatus.OK);
+        return new ResponseEntity<>(new PagingSimpleResponseDto(result.size(), result), HttpStatus.OK);
     }
 
     @GetMapping("/cosmetic/detail-recommends/{category}/{page}")
@@ -74,4 +74,12 @@ public class CosmeticController {
 
         return new ResponseEntity<>(new CosmeticElementsResponseDto(result.size(), page, 4L, elements.getKorean(), result), HttpStatus.OK);
     }
+
+    @GetMapping("/cosmetic/worry-recommends")
+    public ResponseEntity<?> cosmeticWorry(@AuthenticationPrincipal UserDetailsImpl userDetails){
+        List<SimpleCosmeticDto> result = cosmeticService.cosmeticWorry(userDetails);
+
+        return new ResponseEntity<>(new PagingSimpleResponseDto(result.size(), result), HttpStatus.OK);
+    }
+
 }

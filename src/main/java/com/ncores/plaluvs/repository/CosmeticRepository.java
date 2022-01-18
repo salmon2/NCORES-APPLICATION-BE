@@ -10,8 +10,7 @@ import java.util.List;
 
 @Repository
 public interface CosmeticRepository extends JpaRepository<Cosmetic, Long> {
-    Page<Cosmetic> findAll(Pageable pageable);
 
-    @Override
-    List<Cosmetic> findAll();
+
+    List<Cosmetic> findTop5ByOrderByIdAsc();
 }

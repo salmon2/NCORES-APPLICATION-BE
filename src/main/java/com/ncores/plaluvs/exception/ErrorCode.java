@@ -30,7 +30,7 @@ public enum ErrorCode {
     USERNAME_LENGTH_MIN(HttpStatus.FORBIDDEN, "이메일이 8자 미만 입니다."),
     NICKNAME_LENGTH_MAX(HttpStatus.FORBIDDEN, "닉네임 길이가 8자 이상입니다."),
     PAGE_OUT(HttpStatus.FORBIDDEN, "페이지가 최대페이지 이상입니다."),
-    ELEMENT_NOT_FOUND(HttpStatus.FORBIDDEN, "해당하는 성분이 없습니다.");
+    ELEMENT_NOT_FOUND(HttpStatus.FORBIDDEN, "해당하는 성분이 없습니다."), BOUMAN_NOT_FOUND(HttpStatus.FORBIDDEN, "해당하는 바우만 타입이 없습니다.");
     private final HttpStatus httpStatus;
     private final String message;
 }

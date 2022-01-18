@@ -4,13 +4,11 @@ package com.ncores.plaluvs.controller.user;
 import com.ncores.plaluvs.controller.user.dto.*;
 import com.ncores.plaluvs.domain.dto.ElementsDto;
 import com.ncores.plaluvs.domain.dto.PagingResponseDto;
-import com.ncores.plaluvs.domain.dto.SizeResponseDto;
+import com.ncores.plaluvs.domain.dto.PagingSimpleResponseDto;
 import com.ncores.plaluvs.domain.user.User;
 import com.ncores.plaluvs.exception.PlaluvsException;
 import com.ncores.plaluvs.security.UserDetailsImpl;
 import com.ncores.plaluvs.service.UserService;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -112,7 +110,7 @@ public class UserController {
         //UserDetailsImpl.UserCheck(userDetails);
         List<CosmeticDto> result = userService.getUserCosmetics(userDetails);
 
-        return new ResponseEntity<>(new SizeResponseDto<>(result.size(), result), HttpStatus.OK);
+        return new ResponseEntity<>(new PagingSimpleResponseDto<>(result.size(), result), HttpStatus.OK);
     }
 
 

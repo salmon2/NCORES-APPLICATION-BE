@@ -8,6 +8,5 @@ import java.util.List;
 
 public interface ElementsRepository extends JpaRepository<Elements, Long> {
     Elements findByKorean(String korean);
-
     List<Elements> findTop5ByOrderByIdAsc();
 }

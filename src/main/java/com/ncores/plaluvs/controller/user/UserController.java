@@ -25,6 +25,15 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
 
+    //회원탈퇴
+    @DeleteMapping("/user")
+    public ResponseEntity<?> deleteUser(@AuthenticationPrincipal UserDetailsImpl userDetails) throws PlaluvsException {
+        UserDetailsImpl.UserCheck(userDetails);
+        userService.deleteUser(userDetails);
+
+        return new ResponseEntity<>("정상적으로 삭제되었습니다.", HttpStatus.OK);
+    }
+
     //가입요청
     @PostMapping("/user")
     public ResponseEntity<?> registerUser(@RequestBody SignUpRequestDto requestDto) throws PlaluvsException {

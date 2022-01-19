@@ -3,6 +3,7 @@ package com.ncores.plaluvs.domain.skintype;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ncores.plaluvs.domain.SkinTypeBadElements;
 import com.ncores.plaluvs.domain.SkinTypeGoodElements;
+import com.ncores.plaluvs.domain.Timestamped;
 import com.ncores.plaluvs.domain.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,27 +17,26 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class SkinType {
+public class SkinType extends Timestamped {
     @Id
     @GeneratedValue
     private Long id;
 
-    @Enumerated(value = EnumType.STRING)
-    private OilIndicate oilIndicate;
 
-    @Enumerated(value = EnumType.STRING)
-    private Sensitivity sensitivity;
+    private Long oilIndicate;
 
-    @Enumerated(value = EnumType.STRING)
-    private Winkle winkle;
+    private Long sensitivity;
 
-    @Enumerated(value = EnumType.STRING)
-    private Pigment pigment;
+    private Long winkle;
+
+    private Long pigment;
 
     @Enumerated(value = EnumType.STRING)
     private Bouman bouman;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    private Long score;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private User user;

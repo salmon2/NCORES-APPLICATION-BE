@@ -18,7 +18,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 @NoArgsConstructor
-@Component
+//@Component
 public class SimpleListener implements ApplicationListener<ApplicationStartedEvent> {
     @Autowired
     private UserRepository userRepository;

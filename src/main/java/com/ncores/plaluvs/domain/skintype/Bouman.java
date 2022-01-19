@@ -58,8 +58,6 @@ public enum Bouman {
         return skinType.getPigment().equals(winkle);
     }
 
-
-
     private void findBoumanPigment(SkinType skinType, String key) {
         if(findPigment(skinType, Pigment.DRY)
                 || findPigment(skinType, Pigment.DEHYDRATED)

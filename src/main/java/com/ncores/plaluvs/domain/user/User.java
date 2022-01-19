@@ -1,6 +1,7 @@
 package com.ncores.plaluvs.domain.user;
 
 import com.ncores.plaluvs.domain.Photo;
+import com.ncores.plaluvs.domain.Timestamped;
 import com.ncores.plaluvs.domain.skintrouble.SkinTrouble;
 import com.ncores.plaluvs.domain.skintype.SkinType;
 import com.ncores.plaluvs.domain.UserCosmetic;
@@ -10,13 +11,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Entity
 @NoArgsConstructor
-public class User {
+public class User extends Timestamped {
     @GeneratedValue
     @Id
     private Long id;
@@ -37,8 +39,8 @@ public class User {
     @Enumerated(value = EnumType.STRING)
     private UserRoleEnum role;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private SkinType skinType;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<SkinType> skinType;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<SkinTrouble> skinTrouble = new ArrayList<>();
@@ -68,7 +70,4 @@ public class User {
         this.gender = findGender;
     }
 
-    public void setSkinType(SkinType skinType) {
-        this.skinType = skinType;
-    }
 }

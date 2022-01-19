@@ -22,7 +22,7 @@ public class CosmeticService {
     public List<SimpleCosmeticDto> cosmeticSimpleRecommends(Long key, UserDetailsImpl userDetails) {
 
         List<SimpleCosmeticDto> result = new ArrayList<>();
-        List<Cosmetic> findCosmetic = cosmeticRepository.findAll();
+        List<Cosmetic> findCosmetic = cosmeticRepository.findTop5ByOrderByIdAsc();
 
         for (int i = 0; i < 5; i++) {
             SimpleCosmeticDto simpleCosmeticDto =
@@ -37,7 +37,7 @@ public class CosmeticService {
     }
 
     public List<DetailCosmeticDto> cosmeticDetailRecommends(String category, Long page) throws PlaluvsException {
-        List<Cosmetic> findCosmetic = cosmeticRepository.findAll();
+        List<Cosmetic> findCosmetic = cosmeticRepository.findTop20ByOrderByIdAsc();
         List<DetailCosmeticDto> result = new ArrayList<>();
 
         for (int i = 0; i <20; i++) {
@@ -51,7 +51,6 @@ public class CosmeticService {
         }
         if(page >= 4L)
             throw new PlaluvsException(ErrorCode.PAGE_OUT);
-
 
         return result;
     }
@@ -77,6 +76,7 @@ public class CosmeticService {
         List<Cosmetic> findCosmetic = cosmeticRepository.findTop5ByOrderByIdAsc();
         List<SimpleCosmeticDto> result = new ArrayList<>();
         int i = 0;
+
         for (Cosmetic cosmetic : findCosmetic) {
             SimpleCosmeticDto simpleCosmeticDto = new SimpleCosmeticDto(
                     cosmetic.getId(),

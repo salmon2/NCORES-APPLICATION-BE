@@ -32,6 +32,11 @@ public class SkinTypeGoodElements {
     @JsonIgnore
     private Elements elements;
 
-    private String description;
+    private String type;
 
+    public SkinTypeGoodElements(SkinType skinType, Elements elements, String type) {
+        this.skinType = skinType;
+        this.elements = elements;
+        this.type = type;
+    }
 }

@@ -10,7 +10,6 @@ import java.util.List;
 
 @Repository
 public interface CosmeticRepository extends JpaRepository<Cosmetic, Long> {
-
-
+    List<Cosmetic> findTop20ByOrderByIdAsc();
     List<Cosmetic> findTop5ByOrderByIdAsc();
 }

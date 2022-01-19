@@ -196,4 +196,12 @@ public class UserService {
         }
         return result;
     }
+
+    public void deleteUser(UserDetailsImpl userDetails) throws PlaluvsException {
+        User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(
+                () -> new PlaluvsException(ErrorCode.USER_NOT_FOUND)
+        );
+
+        userRepository.deleteById(user.getId());
+    }
 }

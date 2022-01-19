@@ -21,6 +21,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +40,10 @@ public class SkinService {
         OilIndicate oilIndicate = OilIndicate.findOilIndicate(requestDto.getSkinId());
         log.info("oilIndicate = {}", oilIndicate);
 
-        SkinType findSkinType = skinTypeRepository.findByUser(userDetails.getUser());
+        LocalDateTime startDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(0,0,0)); //어제 00:00:00
+        LocalDateTime endDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(23,59,59)); //오늘 23:59:59
+
+        SkinType findSkinType = skinTypeRepository.findTopByUserAndCreatedAtBetween(userDetails.getUser(),startDatetime, endDatetime );
 
         if(findSkinType == null) {
             findSkinType = new SkinType(oilIndicate, userDetails.getUser());

@@ -1,4 +1,4 @@
-package com.ncores.plaluvs.domain.dto;
+package com.ncores.plaluvs.controller.skin.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,6 +12,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SkinWorryRequestDto {
-    List<Long> skinWorryId = new ArrayList<>();
+public class SkinDailyStimulationRequestDto {
+    List<Long> id = new ArrayList<>();
+
 }

@@ -24,8 +24,8 @@ public enum Winkle {
     private String content;
 
 
-    public static OilIndicate findOilIndicate(Long id) throws PlaluvsException {
-        for (OilIndicate value : OilIndicate.values()) {
+    public static CurrentSkinStatus findOilIndicate(Long id) throws PlaluvsException {
+        for (CurrentSkinStatus value : CurrentSkinStatus.values()) {
             if(value.getId().equals(id)){
                 log.info("skinEnum = {}", value);
                 return value;

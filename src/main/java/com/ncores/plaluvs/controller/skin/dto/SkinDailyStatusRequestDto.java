@@ -1,17 +1,15 @@
-package com.ncores.plaluvs.domain.dto;
+package com.ncores.plaluvs.controller.skin.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SkinWorryRequestDto {
-    List<Long> skinWorryId = new ArrayList<>();
+public class SkinDailyStatusRequestDto {
+    List<Long> id = new ArrayList<>();
 }

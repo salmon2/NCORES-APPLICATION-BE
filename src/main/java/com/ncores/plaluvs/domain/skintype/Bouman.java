@@ -91,19 +91,19 @@ public enum Bouman {
     }
 
     private void findBoumanOilIndicate(SkinType skinType, String key) {
-        if(findOilIndicate(skinType, OilIndicate.DRY)
-                || findOilIndicate(skinType, OilIndicate.DEHYDRATED)
-                ||findOilIndicate(skinType, OilIndicate.NEUTRAL))
+        if(findOilIndicate(skinType, CurrentSkinStatus.DRY)
+                || findOilIndicate(skinType, CurrentSkinStatus.DEHYDRATED)
+                ||findOilIndicate(skinType, CurrentSkinStatus.NEUTRAL))
             key += "D";
-        else if (findOilIndicate(skinType, OilIndicate.OILY) || findOilIndicate(skinType, OilIndicate.COMBINATION))
+        else if (findOilIndicate(skinType, CurrentSkinStatus.OILY) || findOilIndicate(skinType, CurrentSkinStatus.COMBINATION))
             key += "O";
         else
             key += "D";
     }
 
 
-    private Boolean findOilIndicate(SkinType skinType, OilIndicate oilIndicate){
-        return skinType.getOilIndicate().equals(oilIndicate);
+    private Boolean findOilIndicate(SkinType skinType, CurrentSkinStatus questionOne){
+        return skinType.getQuestionOne().equals(questionOne);
     }
 
 }

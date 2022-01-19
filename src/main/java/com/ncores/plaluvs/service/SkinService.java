@@ -1,20 +1,19 @@
 package com.ncores.plaluvs.service;
 
-import com.ncores.plaluvs.controller.skin.dto.SkinElementsDto;
-import com.ncores.plaluvs.controller.skin.dto.SkinStatusListResponseDto;
-import com.ncores.plaluvs.controller.skin.dto.SkinStatusResponseDto;
-import com.ncores.plaluvs.controller.skin.dto.StatusList;
+import com.ncores.plaluvs.controller.skin.dto.*;
 import com.ncores.plaluvs.domain.*;
 import com.ncores.plaluvs.domain.dto.OilStatusRequestDto;
 import com.ncores.plaluvs.domain.dto.SkinWorryRequestDto;
-import com.ncores.plaluvs.domain.skintrouble.SkinTrouble;
-import com.ncores.plaluvs.domain.skintrouble.SkinTroubleEnum;
-import com.ncores.plaluvs.domain.skintype.OilIndicate;
+import com.ncores.plaluvs.domain.skintype.skindailyStatus.SkinDailyStatus;
+import com.ncores.plaluvs.domain.skintype.skindailyStatus.SkinDailyStatusEnum;
+import com.ncores.plaluvs.domain.skintype.skindailystimulation.SkinDailyStimulation;
+import com.ncores.plaluvs.domain.skintype.skindailystimulation.SkinDailyStimulationEnum;
+import com.ncores.plaluvs.domain.skintype.skintrouble.SkinTrouble;
+import com.ncores.plaluvs.domain.skintype.skintrouble.SkinTroubleEnum;
+import com.ncores.plaluvs.domain.skintype.CurrentSkinStatus;
 import com.ncores.plaluvs.domain.skintype.SkinType;
 import com.ncores.plaluvs.exception.PlaluvsException;
-import com.ncores.plaluvs.repository.ElementsRepository;
-import com.ncores.plaluvs.repository.SKinWorryRepository;
-import com.ncores.plaluvs.repository.SkinTypeRepository;
+import com.ncores.plaluvs.repository.*;
 import com.ncores.plaluvs.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,41 +32,68 @@ import java.util.List;
 public class SkinService {
     private final SkinTypeRepository skinTypeRepository;
     private final SKinWorryRepository sKinWorryRepository;
+    private final SkinDailyStatusRepository skinDailyStatusRepository;
     private final ElementsRepository elementsRepository;
+    private final SkinDailyStimulationRepository skinDailyStimulationRepository;
+
 
     @Transactional
-    public void skinOilIndicate(OilStatusRequestDto requestDto, UserDetailsImpl userDetails) throws PlaluvsException {
-        OilIndicate oilIndicate = OilIndicate.findOilIndicate(requestDto.getSkinId());
-        log.info("oilIndicate = {}", oilIndicate);
+    public void currentSkinStatus(OilStatusRequestDto requestDto, UserDetailsImpl userDetails) throws PlaluvsException {
+        CurrentSkinStatus currentSkinStatus = CurrentSkinStatus.findQuestionOne(requestDto.getSkinId());
+        log.info("oilIndicate = {}", currentSkinStatus);
 
-        LocalDateTime startDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(0,0,0)); //어제 00:00:00
-        LocalDateTime endDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(23,59,59)); //오늘 23:59:59
-
-        SkinType findSkinType = skinTypeRepository.findTopByUserAndCreatedAtBetween(userDetails.getUser(),startDatetime, endDatetime );
+        SkinType findSkinType = findDailySkinType(userDetails);
 
         if(findSkinType == null) {
-            findSkinType = new SkinType(oilIndicate, userDetails.getUser());
+            findSkinType = new SkinType(currentSkinStatus, userDetails.getUser());
             skinTypeRepository.save(findSkinType);
         }
         else
-            findSkinType.updateSkinType(oilIndicate);
+            findSkinType.updateSkinType(currentSkinStatus);
 
         log.info("skinType = {}", findSkinType);
     }
 
+
+
     @Transactional
     public void skinWorryUpdate(SkinWorryRequestDto requestDto, UserDetailsImpl userDetails) throws PlaluvsException {
-        sKinWorryRepository.deleteAllByUser(userDetails.getUser());
+        SkinType findSkinType = findDailySkinType(userDetails);
+        SkinType.skinTypeCheck(findSkinType);
+
+        sKinWorryRepository.deleteAllBySkinType(findSkinType);
+
 
         for (Long id : requestDto.getSkinWorryId()) {
             SkinTroubleEnum skinTroubleEnum = SkinTroubleEnum.findSkinTroubleEnum(id);
 
-            SkinTrouble skinTrouble = new SkinTrouble(skinTroubleEnum, userDetails.getUser());
+            SkinTrouble skinTrouble = new SkinTrouble(skinTroubleEnum, findSkinType);
             log.info("skinTrouble = {}", skinTrouble);
 
             sKinWorryRepository.save(skinTrouble);
         }
     }
+
+
+    @Transactional
+    public void skinDailyStatus(SkinDailyStatusRequestDto requestDto, UserDetailsImpl userDetails) throws PlaluvsException {
+        SkinType findSkinType = findDailySkinType(userDetails);
+        SkinType.skinTypeCheck(findSkinType);
+
+        skinDailyStatusRepository.deleteAllBySkinType(findSkinType);
+
+        for (Long id : requestDto.getId()) {
+            SkinDailyStatusEnum skinDailyStatusEnum = SkinDailyStatusEnum.findDailySkinEnum(id);
+
+            SkinDailyStatus skinDailyStatus = new SkinDailyStatus(skinDailyStatusEnum, findSkinType);
+            log.info("skinTrouble = {}", skinDailyStatus);
+
+            skinDailyStatusRepository.save(skinDailyStatus);
+        }
+    }
+
+
+
 
     public SkinStatusResponseDto skinStatus() {
         List<Elements> findElements = elementsRepository.findTop5ByOrderByIdAsc();
@@ -97,5 +123,39 @@ public class SkinService {
 
         SkinStatusListResponseDto result = new SkinStatusListResponseDto(newStatusList, "지난주 보다 피부 점수가 20점 상승했어요", "어제보다 민감한 피부가 진정되었어요");
         return result;
+    }
+
+
+    private SkinType findDailySkinType(UserDetailsImpl userDetails) {
+        LocalDateTime startDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(0,0,0)); //오늘 00:00:00
+        LocalDateTime endDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(23,59,59)); //오늘 23:59:59
+
+        SkinType findSkinType = skinTypeRepository.findTopByUserAndCreatedAtBetween(userDetails.getUser(), startDatetime, endDatetime);
+        return findSkinType;
+    }
+
+    @Transactional
+    public void skinDailyStimulation(SkinDailyStimulationRequestDto requestDto, UserDetailsImpl userDetails) throws PlaluvsException {
+        SkinType findSkinType = findDailySkinType(userDetails);
+        SkinType.skinTypeCheck(findSkinType);
+
+        skinDailyStimulationRepository.deleteAllBySkinType(findSkinType);
+
+        for (Long id : requestDto.getId()) {
+            SkinDailyStimulationEnum skinDailyStimulationEnum = SkinDailyStimulationEnum.findSkinDailyStimulationEnum(id);
+
+            SkinDailyStimulation skinDailyStimulation = new SkinDailyStimulation(skinDailyStimulationEnum, findSkinType);
+            log.info("skinTrouble = {}", skinDailyStimulation);
+
+            skinDailyStimulationRepository.save(skinDailyStimulation);
+        }
+    }
+
+    @Transactional
+    public void skinSelfCheck(SkinDailySefCheckRequestDto requestDto, UserDetailsImpl userDetails) throws PlaluvsException {
+        SkinType findSkinType = findDailySkinType(userDetails);
+        SkinType.skinTypeCheck(findSkinType);
+
+        findSkinType.setSelfScore(requestDto.getScore());
     }
 }

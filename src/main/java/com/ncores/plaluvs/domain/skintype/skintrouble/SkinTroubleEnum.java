@@ -1,4 +1,4 @@
-package com.ncores.plaluvs.domain.skintrouble;
+package com.ncores.plaluvs.domain.skintype.skintrouble;
 
 import com.ncores.plaluvs.exception.ErrorCode;
 import com.ncores.plaluvs.exception.PlaluvsException;

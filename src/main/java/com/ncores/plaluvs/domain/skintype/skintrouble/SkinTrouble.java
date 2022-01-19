@@ -1,7 +1,7 @@
-package com.ncores.plaluvs.domain.skintrouble;
+package com.ncores.plaluvs.domain.skintype.skintrouble;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ncores.plaluvs.domain.user.User;
+import com.ncores.plaluvs.domain.skintype.SkinType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,12 +23,12 @@ public class SkinTrouble {
     SkinTroubleEnum trouble;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "skin_type_id")
     @JsonIgnore
-    private User user;
+    private SkinType skinType;
 
-    public SkinTrouble(SkinTroubleEnum trouble, User user) {
+    public SkinTrouble(SkinTroubleEnum trouble, SkinType skinType) {
         this.trouble = trouble;
-        this.user = user;
+        this.skinType = skinType;
     }
 }

@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 @Getter
 @Slf4j
-public enum OilIndicate {
+public enum CurrentSkinStatus {
     DRY("D", 1L, "건성"),
     DEHYDRATED("DH",2L, "수분 부족형 지성"),
     OILY("O", 3L, "지성"),
@@ -23,8 +23,8 @@ public enum OilIndicate {
     private String content;
 
 
-    public static OilIndicate findOilIndicate(Long id) throws PlaluvsException {
-        for (OilIndicate value : OilIndicate.values()) {
+    public static CurrentSkinStatus findQuestionOne(Long id) throws PlaluvsException {
+        for (CurrentSkinStatus value : CurrentSkinStatus.values()) {
             if(value.getId().equals(id)){
                 log.info("skinEnum = {}", value);
                 return value;

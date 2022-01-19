@@ -16,8 +16,7 @@ import java.util.List;
 @Getter
 @Entity
 @NoArgsConstructor
-public class
-User {
+public class User {
     @GeneratedValue
     @Id
     private Long id;

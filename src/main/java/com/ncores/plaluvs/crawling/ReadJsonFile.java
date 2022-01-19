@@ -45,12 +45,17 @@ public class ReadJsonFile {
         log.info("crawling data start");
         JSONParser jsonParser = new JSONParser();
 
+        //notebook
         //FileReader reader = new FileReader("C:\\Users\\박기남\\Desktop\\회사\\data\\item_small_json.json");
-        //FileReader reader = new FileReader("D:\\회사\\item_json.json");
-        FileReader reader = new FileReader("C:\\Users\\user\\Desktop\\작업\\data\\item_json.json");
+
+        //집 컴
+        FileReader reader = new FileReader("D:\\회사\\item_json.json");
+
+        //회사컴
+        //FileReader reader = new FileReader("C:\\Users\\user\\Desktop\\작업\\data\\item_json.json");
+
+        //ec2
         //FileReader reader = new FileReader("./item_small_json.json");
-
-
 
         JSONObject jsonObject = (JSONObject)jsonParser.parse(reader);
         String str = jsonObject.get("item_list").toString();
@@ -69,7 +74,7 @@ public class ReadJsonFile {
 
     public void saveJsonFile(){
         log.info("save data start");
-        int i = 1;
+        int i = 0;
         for (CrawlingItemDto crawlingItemDto : crawlingItemDtoList) {
             Category category = createCategory(crawlingItemDto.getCategory());
             Cosmetic saveCosmetic = createItem(crawlingItemDto, category);
@@ -81,10 +86,20 @@ public class ReadJsonFile {
                 createItemElements(saveCosmetic, saveElements);
             }
             log.info("index == {}", i);
+
+            if(i%2000 == 1){
+
+                log.info("item save start");
+                itemRepository.saveAll(resultCosmeticList);
+                itemElementsRepository.saveAll(resultCosmeticElementsList);
+
+                resultCosmeticList = new ArrayList<>();
+                resultCosmeticElementsList = new ArrayList<>();
+                log.info("item save end");
+            }
+            i++;
         }
 
-        itemRepository.saveAll(resultCosmeticList);
-        itemElementsRepository.saveAll(resultCosmeticElementsList);
 
         log.info("save data end");
     }

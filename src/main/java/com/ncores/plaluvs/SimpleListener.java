@@ -18,7 +18,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 @NoArgsConstructor
-//@Component
+@Component
 public class SimpleListener implements ApplicationListener<ApplicationStartedEvent> {
     @Autowired
     private UserRepository userRepository;
@@ -41,9 +41,9 @@ public class SimpleListener implements ApplicationListener<ApplicationStartedEve
         );
 
         userRepository.save(newUser);
-
-        readJsonFile.readJsonFile();
-        readJsonFile.saveJsonFile();
+//
+//        readJsonFile.readJsonFile();
+//        readJsonFile.saveJsonFile();
     }
 
 }

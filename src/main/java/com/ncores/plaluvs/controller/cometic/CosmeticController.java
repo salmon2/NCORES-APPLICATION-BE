@@ -49,26 +49,25 @@ public class CosmeticController {
     }
 
     @GetMapping("/cosmetic/simple-recommends")
-    public ResponseEntity<?> cosmeticSimpleRecommends(@RequestParam(defaultValue = "0")Long key,
-                                                      @AuthenticationPrincipal UserDetailsImpl userDetails){
+    public ResponseEntity<?> cosmeticSimpleRecommends(@AuthenticationPrincipal UserDetailsImpl userDetails){
 
-        List<SimpleCosmeticDto> result = cosmeticService.cosmeticSimpleRecommends(key, userDetails);
+        List<SimpleCosmeticDto> result = cosmeticService.cosmeticSimpleRecommends(userDetails);
 
         return new ResponseEntity<>(new PagingSimpleResponseDto(result.size(), result), HttpStatus.OK);
     }
 
     @GetMapping("/cosmetic/detail-recommends/{category}/{page}")
-    public ResponseEntity<?> cosmeticDetailRecommends(@PathVariable String category, @PathVariable Long page) throws PlaluvsException {
-        List<DetailCosmeticDto> result = cosmeticService.cosmeticDetailRecommends(category, page);
+    public ResponseEntity<?> cosmeticDetailRecommends(@PathVariable("category") Long categoryId, @PathVariable Long page) throws PlaluvsException {
+        List<DetailCosmeticDto> result = cosmeticService.cosmeticDetailRecommends(categoryId, page);
 
         return new ResponseEntity<>(new PagingResponseDto(result.size(), page.intValue(), 4, result), HttpStatus.OK);
     }
 
-    @GetMapping("/cosmetic/elements-recommend/{elements}/{page}")
-    public ResponseEntity<?> cosmeticElements(@PathVariable(value = "elements") Long elements_id, @PathVariable Long page) throws PlaluvsException {
-        List<DetailCosmeticDto> result = cosmeticService.cosmeticContainsElements(elements_id);
+    @GetMapping("/cosmetic/elements-recommend/{elements}/{category}/{page}")
+    public ResponseEntity<?> cosmeticElements(@PathVariable(value = "elements") Long elementsId,@PathVariable("category") Long categoryId, @PathVariable Long page) throws PlaluvsException {
+        List<DetailCosmeticDto> result = cosmeticService.cosmeticContainsElements(elementsId);
 
-        Elements elements = elementsRepository.findById(elements_id).orElseThrow(
+        Elements elements = elementsRepository.findById(elementsId).orElseThrow(
                 () -> new PlaluvsException(ErrorCode.ELEMENT_NOT_FOUND)
         );
 

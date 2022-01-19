@@ -19,7 +19,7 @@ public class CosmeticService {
     private final CosmeticRepository cosmeticRepository;
 
 
-    public List<SimpleCosmeticDto> cosmeticSimpleRecommends(Long key, UserDetailsImpl userDetails) {
+    public List<SimpleCosmeticDto> cosmeticSimpleRecommends(UserDetailsImpl userDetails) {
 
         List<SimpleCosmeticDto> result = new ArrayList<>();
         List<Cosmetic> findCosmetic = cosmeticRepository.findTop5ByOrderByIdAsc();
@@ -36,7 +36,7 @@ public class CosmeticService {
         return result;
     }
 
-    public List<DetailCosmeticDto> cosmeticDetailRecommends(String category, Long page) throws PlaluvsException {
+    public List<DetailCosmeticDto> cosmeticDetailRecommends(Long category, Long page) throws PlaluvsException {
         List<Cosmetic> findCosmetic = cosmeticRepository.findTop20ByOrderByIdAsc();
         List<DetailCosmeticDto> result = new ArrayList<>();
 

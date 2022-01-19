@@ -30,6 +30,6 @@ public enum SkinTroubleEnum {
                 return value;
             }
         }
-        throw new PlaluvsException(ErrorCode.DATA_EMPTY);
+        throw new PlaluvsException(ErrorCode.DATA_NOT_TYPE);
     }
 }

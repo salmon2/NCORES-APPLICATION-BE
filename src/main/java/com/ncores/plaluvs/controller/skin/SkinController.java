@@ -1,17 +1,17 @@
 package com.ncores.plaluvs.controller.skin;
 
 import com.ncores.plaluvs.controller.skin.dto.*;
-import com.ncores.plaluvs.domain.dto.OilStatusRequestDto;
+import com.ncores.plaluvs.domain.dto.SkinNowStatusRequestDto;
 import com.ncores.plaluvs.domain.dto.SkinWorryRequestDto;
 import com.ncores.plaluvs.exception.PlaluvsException;
 import com.ncores.plaluvs.security.UserDetailsImpl;
 import com.ncores.plaluvs.service.SkinService;
+import com.ncores.plaluvs.service.SkinTypeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,12 +22,13 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class SkinController {
     private final SkinService skinService;
+    private final SkinTypeService skinTypeService;
 
 
-    @PostMapping("/skin/oil-indicate")
-    public ResponseEntity<?> skinOilIndicate(@RequestBody OilStatusRequestDto requestDto,
+    @PostMapping("/skin/now/status")
+    public ResponseEntity<?> skinOilIndicate(@RequestBody SkinNowStatusRequestDto requestDto,
                                              @AuthenticationPrincipal UserDetailsImpl userDetails) throws PlaluvsException {
-        log.info("/skin/oil-indicate");
+        log.info("/skin/now/status");
         log.info("requestDto = {}", requestDto);
 
         UserDetailsImpl.UserCheck(userDetails);
@@ -75,7 +76,8 @@ public class SkinController {
 
         return null;
     }
-    @PostMapping("skin/daily/self-check")
+
+    @PostMapping("/skin/daily/self-check")
     public ResponseEntity<?> skinDailySefCheck(@RequestBody SkinDailySefCheckRequestDto requestDto,
                                                @AuthenticationPrincipal UserDetailsImpl userDetails
                                                ) throws PlaluvsException{
@@ -87,7 +89,6 @@ public class SkinController {
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
 
 
     @GetMapping("/skin/status")

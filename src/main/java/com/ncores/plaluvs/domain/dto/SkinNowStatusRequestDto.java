@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class OilStatusRequestDto {
+public class SkinNowStatusRequestDto {
     private Long skinId;
 }

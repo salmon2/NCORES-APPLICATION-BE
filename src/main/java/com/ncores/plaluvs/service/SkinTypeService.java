@@ -10,10 +10,14 @@ import com.ncores.plaluvs.repository.ElementsRepository;
 import com.ncores.plaluvs.repository.STBadElementRepository;
 import com.ncores.plaluvs.repository.STGoodElementsRepository;
 import com.ncores.plaluvs.repository.SkinTypeRepository;
+import com.ncores.plaluvs.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -26,7 +30,9 @@ public class SkinTypeService {
 
 
     @Transactional
-    public void findSkinElements(SkinType skinType){
+    public void findSkinElements(UserDetailsImpl userDetails){
+        SkinType skinType = findDailySkinType(userDetails);
+
         Bouman bouman = skinType.getBouman();
         String type = bouman.getName();
 
@@ -156,5 +162,13 @@ public class SkinTypeService {
                 stBadElementRepository.save(newSkinTypeBad);
             }
         }
+    }
+
+    private SkinType findDailySkinType(UserDetailsImpl userDetails) {
+        LocalDateTime startDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(0,0,0)); //오늘 00:00:00
+        LocalDateTime endDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(23,59,59)); //오늘 23:59:59
+
+        SkinType findSkinType = skinTypeRepository.findTopByUserAndCreatedAtBetween(userDetails.getUser(), startDatetime, endDatetime);
+        return findSkinType;
     }
 }

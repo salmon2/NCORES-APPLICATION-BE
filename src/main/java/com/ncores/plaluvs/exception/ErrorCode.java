@@ -24,13 +24,18 @@ public enum ErrorCode {
     USER_NOT_LOGIN(HttpStatus.UNAUTHORIZED, "로그인 상태가 아닙니다."),
 
     DATA_EMPTY(HttpStatus.FORBIDDEN, "데이터가 없습니다."),
+    DATA_NOT_TYPE(HttpStatus.FORBIDDEN, "적합한 유형의 데이터가 아닙니다."),
     GENDER_NOT_EXIST(HttpStatus.CONFLICT, "적합한 성별 유형이 아닙니다."),
 
     AGE_TYPE_NOT_SUITABLE(HttpStatus.FORBIDDEN , "적합한 년도가 아닙니다."),
     USERNAME_LENGTH_MIN(HttpStatus.FORBIDDEN, "이메일이 8자 미만 입니다."),
     NICKNAME_LENGTH_MAX(HttpStatus.FORBIDDEN, "닉네임 길이가 8자 이상입니다."),
     PAGE_OUT(HttpStatus.FORBIDDEN, "페이지가 최대페이지 이상입니다."),
-    ELEMENT_NOT_FOUND(HttpStatus.FORBIDDEN, "해당하는 성분이 없습니다."), BOUMAN_NOT_FOUND(HttpStatus.FORBIDDEN, "해당하는 바우만 타입이 없습니다.");
+    ELEMENT_NOT_FOUND(HttpStatus.FORBIDDEN, "해당하는 성분이 없습니다."), BOUMAN_NOT_FOUND(HttpStatus.FORBIDDEN, "해당하는 바우만 타입이 없습니다."),
+    SKIN_TYPE_NOT_FOUND(HttpStatus.FORBIDDEN, "금일 진행한 스킨타입이 없습니다.");
+
+
+
     private final HttpStatus httpStatus;
     private final String message;
 }

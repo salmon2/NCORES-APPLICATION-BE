@@ -2,7 +2,7 @@ package com.ncores.plaluvs.service;
 
 import com.ncores.plaluvs.controller.skin.dto.*;
 import com.ncores.plaluvs.domain.*;
-import com.ncores.plaluvs.domain.dto.OilStatusRequestDto;
+import com.ncores.plaluvs.domain.dto.SkinNowStatusRequestDto;
 import com.ncores.plaluvs.domain.dto.SkinWorryRequestDto;
 import com.ncores.plaluvs.domain.skintype.skindailyStatus.SkinDailyStatus;
 import com.ncores.plaluvs.domain.skintype.skindailyStatus.SkinDailyStatusEnum;
@@ -38,7 +38,7 @@ public class SkinService {
 
 
     @Transactional
-    public void currentSkinStatus(OilStatusRequestDto requestDto, UserDetailsImpl userDetails) throws PlaluvsException {
+    public void currentSkinStatus(SkinNowStatusRequestDto requestDto, UserDetailsImpl userDetails) throws PlaluvsException {
         CurrentSkinStatus currentSkinStatus = CurrentSkinStatus.findQuestionOne(requestDto.getSkinId());
         log.info("oilIndicate = {}", currentSkinStatus);
 
@@ -64,7 +64,7 @@ public class SkinService {
         sKinWorryRepository.deleteAllBySkinType(findSkinType);
 
 
-        for (Long id : requestDto.getSkinWorryId()) {
+        for (Long id : requestDto.getId()) {
             SkinTroubleEnum skinTroubleEnum = SkinTroubleEnum.findSkinTroubleEnum(id);
 
             SkinTrouble skinTrouble = new SkinTrouble(skinTroubleEnum, findSkinType);
@@ -78,7 +78,11 @@ public class SkinService {
     @Transactional
     public void skinDailyStatus(SkinDailyStatusRequestDto requestDto, UserDetailsImpl userDetails) throws PlaluvsException {
         SkinType findSkinType = findDailySkinType(userDetails);
-        SkinType.skinTypeCheck(findSkinType);
+
+        if(findSkinType == null) {
+            SkinType beforeSkinType = skinTypeRepository.findTopByUserOrderByCreatedAtAsc(userDetails.getUser());
+            findSkinType = new SkinType(beforeSkinType.getQuestionOne(), userDetails.getUser());
+        }
 
         skinDailyStatusRepository.deleteAllBySkinType(findSkinType);
 

@@ -1,4 +1,4 @@
-package com.ncores.plaluvs.controller;
+package com.ncores.plaluvs.controller.category;
 
 import com.ncores.plaluvs.controller.category.dto.CategoryResponseDto;
 import com.ncores.plaluvs.domain.dto.PagingSimpleResponseDto;

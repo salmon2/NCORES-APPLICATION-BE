@@ -13,5 +13,5 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SkinWorryRequestDto {
-    List<Long> skinWorryId = new ArrayList<>();
+    List<Long> id = new ArrayList<>();
 }

@@ -77,7 +77,7 @@ public class SkinType extends Timestamped {
 
 
     public SkinType(CurrentSkinStatus questionOne, User user) {
-        this.questionOne = questionOne;
+        this.questionOne = this.questionOne;
         this.user = user;
     }
 
@@ -88,6 +88,6 @@ public class SkinType extends Timestamped {
 
     public static void skinTypeCheck(SkinType skinType) throws PlaluvsException {
         if(skinType == null)
-            throw new PlaluvsException(ErrorCode.DATA_EMPTY);
+            throw new PlaluvsException(ErrorCode.SKIN_TYPE_NOT_FOUND);
     }
 }

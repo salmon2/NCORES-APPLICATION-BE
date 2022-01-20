@@ -5,6 +5,7 @@ import com.ncores.plaluvs.domain.SkinTypeBadElements;
 import com.ncores.plaluvs.domain.SkinTypeGoodElements;
 import com.ncores.plaluvs.domain.Timestamped;
 import com.ncores.plaluvs.domain.skintype.skindailyStatus.SkinDailyStatus;
+import com.ncores.plaluvs.domain.skintype.skindailystimulation.SkinDailyStimulation;
 import com.ncores.plaluvs.domain.skintype.skintrouble.SkinTrouble;
 import com.ncores.plaluvs.domain.user.User;
 import com.ncores.plaluvs.exception.ErrorCode;
@@ -28,20 +29,9 @@ public class SkinType extends Timestamped {
     @GeneratedValue
     private Long id;
 
-    @Enumerated(value = EnumType.STRING)
-    private CurrentSkinStatus questionOne;
-
-    @Enumerated(value = EnumType.STRING)
-    private Sensitivity sensitivity;
-
-    @Enumerated(value = EnumType.STRING)
-    private Winkle winkle;
-
-    @Enumerated(value = EnumType.STRING)
-    private Pigment pigment;
-
 
     private Long oilIndicateScore;
+    private Long dryScore;
 
     private Long sensitivityScore;
 
@@ -52,20 +42,35 @@ public class SkinType extends Timestamped {
     @Enumerated(value = EnumType.STRING)
     private Bouman bouman;
 
+
+    //회원가입 후 설문조사 1번(현재 피부 상태)
+    @Enumerated(value = EnumType.STRING)
+    private CurrentSkinStatus currentSkinStatus;
+
+    //회원가입 후 설문조사 2번 (현재 피부 고민), 카메라 측정 전 설문조사 3번 (오늘 피부 고민)
+    @OneToMany(mappedBy = "skinType", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<SkinTrouble> skinTroubleList = new ArrayList<>();
+
+    //skin/Daily/stauts 카메라 측정 전 설문조사1번
+    @OneToMany(mappedBy = "skinType", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<SkinDailyStatus> skinDailyStatusList = new ArrayList<>();
+
+    //skin/Daily/Stimulation 카메라 측정 전 설문조사2번
+    @OneToMany(mappedBy = "skinType", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<SkinDailyStimulation> skinDailyStimulationList = new ArrayList<>();
+
+    //skin/daily/sef-check 카메라 측정 전 설문조사 3번 (자기 점수)
     private Double selfScore;
 
+    //최종 점수
     private Long score;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private User user;
 
-    @OneToMany(mappedBy = "skinType", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<SkinTrouble> skinTroubleList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "skinType", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<SkinDailyStatus> dailySkinStatusList = new ArrayList<>();
 
     @OneToMany(mappedBy = "skinType", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<SkinTypeGoodElements> skinTypeGoodElementsList = new ArrayList<>();
@@ -74,20 +79,26 @@ public class SkinType extends Timestamped {
     private List<SkinTypeBadElements> skinTypeBadElementsList = new ArrayList<>();
 
 
-
-
     public SkinType(CurrentSkinStatus questionOne, User user) {
-        this.questionOne = this.questionOne;
+        this.oilIndicateScore = 8L;
+        this.dryScore = 5L;
+        this.sensitivityScore = 0L;
+        this.winkleScore = 0L;
+        this.pigmentScore = 0L;
+        this.bouman = Bouman.ORNT;
+
+        this.currentSkinStatus = questionOne;
         this.user = user;
     }
 
+    public SkinType(User user) {
+        this.oilIndicateScore = 8L;
+        this.dryScore = 5L;
+        this.sensitivityScore = 0L;
+        this.winkleScore = 0L;
+        this.pigmentScore = 0L;
 
-    public void updateSkinType(CurrentSkinStatus questionOne) {
-        this.questionOne = questionOne;
+        this.user = user;
     }
 
-    public static void skinTypeCheck(SkinType skinType) throws PlaluvsException {
-        if(skinType == null)
-            throw new PlaluvsException(ErrorCode.SKIN_TYPE_NOT_FOUND);
-    }
 }

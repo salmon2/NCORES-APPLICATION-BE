@@ -91,7 +91,8 @@ public class SkinTypeService {
 
     private <T> void saveSTGoodElements(SkinType skinType, T[] array, String type) {
         for (T value : array) {
-            Elements findElements = elementsRepository.findByKorean((String) value);
+            String name = value.toString();
+            Elements findElements = elementsRepository.findByKorean(name);
             if(findElements == null)
                 continue;
             else{
@@ -153,7 +154,7 @@ public class SkinTypeService {
 
     private <T> void saveSTBadElements(SkinType skinType, T[] array, String type) {
         for (T value : array) {
-            Elements findElements = elementsRepository.findByKorean((String) value);
+            Elements findElements = elementsRepository.findByKorean(value.toString());
             if(findElements == null)
                 continue;
             else{

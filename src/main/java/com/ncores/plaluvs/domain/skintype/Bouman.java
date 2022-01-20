@@ -27,83 +27,14 @@ public enum Bouman {
 
     private String name;
 
-    public Bouman findBoumanBySkinType(SkinType skinType) throws PlaluvsException {
-        String key = "";
-
-        findBoumanOilIndicate(skinType, key);
-        findBoumanSensitivity(skinType, key);
-        findBoumanPigment(skinType, key);
-        findBoumanWinkle(skinType, key);
+    public static Bouman findBoumanBySkinType(String skinType) throws PlaluvsException {
 
         for (Bouman value : Bouman.values()) {
-            if(value.getName().equals(key))
+            if(value.getName().equals(skinType))
                 return value;
         }
 
         throw new PlaluvsException(ErrorCode.BOUMAN_NOT_FOUND);
-    }
-
-    private void findBoumanWinkle(SkinType skinType, String key) {
-        if(findWinkle(skinType, Winkle.DRY)
-                || findWinkle(skinType, Winkle.DEHYDRATED)
-                ||findWinkle(skinType, Winkle.NEUTRAL))
-            key += "T";
-        else if (findWinkle(skinType, Winkle.OILY) || findWinkle(skinType, Winkle.COMBINATION))
-            key += "W";
-        else
-            key += "T";
-    }
-
-    private Boolean findWinkle(SkinType skinType, Winkle winkle){
-        return skinType.getPigment().equals(winkle);
-    }
-
-    private void findBoumanPigment(SkinType skinType, String key) {
-        if(findPigment(skinType, Pigment.DRY)
-                || findPigment(skinType, Pigment.DEHYDRATED)
-                ||findPigment(skinType, Pigment.NEUTRAL))
-            key += "P";
-        else if (findPigment(skinType, Pigment.OILY) || findPigment(skinType, Pigment.COMBINATION))
-            key += "N";
-        else
-            key += "P";
-    }
-
-    private Boolean findPigment(SkinType skinType, Pigment pigment){
-        return skinType.getPigment().equals(pigment);
-    }
-
-
-    private void findBoumanSensitivity(SkinType skinType, String key) {
-        if(findSensitivity(skinType, Sensitivity.DRY)
-                || findSensitivity(skinType, Sensitivity.DEHYDRATED)
-                ||findSensitivity(skinType, Sensitivity.NEUTRAL))
-            key += "R";
-        else if (findSensitivity(skinType, Sensitivity.OILY) || findSensitivity(skinType, Sensitivity.COMBINATION))
-            key += "S";
-        else
-            key += "R";
-    }
-
-    private Boolean findSensitivity(SkinType skinType, Sensitivity sensitivity){
-        return skinType.getSensitivity().equals(sensitivity);
-
-    }
-
-    private void findBoumanOilIndicate(SkinType skinType, String key) {
-        if(findOilIndicate(skinType, CurrentSkinStatus.DRY)
-                || findOilIndicate(skinType, CurrentSkinStatus.DEHYDRATED)
-                ||findOilIndicate(skinType, CurrentSkinStatus.NEUTRAL))
-            key += "D";
-        else if (findOilIndicate(skinType, CurrentSkinStatus.OILY) || findOilIndicate(skinType, CurrentSkinStatus.COMBINATION))
-            key += "O";
-        else
-            key += "D";
-    }
-
-
-    private Boolean findOilIndicate(SkinType skinType, CurrentSkinStatus questionOne){
-        return skinType.getQuestionOne().equals(questionOne);
     }
 
 }

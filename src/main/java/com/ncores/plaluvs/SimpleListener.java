@@ -5,6 +5,7 @@ import com.ncores.plaluvs.crawling.CrawlingItemDto;
 import com.ncores.plaluvs.crawling.ReadJsonFile;
 import com.ncores.plaluvs.domain.user.User;
 import com.ncores.plaluvs.domain.user.UserRoleEnum;
+import com.ncores.plaluvs.repository.SkinTypeRepository;
 import com.ncores.plaluvs.repository.UserRepository;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @NoArgsConstructor
 //@Component
@@ -28,22 +30,21 @@ public class SimpleListener implements ApplicationListener<ApplicationStartedEve
 
     @Autowired
     private ReadJsonFile readJsonFile;
+    @Autowired
+    private SkinTypeRepository skinTypeRepository;
 
     @SneakyThrows
     @Override
-    @Transactional
     public void onApplicationEvent(ApplicationStartedEvent event) {
-        User newUser = new User(
-            "dys04076@naver.com",
-            passwordEncoder.encode("asdf"),
-            "salmon",
-            UserRoleEnum.USER
+        User newUser2 = new User(
+                "dys04076@naver.com",
+                passwordEncoder.encode("asdf"),
+                "test",
+                UserRoleEnum.ADMIN
         );
-
-        userRepository.save(newUser);
-//
-//        readJsonFile.readJsonFile();
-//        readJsonFile.saveJsonFile();
+        Optional<User> byUsername = userRepository.findByUsername(newUser2.getUsername());
+        userRepository.deleteById(byUsername.get().getId());
+        userRepository.save(newUser2);
     }
 
 }

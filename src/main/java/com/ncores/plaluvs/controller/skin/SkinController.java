@@ -3,6 +3,7 @@ package com.ncores.plaluvs.controller.skin;
 import com.ncores.plaluvs.controller.skin.dto.*;
 import com.ncores.plaluvs.domain.dto.SkinNowStatusRequestDto;
 import com.ncores.plaluvs.domain.dto.SkinWorryRequestDto;
+import com.ncores.plaluvs.domain.user.User;
 import com.ncores.plaluvs.exception.PlaluvsException;
 import com.ncores.plaluvs.security.UserDetailsImpl;
 import com.ncores.plaluvs.service.SkinService;
@@ -90,6 +91,16 @@ public class SkinController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PostMapping("/skin/bouman/calculate")
+    public ResponseEntity<?> skinBoumanCalculate(@AuthenticationPrincipal UserDetailsImpl userDetails) throws PlaluvsException {
+        log.info("/skin/bouman/calculate");
+        UserDetailsImpl.UserCheck(userDetails);
+
+        String boumanType = skinService.skinBoumanCalucluate(userDetails);
+
+        return new ResponseEntity<>(boumanType, HttpStatus.OK);
+    }
+
 
     @GetMapping("/skin/status")
     public ResponseEntity<?> skinStatus(@AuthenticationPrincipal UserDetailsImpl userDetails){
@@ -105,7 +116,14 @@ public class SkinController {
         SkinStatusListResponseDto result = skinService.skinStatusList();
 
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
 
+    @PostMapping("/skin/bouman/elements")
+    public ResponseEntity<?> skinBoumanElements(@AuthenticationPrincipal UserDetailsImpl userDetails){
+        log.info("/skin/bouman/elements");
+        skinTypeService.findSkinElements(userDetails);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

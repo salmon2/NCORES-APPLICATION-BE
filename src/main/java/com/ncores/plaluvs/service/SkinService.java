@@ -4,14 +4,17 @@ import com.ncores.plaluvs.controller.skin.dto.*;
 import com.ncores.plaluvs.domain.*;
 import com.ncores.plaluvs.domain.dto.SkinNowStatusRequestDto;
 import com.ncores.plaluvs.domain.dto.SkinWorryRequestDto;
+import com.ncores.plaluvs.domain.skintype.Bouman;
+import com.ncores.plaluvs.domain.skintype.CurrentSkinStatus;
 import com.ncores.plaluvs.domain.skintype.skindailyStatus.SkinDailyStatus;
 import com.ncores.plaluvs.domain.skintype.skindailyStatus.SkinDailyStatusEnum;
 import com.ncores.plaluvs.domain.skintype.skindailystimulation.SkinDailyStimulation;
 import com.ncores.plaluvs.domain.skintype.skindailystimulation.SkinDailyStimulationEnum;
 import com.ncores.plaluvs.domain.skintype.skintrouble.SkinTrouble;
 import com.ncores.plaluvs.domain.skintype.skintrouble.SkinTroubleEnum;
-import com.ncores.plaluvs.domain.skintype.CurrentSkinStatus;
 import com.ncores.plaluvs.domain.skintype.SkinType;
+import com.ncores.plaluvs.domain.user.User;
+import com.ncores.plaluvs.exception.ErrorCode;
 import com.ncores.plaluvs.exception.PlaluvsException;
 import com.ncores.plaluvs.repository.*;
 import com.ncores.plaluvs.security.UserDetailsImpl;
@@ -31,27 +34,67 @@ import java.util.List;
 @Slf4j
 public class SkinService {
     private final SkinTypeRepository skinTypeRepository;
-    private final SKinWorryRepository sKinWorryRepository;
+    private final SKinWorryRepository skinWorryRepository;
     private final SkinDailyStatusRepository skinDailyStatusRepository;
     private final ElementsRepository elementsRepository;
     private final SkinDailyStimulationRepository skinDailyStimulationRepository;
+    private final UserRepository userRepository;
 
 
     @Transactional
     public void currentSkinStatus(SkinNowStatusRequestDto requestDto, UserDetailsImpl userDetails) throws PlaluvsException {
-        CurrentSkinStatus currentSkinStatus = CurrentSkinStatus.findQuestionOne(requestDto.getSkinId());
-        log.info("oilIndicate = {}", currentSkinStatus);
-
         SkinType findSkinType = findDailySkinType(userDetails);
 
-        if(findSkinType == null) {
-            findSkinType = new SkinType(currentSkinStatus, userDetails.getUser());
-            skinTypeRepository.save(findSkinType);
-        }
-        else
-            findSkinType.updateSkinType(currentSkinStatus);
+        updateSkinNowStatus(requestDto.getSkinId(), findSkinType);
 
         log.info("skinType = {}", findSkinType);
+    }
+
+    private void updateSkinNowStatus(Long id, SkinType findSkinType) throws PlaluvsException {
+        CurrentSkinStatus currentSkinStatus = CurrentSkinStatus.findQuestionOne(id);
+        CurrentSkinStatus nowSkinStatus = findSkinType.getCurrentSkinStatus();
+
+        if( nowSkinStatus == null){
+            updateCurrentStatusByCurrentSkinStatus(currentSkinStatus, findSkinType);
+        }
+        else{
+            if(nowSkinStatus.getId() == 1L) {
+                findSkinType.setOilIndicateScore( findSkinType.getOilIndicateScore() + 2);
+                findSkinType.setDryScore( findSkinType.getDryScore() + 1);
+            }
+            else if  (nowSkinStatus.getId()== 2L){
+                findSkinType.setOilIndicateScore( findSkinType.getOilIndicateScore() + 1);
+                findSkinType.setDryScore( findSkinType.getDryScore() + 1);
+            }
+            else if (nowSkinStatus.getId() == 3L){
+                findSkinType.setOilIndicateScore( findSkinType.getOilIndicateScore() + 2);
+            }
+            else if (nowSkinStatus.getId() == 4L){
+                findSkinType.setOilIndicateScore( findSkinType.getOilIndicateScore() + 1);
+                findSkinType.setDryScore( findSkinType.getDryScore() + 1);
+            }
+            updateCurrentStatusByCurrentSkinStatus(currentSkinStatus, findSkinType);
+        }
+    }
+
+    private void updateCurrentStatusByCurrentSkinStatus(CurrentSkinStatus currentSkinStatus, SkinType findSkinType) {
+        findSkinType.setCurrentSkinStatus(currentSkinStatus);
+
+        if(currentSkinStatus.getId() == 1L) {
+            findSkinType.setOilIndicateScore( findSkinType.getOilIndicateScore() - 2);
+            findSkinType.setDryScore( findSkinType.getDryScore() - 1);
+        }
+        else if  (currentSkinStatus.getId()== 2L){
+            findSkinType.setOilIndicateScore( findSkinType.getOilIndicateScore() - 1);
+            findSkinType.setDryScore( findSkinType.getDryScore() - 1);
+        }
+        else if (currentSkinStatus.getId() == 3L){
+            findSkinType.setOilIndicateScore( findSkinType.getOilIndicateScore() - 1);
+        }
+        else if (currentSkinStatus.getId() == 4L){
+            findSkinType.setOilIndicateScore( findSkinType.getOilIndicateScore() - 1);
+            findSkinType.setDryScore( findSkinType.getDryScore() - 1);
+        }
     }
 
 
@@ -59,19 +102,75 @@ public class SkinService {
     @Transactional
     public void skinWorryUpdate(SkinWorryRequestDto requestDto, UserDetailsImpl userDetails) throws PlaluvsException {
         SkinType findSkinType = findDailySkinType(userDetails);
-        SkinType.skinTypeCheck(findSkinType);
 
-        sKinWorryRepository.deleteAllBySkinType(findSkinType);
+        List<SkinTrouble> beforeSkinTroubleList = skinWorryRepository.findAllBySkinType(findSkinType);
 
+        if(beforeSkinTroubleList == null){
+            for (Long id : requestDto.getId()) {
+                SkinTroubleEnum skinTroubleEnum = SkinTroubleEnum.findSkinTroubleEnum(id);
 
-        for (Long id : requestDto.getId()) {
-            SkinTroubleEnum skinTroubleEnum = SkinTroubleEnum.findSkinTroubleEnum(id);
-
-            SkinTrouble skinTrouble = new SkinTrouble(skinTroubleEnum, findSkinType);
-            log.info("skinTrouble = {}", skinTrouble);
-
-            sKinWorryRepository.save(skinTrouble);
+                SkinTrouble skinTrouble = new SkinTrouble(skinTroubleEnum, findSkinType);
+                log.info("skinTrouble = {}", skinTrouble);
+                saveSkinWorry(findSkinType, id, skinTrouble);
+            }
         }
+        else{
+            for (SkinTrouble skinTrouble : beforeSkinTroubleList) {
+                deleteSkinTroble(findSkinType, skinTrouble);
+            }
+            skinWorryRepository.deleteAll(beforeSkinTroubleList);
+
+            for (Long id : requestDto.getId()) {
+                SkinTroubleEnum skinTroubleEnum = SkinTroubleEnum.findSkinTroubleEnum(id);
+
+                SkinTrouble skinTrouble = new SkinTrouble(skinTroubleEnum, findSkinType);
+                log.info("skinTrouble = {}", skinTrouble);
+                saveSkinWorry(findSkinType, id, skinTrouble);
+            }
+        }
+
+    }
+
+    private void deleteSkinTroble(SkinType findSkinType, SkinTrouble skinTrouble) {
+        if(skinTrouble.getTrouble().getId() == 1L) {
+            findSkinType.setOilIndicateScore(findSkinType.getOilIndicateScore() + 1);
+            findSkinType.setSensitivityScore(findSkinType.getSensitivityScore() + 1);
+        }
+        else if (skinTrouble.getTrouble().getId() == 2L){
+            findSkinType.setDryScore(findSkinType.getDryScore() + 1 );
+            findSkinType.setWinkleScore(findSkinType.getWinkleScore() + 1);
+        }
+        else if (skinTrouble.getTrouble().getId() == 3L){
+            findSkinType.setSensitivityScore(findSkinType.getSensitivityScore() + 1 );
+        }
+        else if (skinTrouble.getTrouble().getId() == 4L){
+            findSkinType.setPigmentScore(findSkinType.getPigmentScore() + 1);
+        }
+        else if (skinTrouble.getTrouble().getId() == 5L){
+            findSkinType.setOilIndicateScore(findSkinType.getOilIndicateScore() + 1 );
+        }
+    }
+
+    private void saveSkinWorry(SkinType findSkinType, Long id, SkinTrouble skinTrouble) {
+        if(id == 1L) {
+            findSkinType.setOilIndicateScore(findSkinType.getOilIndicateScore() - 1);
+            findSkinType.setSensitivityScore(findSkinType.getSensitivityScore() -1);
+        }
+        else if (id == 2L){
+            findSkinType.setDryScore(findSkinType.getDryScore() -1 );
+            findSkinType.setWinkleScore(findSkinType.getWinkleScore() -1);
+        }
+        else if (id == 3L){
+            findSkinType.setSensitivityScore(findSkinType.getSensitivityScore() -1 );
+        }
+        else if (id == 4L){
+            findSkinType.setPigmentScore(findSkinType.getPigmentScore() -1);
+        }
+        else if (id == 5L){
+            findSkinType.setOilIndicateScore(findSkinType.getOilIndicateScore() -1 );
+        }
+
+        skinWorryRepository.save(skinTrouble);
     }
 
 
@@ -79,24 +178,64 @@ public class SkinService {
     public void skinDailyStatus(SkinDailyStatusRequestDto requestDto, UserDetailsImpl userDetails) throws PlaluvsException {
         SkinType findSkinType = findDailySkinType(userDetails);
 
-        if(findSkinType == null) {
-            SkinType beforeSkinType = skinTypeRepository.findTopByUserOrderByCreatedAtAsc(userDetails.getUser());
-            findSkinType = new SkinType(beforeSkinType.getQuestionOne(), userDetails.getUser());
+        List<SkinDailyStatus> skinDailyStatusList = skinDailyStatusRepository.findAllBySkinType(findSkinType);
+
+        if(skinDailyStatusList == null){
+            for (Long id : requestDto.getId()) {
+                SkinDailyStatusEnum dailySkinEnum = SkinDailyStatusEnum.findDailySkinEnum(id);
+
+                SkinDailyStatus skinDailyStatus = new SkinDailyStatus(dailySkinEnum, findSkinType);
+                log.info("skinTrouble = {}", skinDailyStatus);
+                saveDailyStatus(findSkinType, id, skinDailyStatus);
+            }
         }
+        else{
+            for ( SkinDailyStatus skinDailyStatus: skinDailyStatusList) {
+                deleteSkinDailyStatus(findSkinType, skinDailyStatus);
+            }
+            skinDailyStatusRepository.deleteAll(skinDailyStatusList);
 
-        skinDailyStatusRepository.deleteAllBySkinType(findSkinType);
+            for (Long id : requestDto.getId()) {
+                SkinDailyStatusEnum dailySkinEnum = SkinDailyStatusEnum.findDailySkinEnum(id);
 
-        for (Long id : requestDto.getId()) {
-            SkinDailyStatusEnum skinDailyStatusEnum = SkinDailyStatusEnum.findDailySkinEnum(id);
-
-            SkinDailyStatus skinDailyStatus = new SkinDailyStatus(skinDailyStatusEnum, findSkinType);
-            log.info("skinTrouble = {}", skinDailyStatus);
-
-            skinDailyStatusRepository.save(skinDailyStatus);
+                SkinDailyStatus skinDailyStatus = new SkinDailyStatus(dailySkinEnum, findSkinType);
+                log.info("skinTrouble = {}", skinDailyStatus);
+                saveDailyStatus(findSkinType, id, skinDailyStatus);
+            }
         }
     }
 
+    private void deleteSkinDailyStatus(SkinType findSkinType, SkinDailyStatus skinDailyStatus) {
+        if(skinDailyStatus.getSkinDaily().getId() == 1L) {
+            findSkinType.setSensitivityScore(findSkinType.getSensitivityScore() + 1);
+        }
+        else if (skinDailyStatus.getSkinDaily().getId() == 2L){
+            findSkinType.setDryScore(findSkinType.getDryScore() + 1 );
+        }
+        else if (skinDailyStatus.getSkinDaily().getId() == 3L){
+            findSkinType.setOilIndicateScore( findSkinType.getOilIndicateScore() + 2);
+        }
+        else if (skinDailyStatus.getSkinDaily().getId() == 4L){
+            findSkinType.setOilIndicateScore( findSkinType.getOilIndicateScore() + 1);
+        }
+    }
 
+    private void saveDailyStatus(SkinType findSkinType, Long id, SkinDailyStatus skinDailyStatus) {
+        if(id == 1L) {
+            findSkinType.setSensitivityScore(findSkinType.getSensitivityScore() -1);
+        }
+        else if (id == 2L){
+            findSkinType.setDryScore(findSkinType.getDryScore() -1 );
+        }
+        else if (id == 3L){
+            findSkinType.setOilIndicateScore( findSkinType.getOilIndicateScore() - 2);
+        }
+        else if (id == 4L){
+            findSkinType.setOilIndicateScore( findSkinType.getOilIndicateScore() -1);
+        }
+
+        skinDailyStatusRepository.save(skinDailyStatus);
+    }
 
 
     public SkinStatusResponseDto skinStatus() {
@@ -134,32 +273,137 @@ public class SkinService {
         LocalDateTime startDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(0,0,0)); //오늘 00:00:00
         LocalDateTime endDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(23,59,59)); //오늘 23:59:59
 
-        SkinType findSkinType = skinTypeRepository.findTopByUserAndCreatedAtBetween(userDetails.getUser(), startDatetime, endDatetime);
-        return findSkinType;
+        SkinType findDailySkinType = skinTypeRepository.findTopByUserAndCreatedAtBetween(userDetails.getUser(), startDatetime, endDatetime);
+
+        SkinType firstSkinType = skinTypeRepository.findTopByUserOrderByCreatedAtAsc(userDetails.getUser());
+        CurrentSkinStatus currentSkinStatus = null;
+
+        if(firstSkinType != null)
+            currentSkinStatus = firstSkinType.getCurrentSkinStatus();
+
+        if(findDailySkinType == null){
+            SkinType newSkinType = new SkinType(currentSkinStatus, userDetails.getUser());
+            skinTypeRepository.save(newSkinType);
+            return newSkinType;
+        }
+        else
+            return findDailySkinType;
+
     }
 
     @Transactional
     public void skinDailyStimulation(SkinDailyStimulationRequestDto requestDto, UserDetailsImpl userDetails) throws PlaluvsException {
         SkinType findSkinType = findDailySkinType(userDetails);
-        SkinType.skinTypeCheck(findSkinType);
+        List<SkinDailyStimulation> skinDailyStimulationList = skinDailyStimulationRepository.findAllBySkinType(findSkinType);
 
-        skinDailyStimulationRepository.deleteAllBySkinType(findSkinType);
+        if(skinDailyStimulationList == null){
+            for (Long id : requestDto.getId()) {
+                SkinDailyStimulationEnum skinDailyStimulationEnum = SkinDailyStimulationEnum.findSkinDailyStimulationEnum(id);
 
-        for (Long id : requestDto.getId()) {
-            SkinDailyStimulationEnum skinDailyStimulationEnum = SkinDailyStimulationEnum.findSkinDailyStimulationEnum(id);
-
-            SkinDailyStimulation skinDailyStimulation = new SkinDailyStimulation(skinDailyStimulationEnum, findSkinType);
-            log.info("skinTrouble = {}", skinDailyStimulation);
-
-            skinDailyStimulationRepository.save(skinDailyStimulation);
+                SkinDailyStimulation skinDailyStimulation = new SkinDailyStimulation(skinDailyStimulationEnum, findSkinType);
+                log.info("skinTrouble = {}", skinDailyStimulation);
+                saveDailyStimulation(findSkinType, id, skinDailyStimulation);
+            }
         }
+        else{
+            for ( SkinDailyStimulation skinDailyStimulation: skinDailyStimulationList) {
+                deleteSkinDailyStimulation(findSkinType, skinDailyStimulation);
+            }
+            skinDailyStimulationRepository.deleteAll(skinDailyStimulationList);
+
+            for (Long id : requestDto.getId()) {
+                SkinDailyStimulationEnum skinDailyStimulationEnum = SkinDailyStimulationEnum.findSkinDailyStimulationEnum(id);
+
+                SkinDailyStimulation skinDailyStimulation = new SkinDailyStimulation(skinDailyStimulationEnum, findSkinType);
+                log.info("skinTrouble = {}", skinDailyStimulation);
+                saveDailyStimulation(findSkinType, id, skinDailyStimulation);
+            }
+        }
+    }
+
+    private void deleteSkinDailyStimulation(SkinType findSkinType, SkinDailyStimulation skinDailyStimulation) {
+        if(skinDailyStimulation.getSkinDaily().getId() == 1L) {
+            findSkinType.setSensitivityScore(findSkinType.getSensitivityScore() + 1);
+        }
+        else if (skinDailyStimulation.getSkinDaily().getId() == 2L){
+            findSkinType.setSensitivityScore(findSkinType.getSensitivityScore() + 1);
+        }
+        else if (skinDailyStimulation.getSkinDaily().getId() == 3L){
+            findSkinType.setOilIndicateScore( findSkinType.getOilIndicateScore() - 1);
+            findSkinType.setSensitivityScore(findSkinType.getSensitivityScore() + 1);
+        }
+        else if (skinDailyStimulation.getSkinDaily().getId() == 4L){
+            findSkinType.setSensitivityScore(findSkinType.getSensitivityScore() + 1);
+        }
+    }
+
+    private void saveDailyStimulation(SkinType findSkinType, Long id, SkinDailyStimulation skinDailyStimulation) {
+        if(id == 1L) {
+            findSkinType.setSensitivityScore(findSkinType.getSensitivityScore() -1);
+        }
+        else if (id == 2L){
+            findSkinType.setSensitivityScore(findSkinType.getSensitivityScore() -1);
+        }
+        else if (id == 3L){
+            findSkinType.setOilIndicateScore( findSkinType.getOilIndicateScore() + 1);
+            findSkinType.setSensitivityScore(findSkinType.getSensitivityScore() -1);
+        }
+        else if (id == 4L){
+            findSkinType.setSensitivityScore(findSkinType.getSensitivityScore() -1);
+        }
+
+        skinDailyStimulationRepository.save(skinDailyStimulation);
     }
 
     @Transactional
     public void skinSelfCheck(SkinDailySefCheckRequestDto requestDto, UserDetailsImpl userDetails) throws PlaluvsException {
         SkinType findSkinType = findDailySkinType(userDetails);
-        SkinType.skinTypeCheck(findSkinType);
 
         findSkinType.setSelfScore(requestDto.getScore());
+    }
+
+
+    @Transactional
+    public String skinBoumanCalucluate(UserDetailsImpl userDetails) throws PlaluvsException {
+        User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(
+                () -> new PlaluvsException(ErrorCode.USER_NOT_FOUND)
+        );
+
+        SkinType dailySkinType = findDailySkinType(userDetails);
+
+        String key = getBoumanKey(dailySkinType);
+        log.info("key = {}", key);
+        dailySkinType.setBouman(Bouman.findBoumanBySkinType(key));
+
+
+        return dailySkinType.getBouman().getName();
+    }
+
+    private String getBoumanKey(SkinType dailySkinType) {
+        String key = "";
+        if(dailySkinType.getOilIndicateScore() <= dailySkinType.getDryScore()){
+            key += "O";
+        }
+        else
+            key += "D";
+
+        if(dailySkinType.getSensitivityScore() < 0){
+            key += "S";
+        }
+        else
+            key += "R";
+
+        if(dailySkinType.getPigmentScore() < 0){
+            key += "P";
+        }
+        else
+            key += "N";
+        if(dailySkinType.getWinkleScore() < 0){
+            key += "W";
+        }
+        else {
+            key += "T";
+        }
+        return key;
     }
 }

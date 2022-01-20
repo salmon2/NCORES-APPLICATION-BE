@@ -1,5 +1,6 @@
 package com.ncores.plaluvs.repository;
 
+import com.ncores.plaluvs.domain.Category;
 import com.ncores.plaluvs.domain.Cosmetic;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,4 +13,7 @@ import java.util.List;
 public interface CosmeticRepository extends JpaRepository<Cosmetic, Long> {
     List<Cosmetic> findTop20ByOrderByIdAsc();
     List<Cosmetic> findTop5ByOrderByIdAsc();
+
+
+    Page<Cosmetic> findAllByCategory(Category category, Pageable pageable);
 }

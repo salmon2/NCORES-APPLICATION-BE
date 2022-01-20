@@ -21,11 +21,8 @@ public class SkinDailyStimulation {
     @Id @GeneratedValue
     Long id;
 
-
     @Enumerated(EnumType.STRING)
     SkinDailyStimulationEnum skinDaily;
-
-
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "skin_type_id")

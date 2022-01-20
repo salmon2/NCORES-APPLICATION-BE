@@ -32,7 +32,7 @@ public enum ErrorCode {
     NICKNAME_LENGTH_MAX(HttpStatus.FORBIDDEN, "닉네임 길이가 8자 이상입니다."),
     PAGE_OUT(HttpStatus.FORBIDDEN, "페이지가 최대페이지 이상입니다."),
     ELEMENT_NOT_FOUND(HttpStatus.FORBIDDEN, "해당하는 성분이 없습니다."), BOUMAN_NOT_FOUND(HttpStatus.FORBIDDEN, "해당하는 바우만 타입이 없습니다."),
-    SKIN_TYPE_NOT_FOUND(HttpStatus.FORBIDDEN, "금일 진행한 스킨타입이 없습니다.");
+    SKIN_TYPE_NOT_FOUND(HttpStatus.FORBIDDEN, "금일 진행한 스킨타입이 없습니다."), SKIN_WORRY_EMPTY(HttpStatus.FORBIDDEN, "피부 걱정 설문조사를 해주세요"), CATEGORY_NOT_FOUND(HttpStatus.FORBIDDEN, "해당하는 카테고리가 없습니다." );
 
 
 

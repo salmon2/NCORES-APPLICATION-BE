@@ -8,8 +8,9 @@ import com.ncores.plaluvs.domain.skintype.skintrouble.*;
 import com.ncores.plaluvs.exception.ErrorCode;
 import com.ncores.plaluvs.exception.PlaluvsException;
 import com.ncores.plaluvs.repository.CategoryRepository;
+import com.ncores.plaluvs.repository.SkinTroubleElementsRepository;
 import com.ncores.plaluvs.repository.cosmetic.CosmeticRepository;
-import com.ncores.plaluvs.repository.ElementsRepository;
+import com.ncores.plaluvs.repository.elements.ElementsRepository;
 import com.ncores.plaluvs.repository.SkinTypeRepository;
 import com.ncores.plaluvs.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class CosmeticService {
     private final ElementsRepository elementsRepository;
     private final SkinTypeRepository skinTypeRepository;
     private final CategoryRepository categoryRepository;
-
+    private final SkinTroubleElementsRepository skinTroubleElementsRepository;
 
     public List<SimpleCosmeticDto> cosmeticSimpleRecommends(UserDetailsImpl userDetails) throws PlaluvsException {
         SkinType dailySkinType = skinTypeRepository.findDailySkinTypeException(userDetails);
@@ -100,67 +101,18 @@ public class CosmeticService {
     }
 
     public List<SimpleCosmeticDto> cosmeticWorry(UserDetailsImpl userDetails) throws PlaluvsException {
-        List<SimpleCosmeticDto> result = new ArrayList<>();
-        SkinType findSkinType = skinTypeRepository.findTopByUserOrderByCreatedAtDesc(userDetails.getUser());
-        List<SkinTrouble> skinTroubleList = findSkinType.getSkinTroubleList();
+        UserDetailsImpl.UserCheck(userDetails);
 
-        if(skinTroubleList == null)
-            throw new PlaluvsException(ErrorCode.SKIN_WORRY_EMPTY);
+        SkinType dailySkinType = skinTypeRepository.findDailySkinTypeException(userDetails);
+        List<SkinTrouble> skinTroubleList = dailySkinType.getSkinTroubleList();
+        List<Elements> elements = elementsRepository.findAllBySkinTroubleCustom(skinTroubleList);
 
-        for (SkinTrouble skinTrouble : skinTroubleList) {
-            SkinTroubleEnum trouble = skinTrouble.getTrouble();
+        List<SkinTroubleElements> skinTroubleElements = new ArrayList<>();
 
-            if(trouble.getId().equals(1L)){
-                for (TroubleSkinElements value : TroubleSkinElements.values()) {
-                    saveSimpleCosmetic(value.getName(), result);
-                }
-            }
-            if(trouble.getId().equals(2L)){
-                for (WrinklesSkinElements value :WrinklesSkinElements.values()) {
-                    saveSimpleCosmetic(value.getName(), result);
-                }
-            }
 
-            if(trouble.getId().equals(3L)){
-                for (SensitiveSkinElements value : SensitiveSkinElements.values()) {
-                    saveSimpleCosmetic(value.getName(), result);
-                }
-            }
+        List<SimpleCosmeticDto> result = cosmeticRepository.findCosmeticWorry(elements, userDetails);
 
-            if(trouble.getId().equals(4L)){
-                for (PigmentationSkinElements value : PigmentationSkinElements.values()) {
-                    saveSimpleCosmetic(value.getName(), result);
-                }
-            }
-
-            if(trouble.getId().equals(5L)){
-                for (UnbalanceSkinElements value : UnbalanceSkinElements.values()) {
-                    saveSimpleCosmetic(value.getName(), result);
-                }
-            }
-        }
-
-        Collections.shuffle(result);
-
-        return result.subList(0,5);
-    }
-
-    private void saveSimpleCosmetic(String value, List<SimpleCosmeticDto> result) {
-        Elements findElements = elementsRepository.findByKorean(value);
-        if(findElements == null)
-            return;
-        List<CosmeticElements> cosmeticElementsList = findElements.getCosmeticElementsList();
-        for (CosmeticElements cosmeticElements : cosmeticElementsList) {
-            SimpleCosmeticDto simpleCosmeticDto = new SimpleCosmeticDto(cosmeticElements.getCosmetic().getId(), cosmeticElements.getCosmetic().getItemImg()
-                    , cosmeticElements.getCosmetic().getItemName(), Boolean.FALSE);
-            result.add(simpleCosmeticDto);
-
-            // List를 Set으로 변경
-            Set<SimpleCosmeticDto> set = new HashSet<SimpleCosmeticDto>(result);
-            // Set을 List로 변경
-            result  = new ArrayList<SimpleCosmeticDto>(set);
-        }
-
+        return result;
 
     }
 }

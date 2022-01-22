@@ -16,6 +16,7 @@ import com.ncores.plaluvs.domain.user.User;
 import com.ncores.plaluvs.exception.ErrorCode;
 import com.ncores.plaluvs.exception.PlaluvsException;
 import com.ncores.plaluvs.repository.*;
+import com.ncores.plaluvs.repository.elements.ElementsRepository;
 import com.ncores.plaluvs.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

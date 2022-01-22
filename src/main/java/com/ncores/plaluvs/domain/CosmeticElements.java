@@ -19,7 +19,7 @@ public class CosmeticElements {
     Long id;
 
     @ManyToOne
-    @JoinColumn(name = "cosmetic_id")
+    @JoinColumn(name = "item_id")
     @JsonIgnore
     Cosmetic cosmetic;
 

@@ -6,7 +6,7 @@ import com.ncores.plaluvs.domain.Elements;
 import com.ncores.plaluvs.domain.Cosmetic;
 import com.ncores.plaluvs.domain.CosmeticElements;
 import com.ncores.plaluvs.repository.CategoryRepository;
-import com.ncores.plaluvs.repository.ElementsRepository;
+import com.ncores.plaluvs.repository.elements.ElementsRepository;
 import com.ncores.plaluvs.repository.ItemElementsRepository;
 import com.ncores.plaluvs.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;

@@ -1,5 +1,6 @@
 package com.ncores.plaluvs.domain.user;
 
+import com.ncores.plaluvs.domain.Cosmetic;
 import com.ncores.plaluvs.domain.Photo;
 import com.ncores.plaluvs.domain.Timestamped;
 import com.ncores.plaluvs.domain.skintype.skintrouble.SkinTrouble;

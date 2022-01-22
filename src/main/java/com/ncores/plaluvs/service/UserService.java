@@ -9,7 +9,7 @@ import com.ncores.plaluvs.domain.user.UserRoleEnum;
 import com.ncores.plaluvs.exception.ErrorCode;
 import com.ncores.plaluvs.exception.PlaluvsException;
 import com.ncores.plaluvs.repository.cosmetic.CosmeticRepository;
-import com.ncores.plaluvs.repository.ElementsRepository;
+import com.ncores.plaluvs.repository.elements.ElementsRepository;
 import com.ncores.plaluvs.repository.UserRepository;
 import com.ncores.plaluvs.security.UserDetailsImpl;
 import com.ncores.plaluvs.security.jwt.JwtTokenProvider;

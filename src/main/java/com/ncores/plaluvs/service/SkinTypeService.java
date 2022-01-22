@@ -6,7 +6,7 @@ import com.ncores.plaluvs.domain.SkinTypeGoodElements;
 import com.ncores.plaluvs.domain.boumanData.good.*;
 import com.ncores.plaluvs.domain.skintype.Bouman;
 import com.ncores.plaluvs.domain.skintype.SkinType;
-import com.ncores.plaluvs.repository.ElementsRepository;
+import com.ncores.plaluvs.repository.elements.ElementsRepository;
 import com.ncores.plaluvs.repository.STBadElementRepository;
 import com.ncores.plaluvs.repository.STGoodElementsRepository;
 import com.ncores.plaluvs.repository.SkinTypeRepository;
@@ -18,7 +18,6 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

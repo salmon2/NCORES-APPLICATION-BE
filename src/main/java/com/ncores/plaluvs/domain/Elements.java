@@ -1,5 +1,6 @@
 package com.ncores.plaluvs.domain;
 
+import com.ncores.plaluvs.domain.skintype.skintrouble.SkinTroubleElements;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,6 +37,14 @@ public class Elements {
 
     @OneToMany(mappedBy = "elements", fetch = LAZY, cascade = CascadeType.ALL)
     List<SkinTypeBadElements> skinTypeBadElementsList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "elements", fetch = LAZY, cascade = CascadeType.ALL)
+    List<SkinTroubleElements> skinTroubleElements = new ArrayList<>();
+
+
+
+
+
 
     public Elements(Map<String, String> value) {
         this.level = value.get("level");

@@ -8,7 +8,7 @@ import com.ncores.plaluvs.domain.skintype.skintrouble.*;
 import com.ncores.plaluvs.exception.ErrorCode;
 import com.ncores.plaluvs.exception.PlaluvsException;
 import com.ncores.plaluvs.repository.CategoryRepository;
-import com.ncores.plaluvs.repository.CosmeticRepository;
+import com.ncores.plaluvs.repository.cosmetic.CosmeticRepository;
 import com.ncores.plaluvs.repository.ElementsRepository;
 import com.ncores.plaluvs.repository.SkinTypeRepository;
 import com.ncores.plaluvs.security.UserDetailsImpl;
@@ -27,33 +27,11 @@ public class CosmeticService {
     private final CategoryRepository categoryRepository;
 
 
-    public List<SimpleCosmeticDto> cosmeticSimpleRecommends(UserDetailsImpl userDetails) {
-        SkinType dailySkinType = skinTypeRepository.findDailySkinType(userDetails);
-        List<SimpleCosmeticDto> result = new ArrayList<>();
+    public List<SimpleCosmeticDto> cosmeticSimpleRecommends(UserDetailsImpl userDetails) throws PlaluvsException {
+        SkinType dailySkinType = skinTypeRepository.findDailySkinTypeException(userDetails);
+        List<SimpleCosmeticDto> result = null;
 
-        if(dailySkinType.getBouman().getName().equals("ORNT")){
-            Long qty = cosmeticRepository.count();
-            int idx = (int)(Math.random() * qty);
-            Page<Cosmetic> cosmeticList = cosmeticRepository.findAll(PageRequest.of(idx,5));
-            for (Cosmetic cosmetic : cosmeticList) {
-                SimpleCosmeticDto simpleCosmeticDto = new SimpleCosmeticDto(cosmetic.getId(), cosmetic.getItemImg(), cosmetic.getItemName(), Boolean.TRUE);
-                result.add(simpleCosmeticDto);
-            }
-            return result;
-        }
-        else{
-            List<SkinTypeGoodElements> skinTypeGoodElementsList = dailySkinType.getSkinTypeGoodElementsList();
-            for (SkinTypeGoodElements skinTypeGoodElements : skinTypeGoodElementsList) {
-                List<CosmeticElements> cosmeticElementsList = skinTypeGoodElements.getElements().getCosmeticElementsList();
-                for (CosmeticElements cosmeticElements : cosmeticElementsList) {
-                    Cosmetic cosmetic = cosmeticElements.getCosmetic();
-                    SimpleCosmeticDto simpleCosmeticDto = new SimpleCosmeticDto(cosmetic.getId(), cosmetic.getItemImg(), cosmetic.getItemName(), Boolean.TRUE);
-                    result.add(simpleCosmeticDto);
-                }
-            }
-        }
-
-        return result.subList(0,5);
+        return null;
     }
 
     public List<DetailCosmeticDto> cosmeticDetailRecommends(UserDetailsImpl userDetails, Long categoryId, Long page) throws PlaluvsException {

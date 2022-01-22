@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static javax.persistence.FetchType.LAZY;
 
 @Entity
@@ -26,6 +29,11 @@ public class SkinTrouble {
     @JoinColumn(name = "skin_type_id")
     @JsonIgnore
     private SkinType skinType;
+
+    @OneToMany(mappedBy = "skinTrouble", cascade = CascadeType.ALL, fetch = LAZY)
+    private List<SkinTroubleElements> skinTroubleElements = new ArrayList<>();
+
+
 
     public SkinTrouble(SkinTroubleEnum trouble, SkinType skinType) {
         this.trouble = trouble;

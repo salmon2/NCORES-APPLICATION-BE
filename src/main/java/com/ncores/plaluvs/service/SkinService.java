@@ -10,8 +10,7 @@ import com.ncores.plaluvs.domain.skintype.skindailyStatus.SkinDailyStatus;
 import com.ncores.plaluvs.domain.skintype.skindailyStatus.SkinDailyStatusEnum;
 import com.ncores.plaluvs.domain.skintype.skindailystimulation.SkinDailyStimulation;
 import com.ncores.plaluvs.domain.skintype.skindailystimulation.SkinDailyStimulationEnum;
-import com.ncores.plaluvs.domain.skintype.skintrouble.SkinTrouble;
-import com.ncores.plaluvs.domain.skintype.skintrouble.SkinTroubleEnum;
+import com.ncores.plaluvs.domain.skintype.skintrouble.*;
 import com.ncores.plaluvs.domain.skintype.SkinType;
 import com.ncores.plaluvs.domain.user.User;
 import com.ncores.plaluvs.exception.ErrorCode;
@@ -39,6 +38,7 @@ public class SkinService {
     private final ElementsRepository elementsRepository;
     private final SkinDailyStimulationRepository skinDailyStimulationRepository;
     private final UserRepository userRepository;
+    private final SkinTroubleElementsRepository skinTroubleElementsRepository;
 
 
     @Transactional
@@ -98,8 +98,6 @@ public class SkinService {
     }
 
 
-
-    @Transactional
     public void skinWorryUpdate(SkinWorryRequestDto requestDto, UserDetailsImpl userDetails) throws PlaluvsException {
         SkinType findSkinType = findDailySkinType(userDetails);
 
@@ -151,26 +149,67 @@ public class SkinService {
         }
     }
 
-    private void saveSkinWorry(SkinType findSkinType, Long id, SkinTrouble skinTrouble) {
+    @Transactional
+    public void saveSkinWorry(SkinType findSkinType, Long id, SkinTrouble skinTrouble) {
         if(id == 1L) {
             findSkinType.setOilIndicateScore(findSkinType.getOilIndicateScore() - 1);
             findSkinType.setSensitivityScore(findSkinType.getSensitivityScore() -1);
+            skinWorryRepository.save(skinTrouble);
+            for (TroubleSkinElements value : TroubleSkinElements.values()) {
+                Elements byKorean = elementsRepository.findByKorean(value.getName());
+                if(byKorean == null)
+                    continue;
+                SkinTroubleElements skinTroubleElements = new SkinTroubleElements(skinTrouble, byKorean);
+                skinTroubleElementsRepository.save(skinTroubleElements);
+            }
         }
         else if (id == 2L){
             findSkinType.setDryScore(findSkinType.getDryScore() -1 );
             findSkinType.setWinkleScore(findSkinType.getWinkleScore() -1);
+            skinWorryRepository.save(skinTrouble);
+            for (WrinklesSkinElements value : WrinklesSkinElements.values()) {
+                Elements byKorean = elementsRepository.findByKorean(value.getName());
+                if(byKorean == null)
+                    continue;
+                SkinTroubleElements skinTroubleElements = new SkinTroubleElements(skinTrouble, byKorean);
+                skinTroubleElementsRepository.save(skinTroubleElements);
+            }
         }
         else if (id == 3L){
             findSkinType.setSensitivityScore(findSkinType.getSensitivityScore() -1 );
+            skinWorryRepository.save(skinTrouble);
+            for (SensitiveSkinElements value : SensitiveSkinElements.values()) {
+                Elements byKorean = elementsRepository.findByKorean(value.getName());
+                if(byKorean == null)
+                    continue;
+                SkinTroubleElements skinTroubleElements = new SkinTroubleElements(skinTrouble, byKorean);
+                skinTroubleElementsRepository.save(skinTroubleElements);
+            }
         }
         else if (id == 4L){
             findSkinType.setPigmentScore(findSkinType.getPigmentScore() -1);
+            skinWorryRepository.save(skinTrouble);
+            for (PigmentationSkinElements value : PigmentationSkinElements.values()) {
+                Elements byKorean = elementsRepository.findByKorean(value.getName());
+                if(byKorean == null)
+                    continue;
+                SkinTroubleElements skinTroubleElements = new SkinTroubleElements(skinTrouble, byKorean);
+                skinTroubleElementsRepository.save(skinTroubleElements);
+            }
         }
         else if (id == 5L){
             findSkinType.setOilIndicateScore(findSkinType.getOilIndicateScore() -1 );
+            skinWorryRepository.save(skinTrouble);
+            for (UnbalanceSkinElements value : UnbalanceSkinElements.values()) {
+                Elements byKorean = elementsRepository.findByKorean(value.getName());
+                if(byKorean == null)
+                    continue;
+                SkinTroubleElements skinTroubleElements = new SkinTroubleElements(skinTrouble, byKorean);
+                skinTroubleElementsRepository.save(skinTroubleElements);
+            }
         }
 
-        skinWorryRepository.save(skinTrouble);
+
     }
 
 
@@ -375,6 +414,13 @@ public class SkinService {
         log.info("key = {}", key);
         dailySkinType.setBouman(Bouman.findBoumanBySkinType(key));
 
+
+        Double selfScore1 = dailySkinType.getSelfScore();
+        if(selfScore1 == null)
+            throw new PlaluvsException(ErrorCode.SKIN_TYPE_NOT_FOUND);
+
+        double selfScore = dailySkinType.getSelfScore() * 20;
+        dailySkinType.setScore(dailySkinType.getBouman().getScore()*40/100 + (long)selfScore*20/100 + 40L);
 
         return dailySkinType.getBouman().getName();
     }

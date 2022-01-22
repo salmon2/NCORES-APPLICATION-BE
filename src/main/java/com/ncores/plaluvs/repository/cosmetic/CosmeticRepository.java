@@ -1,4 +1,4 @@
-package com.ncores.plaluvs.repository;
+package com.ncores.plaluvs.repository.cosmetic;
 
 import com.ncores.plaluvs.domain.Category;
 import com.ncores.plaluvs.domain.Cosmetic;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface CosmeticRepository extends JpaRepository<Cosmetic, Long> {
+public interface CosmeticRepository extends JpaRepository<Cosmetic, Long>, CosmeticRepositoryCustom {
     List<Cosmetic> findTop20ByOrderByIdAsc();
     List<Cosmetic> findTop5ByOrderByIdAsc();
 

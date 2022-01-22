@@ -43,6 +43,7 @@ public class SimpleListener implements ApplicationListener<ApplicationStartedEve
                 UserRoleEnum.ADMIN
         );
         Optional<User> byUsername = userRepository.findByUsername(newUser2.getUsername());
+
         userRepository.deleteById(byUsername.get().getId());
         userRepository.save(newUser2);
     }

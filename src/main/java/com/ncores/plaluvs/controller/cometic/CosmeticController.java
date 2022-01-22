@@ -51,7 +51,7 @@ public class CosmeticController {
 
 
     @GetMapping("/cosmetic/simple-recommends")
-    public ResponseEntity<?> cosmeticSimpleRecommends(@AuthenticationPrincipal UserDetailsImpl userDetails){
+    public ResponseEntity<?> cosmeticSimpleRecommends(@AuthenticationPrincipal UserDetailsImpl userDetails) throws PlaluvsException {
 
         List<SimpleCosmeticDto> result = cosmeticService.cosmeticSimpleRecommends(userDetails);
 
@@ -79,7 +79,6 @@ public class CosmeticController {
         Elements elements = elementsRepository.findById(elementsId).orElseThrow(
                 () -> new PlaluvsException(ErrorCode.ELEMENT_NOT_FOUND)
         );
-
 
         return new ResponseEntity<>(new CosmeticElementsResponseDto(result.size(), page, 4L, elements.getKorean(), result), HttpStatus.OK);
     }

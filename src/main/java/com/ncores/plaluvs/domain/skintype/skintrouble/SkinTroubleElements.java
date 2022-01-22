@@ -1,6 +1,8 @@
-package com.ncores.plaluvs.domain;
+package com.ncores.plaluvs.domain.skintype.skintrouble;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ncores.plaluvs.domain.Cosmetic;
+import com.ncores.plaluvs.domain.Elements;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,23 +15,22 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CosmeticElements {
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+public class SkinTroubleElements {
+    @Id @GeneratedValue
     Long id;
 
     @ManyToOne
-    @JoinColumn(name = "cosmetic_id")
+    @JoinColumn(name = "skin_trouble_id")
     @JsonIgnore
-    Cosmetic cosmetic;
+    SkinTrouble skinTrouble;
 
     @ManyToOne
     @JoinColumn(name = "elements_id")
     @JsonIgnore
     Elements elements;
 
-    public CosmeticElements(Cosmetic cosmetic, Elements elements) {
-        this.cosmetic = cosmetic;
+    public SkinTroubleElements(SkinTrouble skinTrouble, Elements elements) {
+        this.skinTrouble = skinTrouble;
         this.elements = elements;
     }
 }

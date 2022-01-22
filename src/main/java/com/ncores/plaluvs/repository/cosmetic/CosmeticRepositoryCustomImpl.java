@@ -1,21 +1,29 @@
 package com.ncores.plaluvs.repository.cosmetic;
 
 
+import com.ncores.plaluvs.controller.cometic.dto.DetailCosmeticDto;
+import com.ncores.plaluvs.controller.cometic.dto.QDetailCosmeticDto;
 import com.ncores.plaluvs.controller.cometic.dto.QSimpleCosmeticDto;
 import com.ncores.plaluvs.controller.cometic.dto.SimpleCosmeticDto;
-import com.ncores.plaluvs.domain.Elements;
-import com.ncores.plaluvs.domain.QElements;
-import com.ncores.plaluvs.domain.QUserCosmetic;
-import com.ncores.plaluvs.domain.skintype.skintrouble.QSkinTroubleElements;
+import com.ncores.plaluvs.controller.user.dto.CosmeticDto;
+import com.ncores.plaluvs.controller.user.dto.QCosmeticDto;
+import com.ncores.plaluvs.domain.*;
+import com.ncores.plaluvs.domain.user.QUser;
 import com.ncores.plaluvs.domain.user.User;
 import com.ncores.plaluvs.security.UserDetailsImpl;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
+import java.io.Serializable;
 import java.util.List;
 
 import static com.ncores.plaluvs.domain.QCosmetic.cosmetic;
@@ -48,6 +56,130 @@ public class CosmeticRepositoryCustomImpl implements CosmeticRepositoryCustom{
         return result;
     }
 
+    @Override
+    public List<SimpleCosmeticDto> findAllbyBouman(UserDetailsImpl userDetails, List<Elements> findElements) {
+        List<SimpleCosmeticDto> result = queryFactory
+                .select(
+                        new QSimpleCosmeticDto(
+                                cosmeticElements.cosmetic.id,
+                                cosmeticElements.cosmetic.itemImg,
+                                cosmeticElements.cosmetic.itemName,
+                                (userDetails == null) ? setFalse() : distinguishBookmarkExistUser(userDetails.getUser())
+                        )
+                )
+                .from(cosmeticElements)
+                .join(cosmeticElements.elements, elements)
+                .where(cosmeticElements.elements.in(findElements))
+                .limit(5)
+                .fetch();
+
+        return result;
+    }
+
+    @Override
+    public Page<DetailCosmeticDto> findAllByCategoryAndBouman(UserDetailsImpl userDetails, List<Elements> findElements,
+                                                              Category findCategory, PageRequest pageRequest, String sort) {
+        List<DetailCosmeticDto> result = queryFactory
+                .select(
+                        new QDetailCosmeticDto(
+                               cosmeticElements.cosmetic.id,
+                                cosmeticElements.cosmetic.itemImg,
+                                cosmeticElements.cosmetic.itemBrand,
+                                cosmeticElements.cosmetic.itemName,
+                                cosmeticElements.cosmetic.price,
+                                (userDetails == null) ? setFalse() : distinguishBookmarkExistUser(userDetails.getUser())
+                        )
+                )
+                .from(cosmeticElements)
+                .join(cosmeticElements.elements, elements)
+                .where(cosmeticElements.elements.in(findElements).and(cosmeticElements.cosmetic.category.eq(findCategory)))
+                .offset(pageRequest.getOffset())
+                .limit(pageRequest.getPageSize())
+                .orderBy(getSortBy(sort))
+                .fetch();
+
+        JPAQuery<CosmeticElements> countQuery = countDetailCosmeticByElementsList(findElements, findCategory);
+
+        return PageableExecutionUtils.getPage(result, pageRequest, countQuery::fetchCount);
+    }
+
+
+    private JPAQuery<CosmeticElements> countDetailCosmeticByElementsList(List<Elements> findElements, Category findCategory) {
+        return queryFactory
+                .selectFrom(cosmeticElements)
+                .join(cosmeticElements.elements, elements)
+                .where(cosmeticElements.elements.in(findElements).and(cosmeticElements.cosmetic.category.eq(findCategory)));
+
+    }
+
+
+    @Override
+    public Page<DetailCosmeticDto> findCosmeticByElementsCustom(UserDetailsImpl userDetails, Elements findElements, Category findCategory, PageRequest pageRequest, String sort) {
+        List<DetailCosmeticDto> result = queryFactory
+                .select(
+                        new QDetailCosmeticDto(
+                                cosmeticElements.cosmetic.id,
+                                cosmeticElements.cosmetic.itemImg,
+                                cosmeticElements.cosmetic.itemBrand,
+                                cosmeticElements.cosmetic.itemName,
+                                cosmeticElements.cosmetic.price,
+                                (userDetails == null) ? setFalse() : distinguishBookmarkExistUser(userDetails.getUser())
+                        )
+                )
+                .from(cosmeticElements)
+                .join(cosmeticElements.elements)
+                .where(cosmeticElements.elements.eq(findElements).and(cosmeticElements.cosmetic.category.eq(findCategory)))
+                .limit(pageRequest.getPageSize())
+                .offset(pageRequest.getOffset())
+                .orderBy(getSortBy(sort))
+                .fetch();
+
+        JPAQuery<CosmeticElements> countQuery = countDetailCosmeticByElement(findElements, findCategory);
+
+        return PageableExecutionUtils.getPage(result, pageRequest, countQuery::fetchCount);
+    }
+
+    @Override
+    public Page<CosmeticDto> findAllByUserCustom(User user, PageRequest pageRequest) {
+        List<CosmeticDto> result = queryFactory
+                .select(
+                        new QCosmeticDto(
+                            userCosmetic.cosmetic.id,
+                            userCosmetic.cosmetic.itemName,
+                            userCosmetic.cosmetic.itemImg
+                        )
+                )
+                .from(userCosmetic)
+                .join(userCosmetic.cosmetic, cosmetic)
+                .join(userCosmetic.user, QUser.user)
+                .where(QUser.user.id.eq(user.getId()))
+                .offset(pageRequest.getOffset())
+                .limit(pageRequest.getPageSize())
+                .fetch();
+
+        JPAQuery<UserCosmetic> countQuery = countMyBookmarkUserCosmetic(user);
+
+        return PageableExecutionUtils.getPage(result, pageRequest, countQuery::fetchCount);
+    }
+
+    private JPAQuery<UserCosmetic> countMyBookmarkUserCosmetic(User user) {
+        return queryFactory
+                .selectFrom(userCosmetic)
+                .join(userCosmetic.cosmetic, cosmetic)
+                .join(userCosmetic.user, QUser.user)
+                .where(QUser.user.id.eq(user.getId()));
+    }
+
+    private JPAQuery<CosmeticElements> countDetailCosmeticByElement(Elements findElements, Category findCategory) {
+        JPAQuery<CosmeticElements> where = queryFactory
+                .select(cosmeticElements)
+                .from(cosmeticElements)
+                .join(cosmeticElements.elements)
+                .where(cosmeticElements.elements.eq(findElements).and(cosmeticElements.cosmetic.category.eq(findCategory)));
+        return where;
+    }
+
+
     private BooleanExpression distinguishBookmarkExistUser(User user) {
         return JPAExpressions
                 .selectFrom(userCosmetic)
@@ -67,4 +199,12 @@ public class CosmeticRepositoryCustomImpl implements CosmeticRepositoryCustom{
         return Expressions.asBoolean(false);
     }
 
+
+    private OrderSpecifier<? extends Serializable> getSortBy(String sort) {
+        if(sort.equals("asc"))
+            return cosmeticElements.cosmetic.price.asc();
+        else if(sort.equals("desc"))
+            return cosmeticElements.cosmetic.price.desc();
+            return null;
+    }
 }

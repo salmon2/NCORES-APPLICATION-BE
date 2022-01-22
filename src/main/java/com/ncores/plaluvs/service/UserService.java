@@ -1,26 +1,28 @@
 package com.ncores.plaluvs.service;
 
 import com.ncores.plaluvs.controller.user.dto.*;
-import com.ncores.plaluvs.domain.Cosmetic;
-import com.ncores.plaluvs.domain.Elements;
 import com.ncores.plaluvs.domain.dto.ElementsDto;
 import com.ncores.plaluvs.domain.user.User;
 import com.ncores.plaluvs.domain.user.UserRoleEnum;
 import com.ncores.plaluvs.exception.ErrorCode;
 import com.ncores.plaluvs.exception.PlaluvsException;
+import com.ncores.plaluvs.repository.UserCosmeticRepository;
 import com.ncores.plaluvs.repository.cosmetic.CosmeticRepository;
 import com.ncores.plaluvs.repository.elements.ElementsRepository;
 import com.ncores.plaluvs.repository.UserRepository;
 import com.ncores.plaluvs.security.UserDetailsImpl;
 import com.ncores.plaluvs.security.jwt.JwtTokenProvider;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.StringExpression;
+import com.querydsl.core.types.dsl.StringPath;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -32,6 +34,7 @@ public class UserService {
 
     private final ElementsRepository elementsRepository;
     private final CosmeticRepository cosmeticRepository;
+    private final UserCosmeticRepository userCosmeticRepository;
 
 
     @Transactional
@@ -171,29 +174,76 @@ public class UserService {
         user.changeGender(requestDto.getGender());
     }
 
-    public List<ElementsDto> getUserElements(UserDetailsImpl userDetails) {
-        List<Elements> findElements = elementsRepository.findAll();
-        List<ElementsDto> result = new ArrayList<>();
+    public Page<ElementsDto> getUserElements(UserDetailsImpl userDetails, Long page) throws PlaluvsException {
+        UserDetailsImpl.UserCheck(userDetails);
+        PageRequest pageRequest = PageRequest.of(page.intValue(), 5);
 
-        for (int i = 0; i < 5; i++) {
-            ElementsDto elementsDto =
-                    new ElementsDto(findElements.get(i).getId(), findElements.get(i).getKorean(),
-                            "https://www.ewg.org/skindeep/squircle/show.svg?score=1&score_min=1",
-                            findElements.get(i).getLevel());
-            result.add(elementsDto);
+        Page<ElementsDto> result = elementsRepository.findAllByUserCustom(userDetails.getUser(), pageRequest);
+        for (ElementsDto elementsDto : result) {
+           elementsDto.setImg(getImgSRc(elementsDto.getLevel()));
         }
 
         return result;
     }
 
-    public List<CosmeticDto> getUserCosmetics(UserDetailsImpl userDetails) {
-        List<Cosmetic> findCosmetics = cosmeticRepository.findAll();
-        List<CosmeticDto> result = new ArrayList<>();
+    private String getImgSRc(String level) {
+        String low = "https://plaluvs-image.s3.ap-northeast-2.amazonaws.com/rank/row_rank.png";
+        String middle = "https://plaluvs-image.s3.ap-northeast-2.amazonaws.com/rank/middle_rank.png";
+        String high = "https://plaluvs-image.s3.ap-northeast-2.amazonaws.com/rank/high_rank.png";
 
-        for(int i = 0; i<5; i++){
-            CosmeticDto cosmeticDto = new CosmeticDto(findCosmetics.get(i).getId(), findCosmetics.get(i).getItemName(), findCosmetics.get(i).getItemImg());
-            result.add(cosmeticDto);
+        if( level.contains("1")){
+            return low;
         }
+        else if( level.contains("2")){
+            return low;
+        }
+
+        else if( level.contains("3")){
+            return middle;
+        }
+
+        else if( level.contains("4")){
+            return middle;
+        }
+
+        else if( level.contains("5")){
+            return middle;
+        }
+
+        else if( level.contains("6")){
+            return middle;
+        }
+
+        else if( level.contains("7")){
+            return high;
+        }
+
+        else if( level.contains("8")){
+            return high;
+        }
+
+        else if( level.contains("9")){
+            return high;
+        }
+
+        else if( level.contains("10")){
+            return high;
+        }
+
+        else if( level.contains("-")){
+            return low;
+        }
+
+        return "";
+    }
+
+    public Page<CosmeticDto> getUserCosmetics(UserDetailsImpl userDetails, Long page) throws PlaluvsException {
+        PageRequest pageRequest = PageRequest.of(page.intValue(), 5);
+        UserDetailsImpl.UserCheck(userDetails);
+
+        Page<CosmeticDto> result = cosmeticRepository.findAllByUserCustom(userDetails.getUser(), pageRequest);
+
+
         return result;
     }
 
@@ -204,4 +254,5 @@ public class UserService {
 
         userRepository.deleteById(user.getId());
     }
+
 }

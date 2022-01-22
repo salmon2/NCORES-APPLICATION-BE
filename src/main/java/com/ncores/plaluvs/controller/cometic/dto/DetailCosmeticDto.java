@@ -1,5 +1,6 @@
 package com.ncores.plaluvs.controller.cometic.dto;
 
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,7 +9,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class DetailCosmeticDto {
     private Long id;
     private String img;
@@ -16,4 +16,14 @@ public class DetailCosmeticDto {
     private String name;
     private String price;
     private Boolean likeCheck;
+
+    @QueryProjection
+    public DetailCosmeticDto(Long id, String img, String brand, String name, String price, Boolean likeCheck) {
+        this.id = id;
+        this.img = img;
+        this.brand = brand;
+        this.name = name;
+        this.price = price;
+        this.likeCheck = likeCheck;
+    }
 }

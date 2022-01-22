@@ -103,17 +103,17 @@ public class SkinController {
 
 
     @GetMapping("/skin/status")
-    public ResponseEntity<?> skinStatus(@AuthenticationPrincipal UserDetailsImpl userDetails){
+    public ResponseEntity<?> skinStatus(@AuthenticationPrincipal UserDetailsImpl userDetails) throws PlaluvsException {
         log.info("/skin/status");
-        SkinStatusResponseDto skinStatusResponseDto = skinService.skinStatus();
+        SkinStatusResponseDto result = skinService.skinStatus(userDetails);
 
-        return new ResponseEntity<>(skinStatusResponseDto, HttpStatus.OK);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping("/skin/status/list")
     public ResponseEntity<?> skinStatusList(@AuthenticationPrincipal UserDetailsImpl userDetails){
         log.info("skin/status/list");
-        SkinStatusListResponseDto result = skinService.skinStatusList();
+        SkinStatusListResponseDto result = skinService.skinStatusList(userDetails);
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

@@ -1,20 +1,22 @@
-package com.ncores.plaluvs.domain;
+package com.ncores.plaluvs.controller;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ncores.plaluvs.domain.Cosmetic;
+import com.ncores.plaluvs.domain.Elements;
 import com.ncores.plaluvs.domain.user.User;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
 import static javax.persistence.FetchType.LAZY;
 
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
-public class UserCosmetic {
+@Getter
+@Setter
+@NoArgsConstructor
+public class UserElements {
     @Id @GeneratedValue
     Long id;
 
@@ -26,10 +28,10 @@ public class UserCosmetic {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "item_id")
     @JsonIgnore
-    Cosmetic cosmetic;
+    Elements elements;
 
-    public UserCosmetic(User user, Cosmetic cosmetic) {
+    public UserElements(User user, Elements elements) {
         this.user = user;
-        this.cosmetic = cosmetic;
+        this.elements = elements;
     }
 }

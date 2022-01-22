@@ -1,5 +1,6 @@
 package com.ncores.plaluvs.domain;
 
+import com.ncores.plaluvs.controller.UserElements;
 import com.ncores.plaluvs.domain.skintype.skintrouble.SkinTroubleElements;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -41,6 +42,8 @@ public class Elements {
     @OneToMany(mappedBy = "elements", fetch = LAZY, cascade = CascadeType.ALL)
     List<SkinTroubleElements> skinTroubleElements = new ArrayList<>();
 
+    @OneToMany(mappedBy = "elements", fetch = LAZY, cascade = CascadeType.ALL)
+    List<UserElements> userElementsList = new ArrayList<>();
 
 
 

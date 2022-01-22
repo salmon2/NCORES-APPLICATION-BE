@@ -20,14 +20,17 @@ import com.ncores.plaluvs.repository.elements.ElementsRepository;
 import com.ncores.plaluvs.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -278,33 +281,117 @@ public class SkinService {
     }
 
 
-    public SkinStatusResponseDto skinStatus() {
-        List<Elements> findElements = elementsRepository.findTop5ByOrderByIdAsc();
-        List<SkinElementsDto> skinElementsDtos = new ArrayList<>();
-        for (Elements findElement : findElements) {
-            SkinElementsDto skinElementsDto = new SkinElementsDto(findElement.getKorean(), "https://www.ewg.org/skindeep/squircle/show.svg?score=1&score_min=1");
-            skinElementsDtos.add(skinElementsDto);
+    public SkinStatusResponseDto skinStatus(UserDetailsImpl userDetails) throws PlaluvsException {
+        UserDetailsImpl.UserCheck(userDetails);
+
+        SkinType dailySkinTYpe = skinTypeRepository.findDailySkinTypeException(userDetails);
+        List<SkinElementsDto> elementsDtoList = elementsRepository.findSkinElementsDtoListBySkinTypeGoodElements(dailySkinTYpe);
+        for (SkinElementsDto skinElementsDto : elementsDtoList) {
+            skinElementsDto.setImg(getImgSRc(skinElementsDto.getLevel()));
         }
 
+        
+        SkinStatusResponseDto result = new SkinStatusResponseDto(
+                dailySkinTYpe.getScore().toString() + "점",
+                "수분이 부족한 중/복합성 피부네요. 피부에 수분이 부족한 탓에 색소침착이 있네요. 다행히 피부가 저항성을 갖고 있어 외부 환경에 아주 민감 하진 않아요." +
+                        "그래도 주름과 색소침착을 예방하기 위해 자외선은 각별히 신경을 써주셔야해요.외출 시에는 꼭! 자외선 차단제를 자주 덧 발라주세요",
+                dailySkinTYpe.getOilIndicateScore() * 100 /9,
+                dailySkinTYpe.getDryScore()  * 100 / 5,
+                dailySkinTYpe.getSensitivityScore() * 100 / 9,
+                dailySkinTYpe.getPigmentScore() * 100 / 2,
+                dailySkinTYpe.getWinkleScore() *100 /3,
+                elementsDtoList
+        );
 
-        return new SkinStatusResponseDto("70점",
-                "수분이 부족한 중/복합성 피부네요. 피부에 수분이 부족한 탓에 색소침착이 있네요. 다행히 피부가 저항성을 갖고 있어 외부 환경에 아주 민감 하진 않아요.그래도 주름과 색소침착을 예방하기 위해 자외선은 각별히 신경을 써주셔야해요.외출 시에는 꼭! 자외선 차단제를 자주 덧 발라주세요",
-                70L,
-                70L,
-                70L,
-                70L,
-                skinElementsDtos
-                );
+        return result;
+    }
+    private String getImgSRc(String level) {
+        String low = "https://plaluvs-image.s3.ap-northeast-2.amazonaws.com/rank/row_rank.png";
+        String middle = "https://plaluvs-image.s3.ap-northeast-2.amazonaws.com/rank/middle_rank.png";
+        String high = "https://plaluvs-image.s3.ap-northeast-2.amazonaws.com/rank/high_rank.png";
+
+        if( level.contains("1")){
+            return low;
+        }
+        else if( level.contains("2")){
+            return low;
+        }
+
+        else if( level.contains("3")){
+            return middle;
+        }
+
+        else if( level.contains("4")){
+            return middle;
+        }
+
+        else if( level.contains("5")){
+            return middle;
+        }
+
+        else if( level.contains("6")){
+            return middle;
+        }
+
+        else if( level.contains("7")){
+            return high;
+        }
+
+        else if( level.contains("8")){
+            return high;
+        }
+
+        else if( level.contains("9")){
+            return high;
+        }
+
+        else if( level.contains("10")){
+            return high;
+        }
+
+        else if( level.contains("-")){
+            return low;
+        }
+
+        return "";
     }
 
-    public SkinStatusListResponseDto skinStatusList() {
-        List<StatusList> newStatusList = new ArrayList<>();
-        for (int i = 0; i < 2; i++) {
-            StatusList statusList = new StatusList("12월 " + (i + 29), String.valueOf(i + 80));
-            newStatusList.add(statusList);
+    public SkinStatusListResponseDto skinStatusList(UserDetailsImpl userDetails) {
+        Sort createdAt = Sort.by(Sort.Direction.DESC, "createdAt");
+
+        List<SkinType> skinTypeList = skinTypeRepository.findAllByUserOrderByCreatedAt(userDetails.getUser(), createdAt);
+        List<StatusList> statusList = new ArrayList<>();
+
+        for (SkinType skinType : skinTypeList) {
+            StatusList newSatusList = new StatusList(Timestamped.TimeToString(skinType.getCreatedAt(),
+                    "MM월 dd일"), skinType.getScore().toString() + "점");
+            statusList.add(newSatusList);
         }
 
-        SkinStatusListResponseDto result = new SkinStatusListResponseDto(newStatusList, "지난주 보다 피부 점수가 20점 상승했어요", "어제보다 민감한 피부가 진정되었어요");
+        Long minusScore = 0L;
+        if(skinTypeList.size() >= 2){
+            SkinType latest = skinTypeList.get(-1);
+            SkinType a = skinTypeList.get(-2);
+            minusScore = latest.getScore() - a.getScore();
+        }
+        String             str1 = "개선사항이 없습니다.";
+        String str2 = "개선사항이 없습니다.";
+        if(minusScore == 0){
+            str1 = "개선사항이 없습니다.";
+            str2 = "개선사항이 없습니다.";
+        }
+        else if (minusScore > 0 ){
+            str1= "지난 주 보다 점수가" + minusScore +"점 만큼 상승했어요.";
+            str2 = "어제보다 민감한 피부가 개선되었어요";
+        }
+        else if (minusScore < 0 ){
+            str1= "지난 주 보다 점수가" + -minusScore +"점 만큼 떨어졌어요.";
+            str2 = "어제보다 피부가 안좋아졌어요";
+        }
+
+        SkinStatusListResponseDto result = new SkinStatusListResponseDto(statusList, str1, str2);
+
+
         return result;
     }
 

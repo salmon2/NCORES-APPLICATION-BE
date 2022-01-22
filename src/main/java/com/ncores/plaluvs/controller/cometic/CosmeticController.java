@@ -6,6 +6,7 @@ import com.ncores.plaluvs.controller.cometic.dto.SimpleCosmeticDto;
 import com.ncores.plaluvs.crawling.CrawlingItemDto;
 import com.ncores.plaluvs.crawling.ReadJsonFile;
 import com.ncores.plaluvs.domain.Elements;
+import com.ncores.plaluvs.domain.UserCosmetic;
 import com.ncores.plaluvs.domain.dto.PagingResponseDto;
 import com.ncores.plaluvs.domain.dto.PagingSimpleResponseDto;
 import com.ncores.plaluvs.exception.ErrorCode;
@@ -16,12 +17,11 @@ import com.ncores.plaluvs.service.CosmeticService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.ParseException;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -50,7 +50,7 @@ public class CosmeticController {
 
     @GetMapping("/cosmetic/simple-recommends")
     public ResponseEntity<?> cosmeticSimpleRecommends(@AuthenticationPrincipal UserDetailsImpl userDetails) throws PlaluvsException {
-
+        UserDetailsImpl.UserCheck(userDetails);
         List<SimpleCosmeticDto> result = cosmeticService.cosmeticSimpleRecommends(userDetails);
 
         return new ResponseEntity<>(new PagingSimpleResponseDto(result.size(), result), HttpStatus.OK);
@@ -59,26 +59,32 @@ public class CosmeticController {
     @GetMapping("/cosmetic/detail-recommends/{category}/{page}")
     public ResponseEntity<?> cosmeticDetailRecommends(
             @PathVariable("category") Long categoryId,
-            @PathVariable Long page,
-            @AuthenticationPrincipal UserDetailsImpl userDetails
+            @PathVariable() Long page,
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @RequestParam(defaultValue = "asc") String sort
     ) throws PlaluvsException {
 
         UserDetailsImpl.UserCheck(userDetails);
-        List<DetailCosmeticDto> result = cosmeticService.cosmeticDetailRecommends(userDetails, categoryId, page);
+        page = (page == null) ? 0L : page;
 
-        return new ResponseEntity<>(new PagingResponseDto(result.size(), page.intValue(), 4, result), HttpStatus.OK);
+        Page<DetailCosmeticDto> result = cosmeticService.cosmeticDetailRecommends(userDetails, categoryId, page, sort);
+
+        return new ResponseEntity<>(new PagingResponseDto(result.getContent().size(), result.getNumber(), result.getTotalPages(), result.getContent()), HttpStatus.OK);
     }
 
     @GetMapping("/cosmetic/elements-recommend/{elements}/{category}/{page}")
-    public ResponseEntity<?> cosmeticElements(@PathVariable(value = "elements") Long elementsId,@PathVariable("category") Long categoryId, @PathVariable Long page) throws PlaluvsException {
+    public ResponseEntity<?> cosmeticElements(@PathVariable(value = "elements") Long elementsId,
+                                              @PathVariable("category") Long categoryId,
+                                              @PathVariable Long page,
+                                              @AuthenticationPrincipal UserDetailsImpl userDetails,
+                                              @RequestParam(defaultValue = "asc") String sort
+                                              ) throws PlaluvsException {
 
-        List<DetailCosmeticDto> result = cosmeticService.cosmeticContainsElements(elementsId, categoryId, page);
 
-        Elements elements = elementsRepository.findById(elementsId).orElseThrow(
-                () -> new PlaluvsException(ErrorCode.ELEMENT_NOT_FOUND)
-        );
+        Page<DetailCosmeticDto> result = cosmeticService.cosmeticContainsElements(userDetails, elementsId, categoryId, page, sort);
 
-        return new ResponseEntity<>(new CosmeticElementsResponseDto(result.size(), page, 4L, elements.getKorean(), result), HttpStatus.OK);
+
+        return new ResponseEntity<>(new PagingResponseDto(result.getContent().size(), result.getNumber(), result.getTotalPages(), result.getContent()), HttpStatus.OK);
     }
 
     @GetMapping("/cosmetic/worry-recommends")
@@ -87,5 +93,14 @@ public class CosmeticController {
 
         return new ResponseEntity<>(new PagingSimpleResponseDto(result.size(), result), HttpStatus.OK);
     }
+
+    @PostMapping("/cosmetic/mark/{cosmetic}")
+    public ResponseEntity<?> cosmeticMark(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long cosmetic) throws PlaluvsException {
+        UserCosmetic result = cosmeticService.cosmeticMark(userDetails, cosmetic);
+
+        return new ResponseEntity<>(result.getId(), HttpStatus.OK);
+    }
+
+
 
 }

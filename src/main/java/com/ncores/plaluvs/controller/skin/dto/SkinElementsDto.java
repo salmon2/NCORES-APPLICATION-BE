@@ -1,5 +1,6 @@
 package com.ncores.plaluvs.controller.skin.dto;
 
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,8 +9,30 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class SkinElementsDto {
+    private Long id;
     private String korName;
     private String img;
+    private String level;
+
+
+
+    @QueryProjection
+    public SkinElementsDto(String korName, String level) {
+        this.korName = korName;
+        this.level = level;
+    }
+
+    @QueryProjection
+    public SkinElementsDto(Long id, String korName, String level) {
+        this.id = id;
+        this.korName = korName;
+        this.level = level;
+    }
+
+    @QueryProjection
+    public SkinElementsDto(String korName) {
+        this.korName = korName;
+    }
+
 }

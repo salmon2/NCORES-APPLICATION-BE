@@ -8,7 +8,7 @@ import com.ncores.plaluvs.domain.skintype.skintrouble.*;
 import com.ncores.plaluvs.exception.ErrorCode;
 import com.ncores.plaluvs.exception.PlaluvsException;
 import com.ncores.plaluvs.repository.CategoryRepository;
-import com.ncores.plaluvs.repository.SkinTroubleElementsRepository;
+import com.ncores.plaluvs.repository.UserCosmeticRepository;
 import com.ncores.plaluvs.repository.cosmetic.CosmeticRepository;
 import com.ncores.plaluvs.repository.elements.ElementsRepository;
 import com.ncores.plaluvs.repository.SkinTypeRepository;
@@ -26,76 +26,48 @@ public class CosmeticService {
     private final ElementsRepository elementsRepository;
     private final SkinTypeRepository skinTypeRepository;
     private final CategoryRepository categoryRepository;
-    private final SkinTroubleElementsRepository skinTroubleElementsRepository;
+    private final UserCosmeticRepository userCosmeticRepository;
 
     public List<SimpleCosmeticDto> cosmeticSimpleRecommends(UserDetailsImpl userDetails) throws PlaluvsException {
-        SkinType dailySkinType = skinTypeRepository.findDailySkinTypeException(userDetails);
-        List<SimpleCosmeticDto> result = null;
-
-        return null;
-    }
-
-    public List<DetailCosmeticDto> cosmeticDetailRecommends(UserDetailsImpl userDetails, Long categoryId, Long page) throws PlaluvsException {
-        List<DetailCosmeticDto> result = new ArrayList<>();
-        SkinType dailySkinType = skinTypeRepository.findDailySkinType(userDetails);
-        PageRequest paging = PageRequest.of(page.intValue(), 20, Sort.by("price").ascending());
-
-        Category category = categoryRepository.findById(categoryId).orElseThrow(
-                () -> new PlaluvsException(ErrorCode.CATEGORY_NOT_FOUND)
-        );
+        SkinType dailySkinType = skinTypeRepository.findDailySkinTypeOrLatestSkinType(userDetails);
+        List<Elements> elements = elementsRepository.findAllBySkinTypeGoodElements(dailySkinType);
 
 
-        if(dailySkinType.getBouman().equals("ORNT")){
-            Page<Cosmetic> allByCategory = cosmeticRepository.findAllByCategory(category, paging);
-            for (Cosmetic cosmetic : allByCategory) {
-                DetailCosmeticDto detailCosmeticDto = new DetailCosmeticDto(cosmetic.getId(), cosmetic.getItemImg(), cosmetic.getItemBrand(), cosmetic.getItemName(), cosmetic.getPrice(),
-                        Boolean.TRUE);
-                result.add(detailCosmeticDto);
-            }
-        }
-        else{
-            List<SkinTypeGoodElements> skinTypeGoodElementsList = dailySkinType.getSkinTypeGoodElementsList();
-            for (SkinTypeGoodElements skinTypeGoodElements : skinTypeGoodElementsList) {
-                List<CosmeticElements> cosmeticElementsList = skinTypeGoodElements.getElements().getCosmeticElementsList();
-                for (CosmeticElements cosmeticElements : cosmeticElementsList) {
-                    Cosmetic cosmetic = cosmeticElements.getCosmetic();
-                    if(cosmetic.getCategory().getId().equals(category.getId())){
-                        DetailCosmeticDto detailCosmeticDto = new DetailCosmeticDto(cosmetic.getId(), cosmetic.getItemImg(), cosmetic.getItemBrand(), cosmetic.getItemName(), cosmetic.getPrice(),
-                                Boolean.TRUE);
-                        result.add(detailCosmeticDto);
-                    }
-                    else
-                        continue;
-                }
-            }
-
-            Set<DetailCosmeticDto> set = new HashSet<>(result);
-            result = new ArrayList<>(set);
-            if(result.size() >20)
-                result = result.subList(0,20);
-        }
+        List<SimpleCosmeticDto> result = cosmeticRepository.findAllbyBouman(userDetails, elements);
 
         return result;
     }
 
-    public List<DetailCosmeticDto> cosmeticContainsElements(Long elements_id, Long categoryId, Long page) throws PlaluvsException {
-        List<Cosmetic> findCosmetic = cosmeticRepository.findAll();
-        List<DetailCosmeticDto> result = new ArrayList<>();
+    public Page<DetailCosmeticDto> cosmeticDetailRecommends(UserDetailsImpl userDetails, Long categoryId, Long page, String sort) throws PlaluvsException {
+        PageRequest pageRequest = PageRequest.of(page.intValue(), 20);
 
-        categoryRepository.findById(categoryId).orElseThrow(
-                ()->  new PlaluvsException(ErrorCode.CATEGORY_NOT_FOUND)
+        SkinType dailySkinType = skinTypeRepository.findDailySkinTypeOrLatestSkinType(userDetails);
+        List<Elements> findElements = elementsRepository.findAllBySkinTypeGoodElements(dailySkinType);
+
+        Category findCategory = categoryRepository.findById(categoryId).orElseThrow(
+                () -> new PlaluvsException(ErrorCode.CATEGORY_NOT_FOUND)
         );
 
 
-        for (int i = 0; i <20; i++) {
-            DetailCosmeticDto detailCosmeticDto = new DetailCosmeticDto(
-                    findCosmetic.get(i).getId(),
-                    findCosmetic.get(i).getItemImg(), findCosmetic.get(i).getItemBrand(), findCosmetic.get(i).getItemName(),
-                    findCosmetic.get(i).getPrice(), (i % 2 == 0) ? Boolean.TRUE : Boolean.FALSE
-            );
+        Page<DetailCosmeticDto> result = cosmeticRepository.findAllByCategoryAndBouman(userDetails, findElements, findCategory, pageRequest, sort);
 
-            result.add(detailCosmeticDto);
-        }
+
+        return result;
+    }
+
+    public Page<DetailCosmeticDto> cosmeticContainsElements(UserDetailsImpl userDetails, Long elementsId, Long categoryId, Long page, String sort) throws PlaluvsException {
+        Elements findElements = elementsRepository.findById(elementsId).orElseThrow(
+                () -> new PlaluvsException(ErrorCode.ELEMENT_NOT_FOUND)
+        );
+
+        Category findCategory = categoryRepository.findById(categoryId).orElseThrow(
+                () -> new PlaluvsException(ErrorCode.CATEGORY_NOT_FOUND)
+        );
+
+        PageRequest pageRequest = PageRequest.of(page.intValue(), 20);
+
+
+        Page<DetailCosmeticDto> result = cosmeticRepository.findCosmeticByElementsCustom(userDetails, findElements, findCategory, pageRequest, sort);
 
         return result;
     }
@@ -107,12 +79,22 @@ public class CosmeticService {
         List<SkinTrouble> skinTroubleList = dailySkinType.getSkinTroubleList();
         List<Elements> elements = elementsRepository.findAllBySkinTroubleCustom(skinTroubleList);
 
-        List<SkinTroubleElements> skinTroubleElements = new ArrayList<>();
-
 
         List<SimpleCosmeticDto> result = cosmeticRepository.findCosmeticWorry(elements, userDetails);
 
         return result;
 
+    }
+
+    public UserCosmetic cosmeticMark(UserDetailsImpl userDetails, Long cosmetic) throws PlaluvsException {
+        UserDetailsImpl.UserCheck(userDetails);
+
+        Cosmetic findCosmetic = cosmeticRepository.findById(cosmetic).orElseThrow(
+                () -> new PlaluvsException(ErrorCode.COSMETIC_NOT_FOUND)
+        );
+
+        UserCosmetic newUserCosmetic = new UserCosmetic(userDetails.getUser(), findCosmetic);
+        UserCosmetic save = userCosmeticRepository.save(newUserCosmetic);
+        return save;
     }
 }

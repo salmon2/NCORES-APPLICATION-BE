@@ -16,6 +16,7 @@ public class SkinStatusResponseDto {
     private String totalScore;
     private String content;
     private Long oilIndicate;
+    private Long dry;
     private Long sensitivity;
     private Long pigment;
     private Long winkle;

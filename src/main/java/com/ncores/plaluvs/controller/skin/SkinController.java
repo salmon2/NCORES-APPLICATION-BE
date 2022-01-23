@@ -45,7 +45,7 @@ public class SkinController {
 
         log.info("/skin/worry");
         log.info("requestDto = {}", requestDto);
-
+        //skinworry 없으면 걸기
         UserDetailsImpl.UserCheck(userDetails);
         skinService.skinWorryUpdate(requestDto, userDetails);
 
@@ -88,11 +88,16 @@ public class SkinController {
         UserDetailsImpl.UserCheck(userDetails);
         skinService.skinSelfCheck(requestDto, userDetails);
 
+        String boumanType = skinService.skinBoumanCalucluate(userDetails);
+        skinTypeService.findSkinElements(userDetails);
+
+
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/skin/bouman/calculate")
-    public ResponseEntity<?> skinBoumanCalculate(@AuthenticationPrincipal UserDetailsImpl userDetails) throws PlaluvsException {
+    public ResponseEntity<?> skinBoumanCalculate(
+            @AuthenticationPrincipal UserDetailsImpl userDetails) throws PlaluvsException {
         log.info("/skin/bouman/calculate");
         UserDetailsImpl.UserCheck(userDetails);
 

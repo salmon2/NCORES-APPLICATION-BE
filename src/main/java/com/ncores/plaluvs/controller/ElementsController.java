@@ -20,7 +20,8 @@ public class ElementsController {
 
 
     @PostMapping("/elements/mark/{elements}")
-    public ResponseEntity<?> cosmeticMark(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long elements) throws PlaluvsException {
+    public ResponseEntity<?> cosmeticMark(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                          @PathVariable Long elements) throws PlaluvsException {
         UserElements result = elementsService.elementsMark(userDetails, elements);
 
         return new ResponseEntity<>(result.getId(), HttpStatus.OK);

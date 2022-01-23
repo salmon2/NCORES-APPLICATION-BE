@@ -370,8 +370,8 @@ public class SkinService {
 
         Long minusScore = 0L;
         if(skinTypeList.size() >= 2){
-            SkinType latest = skinTypeList.get(-1);
-            SkinType a = skinTypeList.get(-2);
+            SkinType latest = skinTypeList.get(skinTypeList.size() - 1);
+            SkinType a = skinTypeList.get(skinTypeList.size() - 2);
             minusScore = latest.getScore() - a.getScore();
         }
         String             str1 = "개선사항이 없습니다.";

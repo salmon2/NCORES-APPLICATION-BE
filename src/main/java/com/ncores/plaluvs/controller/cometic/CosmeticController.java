@@ -95,7 +95,9 @@ public class CosmeticController {
     }
 
     @PostMapping("/cosmetic/mark/{cosmetic}")
-    public ResponseEntity<?> cosmeticMark(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long cosmetic) throws PlaluvsException {
+    public ResponseEntity<?> cosmeticMark(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @PathVariable Long cosmetic) throws PlaluvsException {
         UserCosmetic result = cosmeticService.cosmeticMark(userDetails, cosmetic);
 
         return new ResponseEntity<>(result.getId(), HttpStatus.OK);

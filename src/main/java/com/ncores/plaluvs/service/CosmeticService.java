@@ -48,7 +48,6 @@ public class CosmeticService {
                 () -> new PlaluvsException(ErrorCode.CATEGORY_NOT_FOUND)
         );
 
-
         Page<DetailCosmeticDto> result = cosmeticRepository.findAllByCategoryAndBouman(userDetails, findElements, findCategory, pageRequest, sort);
 
 
@@ -83,7 +82,6 @@ public class CosmeticService {
         List<SimpleCosmeticDto> result = cosmeticRepository.findCosmeticWorry(elements, userDetails);
 
         return result;
-
     }
 
     public UserCosmetic cosmeticMark(UserDetailsImpl userDetails, Long cosmetic) throws PlaluvsException {

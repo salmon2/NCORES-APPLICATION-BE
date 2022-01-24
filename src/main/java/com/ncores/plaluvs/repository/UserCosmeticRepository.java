@@ -1,5 +1,6 @@
 package com.ncores.plaluvs.repository;
 
+import com.ncores.plaluvs.domain.Cosmetic;
 import com.ncores.plaluvs.domain.UserCosmetic;
 import com.ncores.plaluvs.domain.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,4 +13,5 @@ public interface UserCosmeticRepository extends JpaRepository<UserCosmetic, Long
 
     List<UserCosmetic> findAllByUser(User user);
 
+    UserCosmetic findByUserAndCosmetic(User user, Cosmetic cosmetic);
 }

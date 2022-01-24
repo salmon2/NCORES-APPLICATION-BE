@@ -15,4 +15,6 @@ public class SignInResponseDto {
     private String nickname;
     private Boolean GenderExist;
     private Boolean ageExist;
+    private Boolean statusExist;
+    private Boolean worryExist;
 }

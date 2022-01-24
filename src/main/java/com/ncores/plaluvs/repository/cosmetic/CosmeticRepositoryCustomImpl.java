@@ -26,6 +26,7 @@ import org.springframework.stereotype.Repository;
 import java.io.Serializable;
 import java.util.List;
 
+import static com.ncores.plaluvs.domain.QCategory.category;
 import static com.ncores.plaluvs.domain.QCosmetic.cosmetic;
 import static com.ncores.plaluvs.domain.QCosmeticElements.cosmeticElements;
 import static com.ncores.plaluvs.domain.QElements.elements;
@@ -50,7 +51,7 @@ public class CosmeticRepositoryCustomImpl implements CosmeticRepositoryCustom{
                 .from(cosmeticElements)
                 .join(cosmeticElements.elements, elements)
                 .where(cosmeticElements.elements.in(findElements))
-                .limit(5)
+                .limit(7)
                 .fetch();
 
         return result;
@@ -70,7 +71,7 @@ public class CosmeticRepositoryCustomImpl implements CosmeticRepositoryCustom{
                 .from(cosmeticElements)
                 .join(cosmeticElements.elements, elements)
                 .where(cosmeticElements.elements.in(findElements))
-                .limit(5)
+                .limit(7)
                 .fetch();
 
         return result;
@@ -95,7 +96,7 @@ public class CosmeticRepositoryCustomImpl implements CosmeticRepositoryCustom{
                 .where(cosmeticElements.elements.in(findElements).and(cosmeticElements.cosmetic.category.eq(findCategory)))
                 .offset(pageRequest.getOffset())
                 .limit(pageRequest.getPageSize())
-                .orderBy(getSortBy(sort))
+                .orderBy(getSortCosmeticElements(sort))
                 .fetch();
 
         JPAQuery<CosmeticElements> countQuery = countDetailCosmeticByElementsList(findElements, findCategory);
@@ -111,7 +112,38 @@ public class CosmeticRepositoryCustomImpl implements CosmeticRepositoryCustom{
                 .where(cosmeticElements.elements.in(findElements).and(cosmeticElements.cosmetic.category.eq(findCategory)));
 
     }
+    @Override
+    public Page<DetailCosmeticDto> findAllByCategoryCustom(UserDetailsImpl userDetails, Category findCategory, PageRequest pageRequest, String sort) {
+        List<DetailCosmeticDto> result = queryFactory
+                .select(
+                        new QDetailCosmeticDto(
+                                cosmetic.id,
+                                cosmetic.itemImg,
+                                cosmetic.itemBrand,
+                                cosmetic.itemName,
+                                cosmetic.price,
+                                (userDetails == null) ? setFalse() : distinguishBookmarkExistUser(userDetails.getUser())
+                        )
+                )
+                .from(cosmetic)
+                .join(cosmetic.category, category)
+                .where(category.id.eq(findCategory.getId()))
+                .limit(pageRequest.getPageSize())
+                .offset(pageRequest.getOffset())
+                .orderBy(getSortCosmetic(sort))
+                .fetch();
 
+        JPAQuery<Cosmetic> countQuery = countDetailCosmetic(findCategory);
+
+        return PageableExecutionUtils.getPage(result, pageRequest, countQuery::fetchCount);
+    }
+
+    private JPAQuery<Cosmetic> countDetailCosmetic(Category findCategory) {
+        return queryFactory
+                .selectFrom(cosmetic)
+                .join(cosmetic.category, category)
+                .where(category.id.eq(findCategory.getId()));
+    }
 
     @Override
     public Page<DetailCosmeticDto> findCosmeticByElementsCustom(UserDetailsImpl userDetails, Elements findElements, Category findCategory, PageRequest pageRequest, String sort) {
@@ -131,7 +163,7 @@ public class CosmeticRepositoryCustomImpl implements CosmeticRepositoryCustom{
                 .where(cosmeticElements.elements.eq(findElements).and(cosmeticElements.cosmetic.category.eq(findCategory)))
                 .limit(pageRequest.getPageSize())
                 .offset(pageRequest.getOffset())
-                .orderBy(getSortBy(sort))
+                .orderBy(getSortCosmeticElements(sort))
                 .fetch();
 
         JPAQuery<CosmeticElements> countQuery = countDetailCosmeticByElement(findElements, findCategory);
@@ -161,6 +193,25 @@ public class CosmeticRepositoryCustomImpl implements CosmeticRepositoryCustom{
 
         return PageableExecutionUtils.getPage(result, pageRequest, countQuery::fetchCount);
     }
+
+    @Override
+    public List<SimpleCosmeticDto> findCosmeticNoneWorry(User user) {
+        return queryFactory
+                .select(
+                        new QSimpleCosmeticDto(
+                                cosmetic.id,
+                                cosmetic.itemImg,
+                                cosmetic.itemName,
+                                (user == null) ? setFalse() : distinguishBookmarkExistUser(user)
+                        )
+                )
+                .from(cosmetic)
+                .limit(7)
+                .fetch();
+
+    }
+
+
 
     private JPAQuery<UserCosmetic> countMyBookmarkUserCosmetic(User user) {
         return queryFactory
@@ -200,11 +251,19 @@ public class CosmeticRepositoryCustomImpl implements CosmeticRepositoryCustom{
     }
 
 
-    private OrderSpecifier<? extends Serializable> getSortBy(String sort) {
+    private OrderSpecifier<? extends Serializable> getSortCosmeticElements(String sort) {
         if(sort.equals("asc"))
             return cosmeticElements.cosmetic.price.asc();
         else if(sort.equals("desc"))
             return cosmeticElements.cosmetic.price.desc();
             return null;
     }
+    private OrderSpecifier<? extends Serializable> getSortCosmetic(String sort) {
+        if(sort.equals("asc"))
+            return cosmetic.price.asc();
+        else if(sort.equals("desc"))
+            return cosmetic.price.desc();
+        return null;
+    }
+
 }

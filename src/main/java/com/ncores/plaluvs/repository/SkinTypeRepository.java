@@ -18,6 +18,7 @@ import java.util.List;
 @Repository
 public interface SkinTypeRepository extends JpaRepository<SkinType, Long> {
     SkinType findTopByUserOrderByCreatedAtAsc(User user);
+
     SkinType findTopByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 
     SkinType findTopByUserAndCreatedAtBetween(User user, LocalDateTime startDatetime, LocalDateTime endDatetime);
@@ -25,6 +26,7 @@ public interface SkinTypeRepository extends JpaRepository<SkinType, Long> {
     SkinType findTopByUserOrderByCreatedAtDesc(User user);
 
     List<SkinType> findAllByUserOrderByCreatedAt(User user, Sort createdAt);
+
 
     default SkinType findDailySkinType(UserDetailsImpl userDetails) {
         LocalDateTime startDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(0,0,0)); //오늘 00:00:00
@@ -63,8 +65,36 @@ public interface SkinTypeRepository extends JpaRepository<SkinType, Long> {
         LocalDateTime endDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(23,59,59)); //오늘 23:59:59
 
         SkinType findDailySkinType = findTopByUserAndCreatedAtBetween(userDetails.getUser(), startDatetime, endDatetime);
+
         if(findDailySkinType == null)
             findDailySkinType = findTopByUserOrderByCreatedAtAsc(userDetails.getUser());
+
+        if(findDailySkinType == null)
+            throw new PlaluvsException(ErrorCode.SKIN_TYPE_NOT_FOUND);
+
+        return findDailySkinType;
+    }
+
+    default SkinType findDailySkinTypeOrLatestSkinTypeNotException(UserDetailsImpl userDetails) throws PlaluvsException {
+        LocalDateTime startDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(0,0,0)); //오늘 00:00:00
+        LocalDateTime endDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(23,59,59)); //오늘 23:59:59
+
+        SkinType findDailySkinType = findTopByUserAndCreatedAtBetween(userDetails.getUser(), startDatetime, endDatetime);
+
+        if(findDailySkinType == null)
+            findDailySkinType = findTopByUserOrderByCreatedAtAsc(userDetails.getUser());
+
+
+        return findDailySkinType;
+    }
+
+    default SkinType findDailySkinTypeOrLatestSkinType(User user) throws PlaluvsException {
+        LocalDateTime startDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(0,0,0)); //오늘 00:00:00
+        LocalDateTime endDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(23,59,59)); //오늘 23:59:59
+
+        SkinType findDailySkinType = findTopByUserAndCreatedAtBetween(user, startDatetime, endDatetime);
+        if(findDailySkinType == null)
+            findDailySkinType = findTopByUserOrderByCreatedAtAsc(user);
         if(findDailySkinType == null)
             throw new PlaluvsException(ErrorCode.SKIN_TYPE_NOT_FOUND);
 

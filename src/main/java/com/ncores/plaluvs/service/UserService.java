@@ -2,10 +2,12 @@ package com.ncores.plaluvs.service;
 
 import com.ncores.plaluvs.controller.user.dto.*;
 import com.ncores.plaluvs.domain.dto.ElementsDto;
+import com.ncores.plaluvs.domain.skintype.SkinType;
 import com.ncores.plaluvs.domain.user.User;
 import com.ncores.plaluvs.domain.user.UserRoleEnum;
 import com.ncores.plaluvs.exception.ErrorCode;
 import com.ncores.plaluvs.exception.PlaluvsException;
+import com.ncores.plaluvs.repository.SkinTypeRepository;
 import com.ncores.plaluvs.repository.UserCosmeticRepository;
 import com.ncores.plaluvs.repository.cosmetic.CosmeticRepository;
 import com.ncores.plaluvs.repository.elements.ElementsRepository;
@@ -35,6 +37,7 @@ public class UserService {
     private final ElementsRepository elementsRepository;
     private final CosmeticRepository cosmeticRepository;
     private final UserCosmeticRepository userCosmeticRepository;
+    private final SkinTypeRepository skinTypeRepository;
 
 
     @Transactional
@@ -111,7 +114,7 @@ public class UserService {
             throw new PlaluvsException(ErrorCode.PASSWORD_NOT_EQUAL);
         }
 
-        if(pw.length() <= 8 ){
+        if(pw.length() < 8 ){
             throw new PlaluvsException(ErrorCode.PASSWORD_FAIL);
         }
     }
@@ -135,17 +138,38 @@ public class UserService {
         if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
             throw new PlaluvsException(ErrorCode.USER_NOT_FOUND);
         }
+
         String token = jwtTokenProvider.createToken(user.getUsername(), user.getUsername(), user.getNickname());
+        SkinType skinType = skinTypeRepository.findTopByUserOrderByCreatedAtDesc(user);
+
 
         SignInResponseDto signInResponseDto = new SignInResponseDto(
                 token,
                 user.getId(),
                 user.getNickname(),
                 (user.getGender() == null) ? Boolean.FALSE : Boolean.TRUE,
-                (user.getAge() == null) ? Boolean.FALSE : Boolean.TRUE
+                (user.getAge() == null) ? Boolean.FALSE : Boolean.TRUE,
+                getCurrentSKinStatusExist(skinType),
+                getCurrentSKinWorryExist(skinType)
         );
 
         return signInResponseDto;
+    }
+
+    private Boolean getCurrentSKinStatusExist(SkinType skinType){
+        if(skinType == null)
+            return Boolean.FALSE;
+        else{
+            return (skinType.getCurrentSkinStatus() == null) ? Boolean.FALSE : Boolean.TRUE;
+        }
+    }
+
+    private Boolean getCurrentSKinWorryExist(SkinType skinType){
+        if(skinType == null)
+            return Boolean.FALSE;
+        else{
+            return (skinType.getSkinTroubleList() == null) ? Boolean.FALSE : Boolean.TRUE;
+        }
     }
 
     @Transactional

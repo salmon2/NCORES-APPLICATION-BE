@@ -80,7 +80,6 @@ public class CosmeticController {
                                               @RequestParam(defaultValue = "asc") String sort
                                               ) throws PlaluvsException {
 
-
         Page<DetailCosmeticDto> result = cosmeticService.cosmeticContainsElements(userDetails, elementsId, categoryId, page, sort);
 
 

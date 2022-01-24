@@ -128,7 +128,5 @@ public class CosmeticService {
             return "즐겨찾기 삭제 완료";
         }
 
-
-
     }
 }

@@ -15,7 +15,4 @@ public class SkinStatusListResponseDto {
     private List<StatusList> statusList;
     private String content1;
     private String content2;
-
-
-
 }

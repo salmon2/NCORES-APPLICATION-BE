@@ -46,6 +46,8 @@ public class SimpleListener implements ApplicationListener<ApplicationStartedEve
 
         userRepository.deleteById(byUsername.get().getId());
         userRepository.save(newUser2);
+
+//        skinTypeRepository.deleteAll();
     }
 
 }

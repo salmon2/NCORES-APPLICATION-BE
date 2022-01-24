@@ -6,9 +6,9 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class StatusList {
+public class Status {
+    private Long score;
     private String date;
-    private String score;
 
 
 }

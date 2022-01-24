@@ -3,7 +3,6 @@ package com.ncores.plaluvs.controller.skin;
 import com.ncores.plaluvs.controller.skin.dto.*;
 import com.ncores.plaluvs.domain.dto.SkinNowStatusRequestDto;
 import com.ncores.plaluvs.domain.dto.SkinWorryRequestDto;
-import com.ncores.plaluvs.domain.user.User;
 import com.ncores.plaluvs.exception.PlaluvsException;
 import com.ncores.plaluvs.security.UserDetailsImpl;
 import com.ncores.plaluvs.service.SkinService;
@@ -13,10 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -115,16 +111,39 @@ public class SkinController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @GetMapping("/skin/status/list")
-    public ResponseEntity<?> skinStatusList(@AuthenticationPrincipal UserDetailsImpl userDetails){
+    @GetMapping("/skin/status/list/{page}")
+    public ResponseEntity<?> skinStatusList(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                            @PathVariable Long page,
+                                            @RequestParam(defaultValue = "asc") String sort){
         log.info("skin/status/list");
-        SkinStatusListResponseDto result = skinService.skinStatusList(userDetails);
+        PagingAveragingScoreResponseDto result = skinService.skinStatusList(userDetails, page, sort);
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    @GetMapping("/skin/status/bouman")
+    public ResponseEntity<?> skinStatusBouman(@AuthenticationPrincipal UserDetailsImpl userDetails){
+        log.info("skin/status/list");
+         skinStatusBoumanResponseDto result = skinService.skinStatusBouman(userDetails);
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @GetMapping("/skin/status/record/{page}")
+    public ResponseEntity<?> skinStatusRecord(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                              @PathVariable Long page){
+        log.info("skin/status/list");
+        SkinStatusRecordResponseDto result = skinService.skinStatusRecord(userDetails, page);
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+
+
+
+
     @PostMapping("/skin/bouman/elements")
-    public ResponseEntity<?> skinBoumanElements(@AuthenticationPrincipal UserDetailsImpl userDetails){
+    public ResponseEntity<?> skinBoumanElements(@AuthenticationPrincipal UserDetailsImpl userDetails,){
         log.info("/skin/bouman/elements");
         skinTypeService.findSkinElements(userDetails);
 

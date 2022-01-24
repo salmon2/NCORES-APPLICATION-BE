@@ -9,7 +9,7 @@ import com.ncores.plaluvs.domain.skintype.SkinType;
 import com.ncores.plaluvs.repository.elements.ElementsRepository;
 import com.ncores.plaluvs.repository.STBadElementRepository;
 import com.ncores.plaluvs.repository.STGoodElementsRepository;
-import com.ncores.plaluvs.repository.SkinTypeRepository;
+import com.ncores.plaluvs.repository.skinType.SkinTypeRepository;
 import com.ncores.plaluvs.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -17,9 +17,12 @@ import com.ncores.plaluvs.exception.ErrorCode;
 import com.ncores.plaluvs.exception.PlaluvsException;
 import com.ncores.plaluvs.repository.*;
 import com.ncores.plaluvs.repository.elements.ElementsRepository;
+import com.ncores.plaluvs.repository.skinType.SkinTypeRepository;
 import com.ncores.plaluvs.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -27,10 +30,9 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -356,43 +358,44 @@ public class SkinService {
         return "";
     }
 
-    public SkinStatusListResponseDto skinStatusList(UserDetailsImpl userDetails) {
-        Sort createdAt = Sort.by(Sort.Direction.DESC, "createdAt");
+    public PagingAveragingScoreResponseDto skinStatusList(UserDetailsImpl userDetails, Long page, String sort) {
+        PageRequest pageRequest = PageRequest.of(page.intValue(), 7);
+        Page<SkinType> result =  skinTypeRepository.findAllCustom(userDetails, pageRequest, sort);
+        List<Status> statusList = new ArrayList<>();
 
-        List<SkinType> skinTypeList = skinTypeRepository.findAllByUserOrderByCreatedAt(userDetails.getUser(), createdAt);
-        List<StatusList> statusList = new ArrayList<>();
+        Double averageCustom = skinTypeRepository.findAverageCustom(userDetails);
 
-        for (SkinType skinType : skinTypeList) {
-            StatusList newSatusList = new StatusList(Timestamped.TimeToString(skinType.getCreatedAt(),
-                    "MM월 dd일"), skinType.getScore().toString() + "점");
-            statusList.add(newSatusList);
+
+        for (SkinType skinType : result) {
+            LocalDateTime createdAt = skinType.getCreatedAt();
+            Status newStatusList = new Status(skinType.getScore(), getDate(createdAt));
+            statusList.add(newStatusList);
         }
 
-        Long minusScore = 0L;
-        if(skinTypeList.size() >= 2){
-            SkinType latest = skinTypeList.get(skinTypeList.size() - 1);
-            SkinType a = skinTypeList.get(skinTypeList.size() - 2);
-            minusScore = latest.getScore() - a.getScore();
-        }
-        String             str1 = "개선사항이 없습니다.";
-        String str2 = "개선사항이 없습니다.";
-        if(minusScore == 0){
-            str1 = "개선사항이 없습니다.";
-            str2 = "개선사항이 없습니다.";
-        }
-        else if (minusScore > 0 ){
-            str1= "지난 주 보다 점수가" + minusScore +"점 만큼 상승했어요.";
-            str2 = "어제보다 민감한 피부가 개선되었어요";
-        }
-        else if (minusScore < 0 ){
-            str1= "지난 주 보다 점수가" + -minusScore +"점 만큼 떨어졌어요.";
-            str2 = "어제보다 피부가 안좋아졌어요";
-        }
-
-        SkinStatusListResponseDto result = new SkinStatusListResponseDto(statusList, str1, str2);
 
 
-        return result;
+        return new PagingAveragingScoreResponseDto(statusList.size(), averageCustom.intValue(), result.getNumber(), result.getTotalPages(), statusList);
+    }
+
+    private String getDate(LocalDateTime createdAt){
+        LocalDateTime now = LocalDateTime.now();
+
+        long betWeenYear = ChronoUnit.YEARS.between(now, createdAt);
+        if(betWeenYear != 0){
+            return "1년 전";
+        }
+
+        long betWeenMonth = ChronoUnit.MONTHS.between(now, createdAt);
+        if(betWeenMonth != 0 ){
+            return betWeenMonth +"달 전";
+        }
+
+        long betWeenDay = ChronoUnit.DAYS.between(now, createdAt);
+        if(betWeenDay != 0){
+            return betWeenDay +"일 전";
+        }
+
+        return "오늘";
     }
 
 
@@ -539,5 +542,56 @@ public class SkinService {
             key += "T";
         }
         return key;
+    }
+
+    public skinStatusBoumanResponseDto skinStatusBouman(UserDetailsImpl userDetails) {
+
+        skinStatusBoumanResponseDto result = new skinStatusBoumanResponseDto();
+        LocalDateTime startDatetime;
+        LocalDateTime endDatetime;
+
+        startDatetime = LocalDateTime.of(LocalDate.now().minusWeeks(1), LocalTime.of(0,0,0)); //오늘 00:00:00
+        endDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(23,59,59)); //오늘 23:59:59
+
+        SkinType skinTypeThisWeek = skinTypeRepository.findTopByCreatedAtBetweenAndUser(startDatetime, endDatetime, userDetails.getUser());
+        resultAdd(result, skinTypeThisWeek, "이번 주");
+
+
+        startDatetime = LocalDateTime.of(LocalDate.now().minusWeeks(2), LocalTime.of(0,0,0)); //오늘 00:00:00
+        endDatetime = LocalDateTime.of(LocalDate.now().minusWeeks(1), LocalTime.of(23,59,59)); //오늘 23:59:59
+
+        SkinType skinTypeWeekAgo = skinTypeRepository.findTopByCreatedAtBetweenAndUser(startDatetime, endDatetime, userDetails.getUser());
+        resultAdd(result, skinTypeWeekAgo, "일주일 전");
+
+
+
+        startDatetime = LocalDateTime.of(LocalDate.now().minusMonths(2), LocalTime.of(0,0,0)); //오늘 00:00:00
+        endDatetime = LocalDateTime.of(LocalDate.now().minusWeeks(2), LocalTime.of(23,59,59)); //오늘 23:59:59
+
+        SkinType skinTypeMonthAgo= skinTypeRepository.findTopByCreatedAtBetweenAndUser(startDatetime, endDatetime, userDetails.getUser());
+        resultAdd(result, skinTypeMonthAgo, "한달 전");
+
+        return result;
+    }
+
+    private void resultAdd(skinStatusBoumanResponseDto result, SkinType skinTypeThisWeek, String msg) {
+        if(skinTypeThisWeek == null)
+            return;
+        result.getAquaScore().add(new ScoreData(msg, (skinTypeThisWeek.getDryScore()*100/5) ));
+        result.getOilScore().add(new ScoreData(msg, (skinTypeThisWeek.getOilIndicateScore()*100/8) ));
+        result.getSensitiveScore().add(new ScoreData(msg, (skinTypeThisWeek.getSensitivityScore()*100/9) ));
+        result.getWinkleScore().add(new ScoreData(msg, (skinTypeThisWeek.getWinkleScore()*100/3) ));
+        result.getPigmentScore().add(new ScoreData(msg, (skinTypeThisWeek.getPigmentScore()*100/2) ));
+    }
+
+    public SkinStatusRecordResponseDto skinStatusRecord(UserDetailsImpl userDetails, Long page) {
+        PageRequest pageRequest = PageRequest.of(page.intValue(), 7);
+
+        Page<SkinStatusRecordResponseDto> result = skinTypeRepository.findskinStatusRecord(userDetails, pageRequest);
+        for (SkinStatusRecordResponseDto skinStatusRecordResponseDto : result) {
+            skinStatusRecordResponseDto.getDate();
+        }
+
+        return null;
     }
 }

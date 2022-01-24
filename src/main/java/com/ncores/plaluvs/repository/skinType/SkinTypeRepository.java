@@ -1,4 +1,4 @@
-package com.ncores.plaluvs.repository;
+package com.ncores.plaluvs.repository.skinType;
 
 import com.ncores.plaluvs.domain.skintype.CurrentSkinStatus;
 import com.ncores.plaluvs.domain.skintype.SkinType;
@@ -16,7 +16,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 @Repository
-public interface SkinTypeRepository extends JpaRepository<SkinType, Long> {
+public interface SkinTypeRepository extends JpaRepository<SkinType, Long>, SkinTypeRepositoryCustom {
     SkinType findTopByUserOrderByCreatedAtAsc(User user);
 
     SkinType findTopByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
@@ -102,4 +102,5 @@ public interface SkinTypeRepository extends JpaRepository<SkinType, Long> {
     }
 
 
+    SkinType findTopByCreatedAtBetweenAndUser(LocalDateTime startDatetime, LocalDateTime endDatetime, User user);
 }

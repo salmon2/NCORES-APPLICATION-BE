@@ -11,7 +11,7 @@ import com.ncores.plaluvs.repository.CategoryRepository;
 import com.ncores.plaluvs.repository.UserCosmeticRepository;
 import com.ncores.plaluvs.repository.cosmetic.CosmeticRepository;
 import com.ncores.plaluvs.repository.elements.ElementsRepository;
-import com.ncores.plaluvs.repository.SkinTypeRepository;
+import com.ncores.plaluvs.repository.skinType.SkinTypeRepository;
 import com.ncores.plaluvs.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;

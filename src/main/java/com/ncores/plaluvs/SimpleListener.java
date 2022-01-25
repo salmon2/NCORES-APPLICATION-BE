@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
@@ -32,18 +33,25 @@ public class SimpleListener implements ApplicationListener<ApplicationStartedEve
     @SneakyThrows
     @Override
     public void onApplicationEvent(ApplicationStartedEvent event) {
+        userRepository.deleteAll();
+
         User newUser2 = new User(
                 "dys04076@naver.com",
                 passwordEncoder.encode("asdf"),
                 "test",
                 UserRoleEnum.ADMIN
         );
-        Optional<User> byUsername = userRepository.findByUsername(newUser2.getUsername());
 
-        userRepository.deleteById(byUsername.get().getId());
         userRepository.save(newUser2);
 
-//        skinTypeRepository.deleteAll();
+        User newUser1 = new User(
+                "asdf1234",
+                passwordEncoder.encode("asdf1234"),
+                "test",
+                UserRoleEnum.ADMIN
+        );
+
+        userRepository.save(newUser1);
     }
 
 }

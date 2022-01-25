@@ -16,6 +16,8 @@ public class DetailCosmeticDto {
     private String name;
     private String price;
     private Boolean likeCheck;
+    private String naverUrl;
+    private Long CategoryId;
 
     @QueryProjection
     public DetailCosmeticDto(Long id, String img, String brand, String name, String price, Boolean likeCheck) {
@@ -25,5 +27,15 @@ public class DetailCosmeticDto {
         this.name = name;
         this.price = price;
         this.likeCheck = likeCheck;
+    }
+    @QueryProjection
+    public DetailCosmeticDto(Long id, String img, String brand, String name, String price, Boolean likeCheck, Long categoryId) {
+        this.id = id;
+        this.img = img;
+        this.brand = brand;
+        this.name = name;
+        this.price = price;
+        this.likeCheck = likeCheck;
+        CategoryId = categoryId;
     }
 }

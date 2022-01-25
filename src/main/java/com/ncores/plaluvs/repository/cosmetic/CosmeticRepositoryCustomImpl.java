@@ -14,6 +14,8 @@ import com.ncores.plaluvs.security.UserDetailsImpl;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.StringExpression;
+import com.querydsl.core.types.dsl.StringPath;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -45,7 +47,9 @@ public class CosmeticRepositoryCustomImpl implements CosmeticRepositoryCustom{
                                 cosmeticElements.cosmetic.id,
                                 cosmeticElements.cosmetic.itemImg,
                                 cosmeticElements.cosmetic.itemName,
-                                (userDetails == null) ? setFalse() : distinguishBookmarkExistUser(userDetails.getUser())
+                                (userDetails == null) ? setFalse() : distinguishBookmarkExistUser(cosmeticElements.cosmetic, userDetails.getUser()),
+                                cosmeticElements.cosmetic.itemBrand,
+                                cosmeticElements.cosmetic.category.id
                         )
                 )
                 .from(cosmeticElements)
@@ -65,7 +69,9 @@ public class CosmeticRepositoryCustomImpl implements CosmeticRepositoryCustom{
                                 cosmeticElements.cosmetic.id,
                                 cosmeticElements.cosmetic.itemImg,
                                 cosmeticElements.cosmetic.itemName,
-                                (userDetails == null) ? setFalse() : distinguishBookmarkExistUser(userDetails.getUser())
+                                (userDetails == null) ? setFalse() : distinguishBookmarkExistUser(cosmeticElements.cosmetic, userDetails.getUser()),
+                                cosmeticElements.cosmetic.itemBrand,
+                                cosmeticElements.cosmetic.category.id
                         )
                 )
                 .from(cosmeticElements)
@@ -88,10 +94,12 @@ public class CosmeticRepositoryCustomImpl implements CosmeticRepositoryCustom{
                                 cosmeticElements.cosmetic.itemBrand,
                                 cosmeticElements.cosmetic.itemName,
                                 cosmeticElements.cosmetic.price,
-                                (userDetails == null) ? setFalse() : distinguishBookmarkExistUser(userDetails.getUser())
+                                (userDetails == null) ? setFalse() : distinguishBookmarkExistUser(cosmeticElements.cosmetic, userDetails.getUser()),
+                                cosmeticElements.cosmetic.category.id
                         )
                 )
                 .from(cosmeticElements)
+                .distinct()
                 .join(cosmeticElements.elements, elements)
                 .where(cosmeticElements.elements.in(findElements).and(cosmeticElements.cosmetic.category.eq(findCategory)))
                 .offset(pageRequest.getOffset())
@@ -122,10 +130,12 @@ public class CosmeticRepositoryCustomImpl implements CosmeticRepositoryCustom{
                                 cosmetic.itemBrand,
                                 cosmetic.itemName,
                                 cosmetic.price,
-                                (userDetails == null) ? setFalse() : distinguishBookmarkExistUser(userDetails.getUser())
+                                (userDetails == null) ? setFalse() : distinguishBookmarkExistUser(cosmeticElements.cosmetic, userDetails.getUser()),
+                                cosmetic.category.id
                         )
                 )
                 .from(cosmetic)
+                .distinct()
                 .join(cosmetic.category, category)
                 .where(category.id.eq(findCategory.getId()))
                 .limit(pageRequest.getPageSize())
@@ -155,7 +165,7 @@ public class CosmeticRepositoryCustomImpl implements CosmeticRepositoryCustom{
                                 cosmeticElements.cosmetic.itemBrand,
                                 cosmeticElements.cosmetic.itemName,
                                 cosmeticElements.cosmetic.price,
-                                (userDetails == null) ? setFalse() : distinguishBookmarkExistUser(userDetails.getUser())
+                                (userDetails == null) ? setFalse() : distinguishBookmarkExistUser(cosmeticElements.cosmetic, userDetails.getUser())
                         )
                 )
                 .from(cosmeticElements)
@@ -178,13 +188,14 @@ public class CosmeticRepositoryCustomImpl implements CosmeticRepositoryCustom{
                         new QCosmeticDto(
                             userCosmetic.cosmetic.id,
                             userCosmetic.cosmetic.itemName,
-                            userCosmetic.cosmetic.itemImg
+                            userCosmetic.cosmetic.itemImg,
+                                (user == null) ? setFalse(): distinguishBookmarkExistUser(userCosmetic.cosmetic, user)
                         )
                 )
                 .from(userCosmetic)
                 .join(userCosmetic.cosmetic, cosmetic)
                 .join(userCosmetic.user, QUser.user)
-                .where(QUser.user.id.eq(user.getId()))
+                .where(QUser.user.id.eq(user.getId()).and(userCosmetic.cosmetic.id.eq(cosmetic.id)))
                 .offset(pageRequest.getOffset())
                 .limit(pageRequest.getPageSize())
                 .fetch();
@@ -202,7 +213,9 @@ public class CosmeticRepositoryCustomImpl implements CosmeticRepositoryCustom{
                                 cosmetic.id,
                                 cosmetic.itemImg,
                                 cosmetic.itemName,
-                                (user == null) ? setFalse() : distinguishBookmarkExistUser(user)
+                                (user == null) ? setFalse() : distinguishBookmarkExistUser(cosmeticElements.cosmetic, user),
+                                cosmetic.itemBrand,
+                                cosmetic.category.id
                         )
                 )
                 .from(cosmetic)
@@ -231,10 +244,11 @@ public class CosmeticRepositoryCustomImpl implements CosmeticRepositoryCustom{
     }
 
 
-    private BooleanExpression distinguishBookmarkExistUser(User user) {
+
+    private BooleanExpression distinguishBookmarkExistUser(QCosmetic cosmetic, User user) {
         return JPAExpressions
                 .selectFrom(userCosmetic)
-                .where(userIdEqBookmarkUserId(user).and(boardIdEqBookmarkBoardId()))
+                .where(userIdEqBookmarkUserId(user).and(boardIdEqBookmarkBoardId(cosmetic)))
                 .exists();
     }
 
@@ -242,7 +256,7 @@ public class CosmeticRepositoryCustomImpl implements CosmeticRepositoryCustom{
         return userCosmetic.user.id.eq(user.getId());
     }
 
-    private BooleanExpression boardIdEqBookmarkBoardId() {
+    private BooleanExpression boardIdEqBookmarkBoardId(QCosmetic cosmetic) {
         return userCosmetic.cosmetic.id.eq(cosmetic.id);
     }
 

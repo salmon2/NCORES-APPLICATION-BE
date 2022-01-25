@@ -14,6 +14,28 @@ public class SimpleCosmeticDto {
     private String img;
     private String name;
     private Boolean likeCheck;
+    private String naverUrl;
+    private String brandName;
+    private Long categoryId;
+
+    @QueryProjection
+    public SimpleCosmeticDto(Long id, String img, String name, Boolean likeCheck, String brandName, Long categoryId) {
+        this.id = id;
+        this.img = img;
+        this.name = name;
+        this.likeCheck = likeCheck;
+        this.brandName = brandName;
+        this.categoryId = categoryId;
+    }
+
+    @QueryProjection
+    public SimpleCosmeticDto(Long id, String img, String name, Boolean likeCheck, Long categoryId) {
+        this.id = id;
+        this.img = img;
+        this.name = name;
+        this.likeCheck = likeCheck;
+        this.categoryId = categoryId;
+    }
 
     @QueryProjection
     public SimpleCosmeticDto(Long id, String img, String name, Boolean likeCheck) {
@@ -21,5 +43,14 @@ public class SimpleCosmeticDto {
         this.img = img;
         this.name = name;
         this.likeCheck = likeCheck;
+    }
+
+    @QueryProjection
+    public SimpleCosmeticDto(Long id, String img, String name, Boolean likeCheck, String naverUrl) {
+        this.id = id;
+        this.img = img;
+        this.name = name;
+        this.likeCheck = likeCheck;
+        this.naverUrl = naverUrl;
     }
 }

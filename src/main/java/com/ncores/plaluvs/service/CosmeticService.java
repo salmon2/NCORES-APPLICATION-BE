@@ -32,17 +32,54 @@ public class CosmeticService {
         SkinType dailySkinType = skinTypeRepository.findDailySkinTypeOrLatestSkinTypeNotException(userDetails);
         if(dailySkinType == null){
             List<SimpleCosmeticDto> result = cosmeticRepository.findCosmeticNoneWorry(userDetails.getUser());
+            naverUrl(result);
             return result;
         }
+
         else if (dailySkinType.getBouman().equals("ORNT")){
             List<SimpleCosmeticDto> result = cosmeticRepository.findCosmeticNoneWorry(userDetails.getUser());
+            naverUrl(result);
             return result;
         }
         else{
             List<Elements> elements = elementsRepository.findAllBySkinTypeGoodElements(dailySkinType);
             List<SimpleCosmeticDto> result = cosmeticRepository.findAllbyBouman(userDetails, elements);
-
+            naverUrl(result);
             return result;
+        }
+    }
+
+    private void naverUrl(List<SimpleCosmeticDto> result) {
+        for (SimpleCosmeticDto simpleCosmeticDto : result) {
+
+            String name = simpleCosmeticDto.getName();
+            String brand = simpleCosmeticDto.getBrandName();
+            String url = "https://search.shopping.naver.com/search/all?frm=NVSHATC" +
+                    "&origQuery=" + brand+name +
+                    "&pagingIndex=1&pagingSize=40" +
+                    "&productSet=total" +
+                    "&query=" + brand+name +
+                    "&sort=price_asc" +
+                    "&timestamp=" +
+                    "&viewType=list";
+
+            simpleCosmeticDto.setNaverUrl(url);
+        }
+    }
+
+    private void naverUrl2(Page<DetailCosmeticDto> result) {
+        for (DetailCosmeticDto detailCosmeticDto : result) {
+            String brand = detailCosmeticDto.getBrand();
+            String name = detailCosmeticDto.getName();
+            String url = "https://search.shopping.naver.com/search/all?frm=NVSHATC" +
+                    "&origQuery=" + brand+name +
+                    "&pagingIndex=1&pagingSize=40" +
+                    "&productSet=total" +
+                    "&query=" + brand+name +
+                    "&sort=price_asc" +
+                    "&timestamp=" +
+                    "&viewType=list";
+            detailCosmeticDto.setNaverUrl(url);
         }
     }
 
@@ -56,16 +93,20 @@ public class CosmeticService {
 
         if(dailySkinType == null){
             Page<DetailCosmeticDto> result = cosmeticRepository.findAllByCategoryCustom(userDetails, findCategory, pageRequest, sort);
+            naverUrl2(result);
+
             return result;
         }
         else if(dailySkinType.getBouman().equals("ORNT")){
             Page<DetailCosmeticDto> result = cosmeticRepository.findAllByCategoryCustom(userDetails, findCategory, pageRequest, sort);
+            naverUrl2(result);
+
             return result;
         }
         else{
             List<Elements> findElements = elementsRepository.findAllBySkinTypeGoodElements(dailySkinType);
             Page<DetailCosmeticDto> result = cosmeticRepository.findAllByCategoryAndBouman(userDetails, findElements, findCategory, pageRequest, sort);
-
+            naverUrl2(result);
 
             return result;
         }
@@ -95,16 +136,21 @@ public class CosmeticService {
         SkinType dailySkinType = skinTypeRepository.findDailySkinTypeOrLatestSkinTypeNotException(userDetails);
 
         if(dailySkinType != null){
+
             List<SkinTrouble> skinTroubleList = dailySkinType.getSkinTroubleList();
+            if(skinTroubleList == null)
+                throw new PlaluvsException(ErrorCode.SKIN_WORRY_EMPTY);
+
             List<Elements> elements = elementsRepository.findAllBySkinTroubleCustom(skinTroubleList);
 
-
             List<SimpleCosmeticDto> result = cosmeticRepository.findCosmeticWorry(elements, userDetails);
+            naverUrl(result);
 
             return result;
         }
         else{
             List<SimpleCosmeticDto> result = cosmeticRepository.findCosmeticNoneWorry(userDetails.getUser());
+            naverUrl(result);
             return result;
         }
 

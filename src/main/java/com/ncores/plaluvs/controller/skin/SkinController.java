@@ -1,6 +1,7 @@
 package com.ncores.plaluvs.controller.skin;
 
 import com.ncores.plaluvs.controller.skin.dto.*;
+import com.ncores.plaluvs.domain.dto.PagingResponseDto;
 import com.ncores.plaluvs.domain.dto.SkinNowStatusRequestDto;
 import com.ncores.plaluvs.domain.dto.SkinWorryRequestDto;
 import com.ncores.plaluvs.exception.PlaluvsException;
@@ -9,6 +10,7 @@ import com.ncores.plaluvs.service.SkinService;
 import com.ncores.plaluvs.service.SkinTypeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -91,17 +93,6 @@ public class SkinController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/skin/bouman/calculate")
-    public ResponseEntity<?> skinBoumanCalculate(
-            @AuthenticationPrincipal UserDetailsImpl userDetails) throws PlaluvsException {
-        log.info("/skin/bouman/calculate");
-        UserDetailsImpl.UserCheck(userDetails);
-
-        String boumanType = skinService.skinBoumanCalucluate(userDetails);
-
-        return new ResponseEntity<>(boumanType, HttpStatus.OK);
-    }
-
 
     @GetMapping("/skin/status")
     public ResponseEntity<?> skinStatus(@AuthenticationPrincipal UserDetailsImpl userDetails) throws PlaluvsException {
@@ -133,23 +124,10 @@ public class SkinController {
     public ResponseEntity<?> skinStatusRecord(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                               @PathVariable Long page){
         log.info("skin/status/list");
-        SkinStatusRecordResponseDto result = skinService.skinStatusRecord(userDetails, page);
+        Page<SkinStatusRecordResponseDto> result = skinService.skinStatusRecord(userDetails, page);
 
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return new ResponseEntity<>(new PagingResponseDto(result.getContent().size(), result.getNumber(), result.getTotalPages(), result.getContent()), HttpStatus.OK);
     }
-
-
-
-
-
-    @PostMapping("/skin/bouman/elements")
-    public ResponseEntity<?> skinBoumanElements(@AuthenticationPrincipal UserDetailsImpl userDetails,){
-        log.info("/skin/bouman/elements");
-        skinTypeService.findSkinElements(userDetails);
-
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
 }
 
 

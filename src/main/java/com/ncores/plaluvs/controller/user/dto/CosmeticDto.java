@@ -14,11 +14,20 @@ public class CosmeticDto {
     private Long id;
     private String korName;
     private String img;
+    private Boolean likeCheck;
 
     @QueryProjection
     public CosmeticDto(Long id, String korName, String img) {
         this.id = id;
         this.korName = korName;
         this.img = img;
+    }
+
+    @QueryProjection
+    public CosmeticDto(Long id, String korName, String img, Boolean likeCheck) {
+        this.id = id;
+        this.korName = korName;
+        this.img = img;
+        this.likeCheck = likeCheck;
     }
 }

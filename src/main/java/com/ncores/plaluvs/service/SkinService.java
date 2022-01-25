@@ -23,10 +23,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -287,7 +287,7 @@ public class SkinService {
         UserDetailsImpl.UserCheck(userDetails);
 
         SkinType dailySkinTYpe = skinTypeRepository.findDailySkinTypeException(userDetails);
-        List<SkinElementsDto> elementsDtoList = elementsRepository.findSkinElementsDtoListBySkinTypeGoodElements(dailySkinTYpe);
+        List<SkinElementsDto> elementsDtoList = elementsRepository.findSkinElementsDtoListBySkinTypeGoodElements(dailySkinTYpe, userDetails);
         for (SkinElementsDto skinElementsDto : elementsDtoList) {
             skinElementsDto.setImg(getImgSRc(skinElementsDto.getLevel()));
         }
@@ -584,14 +584,47 @@ public class SkinService {
         result.getPigmentScore().add(new ScoreData(msg, (skinTypeThisWeek.getPigmentScore()*100/2) ));
     }
 
-    public SkinStatusRecordResponseDto skinStatusRecord(UserDetailsImpl userDetails, Long page) {
+    public Page<SkinStatusRecordResponseDto> skinStatusRecord(UserDetailsImpl userDetails, Long page) {
         PageRequest pageRequest = PageRequest.of(page.intValue(), 7);
 
         Page<SkinStatusRecordResponseDto> result = skinTypeRepository.findskinStatusRecord(userDetails, pageRequest);
         for (SkinStatusRecordResponseDto skinStatusRecordResponseDto : result) {
-            skinStatusRecordResponseDto.getDate();
+            String date = skinStatusRecordResponseDto.getDate();
+            date = date.split(" ")[0];
+            String year = date.split("-")[0];
+            String month = date.split("-")[1];
+            String day = date.split("-")[2];
+
+            DayOfWeek dayOfWeek = LocalDate.of(Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day)).getDayOfWeek();
+            System.out.println("dayOfWeek = " + dayOfWeek);
+
+            String week = null;
+            if(dayOfWeek.equals(DayOfWeek.MONDAY)){
+                week = "월";
+            }
+            else if(dayOfWeek.equals(DayOfWeek.TUESDAY)){
+                week = "화";
+            }
+            else if (dayOfWeek.equals(DayOfWeek.WEDNESDAY)){
+                week = "수";
+            }
+            else if (dayOfWeek.equals(DayOfWeek.THURSDAY)){
+                week = "목";
+            }
+            else if (dayOfWeek.equals(DayOfWeek.FRIDAY)){
+                week = "금";
+            }
+            else if (dayOfWeek.equals(DayOfWeek.SATURDAY)){
+                week = "토";
+            }
+            else if (dayOfWeek.equals(DayOfWeek.SUNDAY)){
+                week = "일";
+            }
+
+            skinStatusRecordResponseDto.setDate(month + "월 " + day + "일 "+ week+"요일");
+            skinStatusRecordResponseDto.setScore(skinStatusRecordResponseDto.getScore() + "점");
         }
 
-        return null;
+        return result;
     }
 }

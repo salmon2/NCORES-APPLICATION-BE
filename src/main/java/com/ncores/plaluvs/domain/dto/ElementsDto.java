@@ -13,20 +13,21 @@ public class ElementsDto {
     private String korName;
     private String img;
     private String level;
+    private Boolean likeCheck;
 
-
-    @QueryProjection
-    public ElementsDto(Long id, String korName, String img, String level) {
-        this.id = id;
-        this.korName = korName;
-        this.img = img;
-        this.level = level;
-    }
 
     @QueryProjection
     public ElementsDto(Long id, String korName, String level) {
         this.id = id;
         this.korName = korName;
         this.level = level;
+    }
+
+    @QueryProjection
+    public ElementsDto(Long id, String korName, String level, Boolean likeCheck) {
+        this.id = id;
+        this.korName = korName;
+        this.level = level;
+        this.likeCheck = likeCheck;
     }
 }

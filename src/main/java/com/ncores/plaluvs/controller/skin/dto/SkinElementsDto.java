@@ -14,25 +14,16 @@ public class SkinElementsDto {
     private String korName;
     private String img;
     private String level;
-
-
-
-    @QueryProjection
-    public SkinElementsDto(String korName, String level) {
-        this.korName = korName;
-        this.level = level;
-    }
+    private Boolean likeCheck;
 
     @QueryProjection
-    public SkinElementsDto(Long id, String korName, String level) {
+    public SkinElementsDto(Long id, String korName, String level, Boolean likeCheck) {
         this.id = id;
         this.korName = korName;
         this.level = level;
+        this.likeCheck = likeCheck;
     }
 
-    @QueryProjection
-    public SkinElementsDto(String korName) {
-        this.korName = korName;
-    }
+
 
 }

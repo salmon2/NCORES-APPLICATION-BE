@@ -12,4 +12,6 @@ import lombok.Setter;
 public class ScoreData {
     private String tag;
     private Long score;
+    private Long rate;
+    private String color;
 }

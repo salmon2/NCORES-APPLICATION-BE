@@ -554,14 +554,14 @@ public class SkinService {
         endDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(23,59,59)); //오늘 23:59:59
 
         SkinType skinTypeThisWeek = skinTypeRepository.findTopByCreatedAtBetweenAndUser(startDatetime, endDatetime, userDetails.getUser());
-        resultAdd(result, skinTypeThisWeek, "이번 주");
+        resultAdd(result, skinTypeThisWeek, "일주일전엔 40점이었어요", 40L, 40L, "EFC2C2");
 
 
         startDatetime = LocalDateTime.of(LocalDate.now().minusWeeks(2), LocalTime.of(0,0,0)); //오늘 00:00:00
         endDatetime = LocalDateTime.of(LocalDate.now().minusWeeks(1), LocalTime.of(23,59,59)); //오늘 23:59:59
 
         SkinType skinTypeWeekAgo = skinTypeRepository.findTopByCreatedAtBetweenAndUser(startDatetime, endDatetime, userDetails.getUser());
-        resultAdd(result, skinTypeWeekAgo, "일주일 전");
+        resultAdd(result, skinTypeWeekAgo, "한달전엔 60점이었어요", 60L, 20L, "C14242");
 
 
 
@@ -569,19 +569,19 @@ public class SkinService {
         endDatetime = LocalDateTime.of(LocalDate.now().minusWeeks(2), LocalTime.of(23,59,59)); //오늘 23:59:59
 
         SkinType skinTypeMonthAgo= skinTypeRepository.findTopByCreatedAtBetweenAndUser(startDatetime, endDatetime, userDetails.getUser());
-        resultAdd(result, skinTypeMonthAgo, "한달 전");
+        resultAdd(result, skinTypeMonthAgo, "이번주엔 90점이에요", 90L, 30L, "959698");
 
         return result;
     }
 
-    private void resultAdd(skinStatusBoumanResponseDto result, SkinType skinTypeThisWeek, String msg) {
-        if(skinTypeThisWeek == null)
-            return;
-        result.getAquaScore().add(new ScoreData(msg, (skinTypeThisWeek.getDryScore()*100/5) ));
-        result.getOilScore().add(new ScoreData(msg, (skinTypeThisWeek.getOilIndicateScore()*100/8) ));
-        result.getSensitiveScore().add(new ScoreData(msg, (skinTypeThisWeek.getSensitivityScore()*100/9) ));
-        result.getWinkleScore().add(new ScoreData(msg, (skinTypeThisWeek.getWinkleScore()*100/3) ));
-        result.getPigmentScore().add(new ScoreData(msg, (skinTypeThisWeek.getPigmentScore()*100/2) ));
+    private void resultAdd(skinStatusBoumanResponseDto result, SkinType skinTypeThisWeek, String msg, Long score, Long rate, String color) {
+        //if(skinTypeThisWeek == null)
+          //  return;
+        result.getAquaScore().add(new ScoreData(msg, score, rate, color));
+        result.getOilScore().add(new ScoreData(msg, score, rate, color));
+        result.getSensitiveScore().add(new ScoreData(msg, score, rate, color));
+        result.getWinkleScore().add(new ScoreData(msg, score, rate, color));
+        result.getPigmentScore().add(new ScoreData(msg, score, rate, color));
     }
 
     public Page<SkinStatusRecordResponseDto> skinStatusRecord(UserDetailsImpl userDetails, Long page) {

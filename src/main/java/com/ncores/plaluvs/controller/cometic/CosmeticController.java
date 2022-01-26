@@ -102,6 +102,4 @@ public class CosmeticController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-
-
 }

@@ -165,7 +165,8 @@ public class CosmeticRepositoryCustomImpl implements CosmeticRepositoryCustom{
                                 cosmeticElements.cosmetic.itemBrand,
                                 cosmeticElements.cosmetic.itemName,
                                 cosmeticElements.cosmetic.price,
-                                (userDetails == null) ? setFalse() : distinguishBookmarkExistUser(cosmeticElements.cosmetic, userDetails.getUser())
+                                (userDetails == null) ? setFalse() : distinguishBookmarkExistUser(cosmeticElements.cosmetic, userDetails.getUser()),
+                                cosmeticElements.cosmetic.category.id
                         )
                 )
                 .from(cosmeticElements)
@@ -189,7 +190,9 @@ public class CosmeticRepositoryCustomImpl implements CosmeticRepositoryCustom{
                             userCosmetic.cosmetic.id,
                             userCosmetic.cosmetic.itemName,
                             userCosmetic.cosmetic.itemImg,
-                                (user == null) ? setFalse(): distinguishBookmarkExistUser(userCosmetic.cosmetic, user)
+                            (user == null) ? setFalse(): distinguishBookmarkExistUser(userCosmetic.cosmetic, user),
+                            userCosmetic.cosmetic.category.id,
+                            userCosmetic.cosmetic.itemBrand
                         )
                 )
                 .from(userCosmetic)

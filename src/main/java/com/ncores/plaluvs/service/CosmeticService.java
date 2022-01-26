@@ -124,8 +124,8 @@ public class CosmeticService {
 
         PageRequest pageRequest = PageRequest.of(page.intValue(), 20);
 
-
         Page<DetailCosmeticDto> result = cosmeticRepository.findCosmeticByElementsCustom(userDetails, findElements, findCategory, pageRequest, sort);
+        naverUrl2(result);
 
         return result;
     }

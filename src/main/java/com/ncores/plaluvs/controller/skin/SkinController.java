@@ -32,7 +32,7 @@ public class SkinController {
 
         UserDetailsImpl.UserCheck(userDetails);
 
-        skinService.currentSkinStatus(requestDto, userDetails);
+        skinService.currentSkinStatus(requestDto, userDetails.getUser(), null);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -45,7 +45,7 @@ public class SkinController {
         log.info("requestDto = {}", requestDto);
         //skinworry 없으면 걸기
         UserDetailsImpl.UserCheck(userDetails);
-        skinService.skinWorryUpdate(requestDto, userDetails);
+        skinService.skinWorryUpdate(requestDto, userDetails.getUser(), null);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -58,7 +58,7 @@ public class SkinController {
         log.info("requestDto = {}", requestDto);
 
         UserDetailsImpl.UserCheck(userDetails);
-        skinService.skinDailyStatus(requestDto, userDetails);
+        skinService.skinDailyStatus(requestDto, userDetails.getUser(), null);
 
         return null;
     }
@@ -71,7 +71,7 @@ public class SkinController {
         log.info("requestDto = {}", requestDto);
 
         UserDetailsImpl.UserCheck(userDetails);
-        skinService.skinDailyStimulation(requestDto, userDetails);
+        skinService.skinDailyStimulation(requestDto, userDetails.getUser(), null);
 
         return null;
     }
@@ -84,10 +84,10 @@ public class SkinController {
         log.info("requestDto = {}", requestDto);
 
         UserDetailsImpl.UserCheck(userDetails);
-        skinService.skinSelfCheck(requestDto, userDetails);
+        skinService.skinSelfCheck(requestDto, userDetails.getUser(), null);
 
-        String boumanType = skinService.skinBoumanCalucluate(userDetails);
-        skinTypeService.findSkinElements(userDetails);
+        String boumanType = skinService.skinBoumanCalucluate(userDetails.getUser(), null);
+        skinTypeService.findSkinElements(userDetails.getUser(), null);
 
 
         return new ResponseEntity<>(HttpStatus.OK);
@@ -102,11 +102,11 @@ public class SkinController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @GetMapping("/skin/status/list/{page}")
+    @GetMapping("/skin/status/list")
     public ResponseEntity<?> skinStatusList(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                            @PathVariable Long page,
                                             @RequestParam(defaultValue = "asc") String sort){
         log.info("skin/status/list");
+        Long page = 0L;
         PagingAveragingScoreResponseDto result = skinService.skinStatusList(userDetails, page, sort);
 
         return new ResponseEntity<>(result, HttpStatus.OK);
@@ -123,14 +123,6 @@ public class SkinController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @GetMapping("/skin/status/record/{page}")
-    public ResponseEntity<?> skinStatusRecord(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                              @PathVariable Long page){
-        log.info("skin/status/list");
-        Page<SkinStatusRecordResponseDto> result = skinService.skinStatusRecord(userDetails, page);
-
-        return new ResponseEntity<>(new PagingResponseDto(result.getContent().size(), result.getNumber(), result.getTotalPages(), result.getContent()), HttpStatus.OK);
-    }
 }
 
 

@@ -1,5 +1,6 @@
 package com.ncores.plaluvs.service;
 
+import com.ncores.plaluvs.controller.cometic.dto.SimpleCosmeticDto;
 import com.ncores.plaluvs.controller.user.dto.*;
 import com.ncores.plaluvs.domain.dto.ElementsDto;
 import com.ncores.plaluvs.domain.skintype.SkinType;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -266,6 +268,23 @@ public class UserService {
 
 
         return result;
+    }
+    private void naverUrl(Page<CosmeticDto> result) {
+        for (CosmeticDto cosmeticDto : result){
+
+            String name = cosmeticDto.getKorName();
+            String brand = cosmeticDto.getBrandName();
+            String url = "https://search.shopping.naver.com/search/all?frm=NVSHATC" +
+                    "&origQuery=" + brand+name +
+                    "&pagingIndex=1&pagingSize=40" +
+                    "&productSet=total" +
+                    "&query=" + brand+name +
+                    "&sort=price_asc" +
+                    "&timestamp=" +
+                    "&viewType=list";
+
+            cosmeticDto.setNaverUrl(url);
+        }
     }
 
     public void deleteUser(UserDetailsImpl userDetails) throws PlaluvsException {

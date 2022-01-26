@@ -14,14 +14,9 @@ public class ElementsDto {
     private String img;
     private String level;
     private Boolean likeCheck;
+    private String naverUrl;
+    private Long categoryId;
 
-
-    @QueryProjection
-    public ElementsDto(Long id, String korName, String level) {
-        this.id = id;
-        this.korName = korName;
-        this.level = level;
-    }
 
     @QueryProjection
     public ElementsDto(Long id, String korName, String level, Boolean likeCheck) {
@@ -29,5 +24,14 @@ public class ElementsDto {
         this.korName = korName;
         this.level = level;
         this.likeCheck = likeCheck;
+    }
+
+    @QueryProjection
+    public ElementsDto(Long id, String korName, String level, Boolean likeCheck, Long categoryId) {
+        this.id = id;
+        this.korName = korName;
+        this.level = level;
+        this.likeCheck = likeCheck;
+        this.categoryId = categoryId;
     }
 }

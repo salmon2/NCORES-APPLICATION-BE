@@ -6,6 +6,7 @@ import com.ncores.plaluvs.domain.SkinTypeGoodElements;
 import com.ncores.plaluvs.domain.boumanData.good.*;
 import com.ncores.plaluvs.domain.skintype.Bouman;
 import com.ncores.plaluvs.domain.skintype.SkinType;
+import com.ncores.plaluvs.domain.user.User;
 import com.ncores.plaluvs.repository.elements.ElementsRepository;
 import com.ncores.plaluvs.repository.STBadElementRepository;
 import com.ncores.plaluvs.repository.STGoodElementsRepository;
@@ -29,8 +30,8 @@ public class SkinTypeService {
 
 
     @Transactional
-    public void findSkinElements(UserDetailsImpl userDetails){
-        SkinType skinType = findDailySkinType(userDetails);
+    public void findSkinElements(User user, LocalDateTime createdAt){
+        SkinType skinType = findDailySkinType(user, createdAt);
 
         Bouman bouman = skinType.getBouman();
         String type = bouman.getName();
@@ -164,11 +165,31 @@ public class SkinTypeService {
         }
     }
 
-    private SkinType findDailySkinType(UserDetailsImpl userDetails) {
-        LocalDateTime startDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(0,0,0)); //오늘 00:00:00
-        LocalDateTime endDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(23,59,59)); //오늘 23:59:59
+    private SkinType findDailySkinType(User user, LocalDateTime createdAt) {
+        LocalDateTime startDatetime = null;
+        LocalDateTime endDatetime = null;
+        if(createdAt == null) {
+            startDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(0, 0, 0)); //오늘 00:00:00
+            endDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(23, 59, 59)); //오늘 23:59:59
+        }
+        else{
+            startDatetime = LocalDateTime.of(createdAt.toLocalDate(), LocalTime.of(0,0,0));
+            endDatetime = LocalDateTime.of(createdAt.toLocalDate(), LocalTime.of(23,59,59));
+        }
 
-        SkinType findSkinType = skinTypeRepository.findTopByUserAndCreatedAtBetween(userDetails.getUser(), startDatetime, endDatetime);
+
+        SkinType findSkinType = skinTypeRepository.findTopByUserAndCreatedAtBetween(user, startDatetime, endDatetime);
         return findSkinType;
+    }
+
+    private void setLocalDateTime( LocalDateTime startDatetime, LocalDateTime endDatetime, LocalDateTime createdAt){
+        if(createdAt == null) {
+            startDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(0, 0, 0)); //오늘 00:00:00
+            endDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(23, 59, 59)); //오늘 23:59:59
+        }
+        else{
+            startDatetime = LocalDateTime.of(createdAt.toLocalDate(), LocalTime.of(0,0,0));
+            endDatetime = LocalDateTime.of(createdAt.toLocalDate(), LocalTime.of(23,59,59));
+        }
     }
 }

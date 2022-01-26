@@ -48,8 +48,8 @@ public class SkinService {
 
 
     @Transactional
-    public void currentSkinStatus(SkinNowStatusRequestDto requestDto, UserDetailsImpl userDetails) throws PlaluvsException {
-        SkinType findSkinType = findDailySkinType(userDetails);
+    public void currentSkinStatus(SkinNowStatusRequestDto requestDto, User user, LocalDateTime createdAt) throws PlaluvsException {
+        SkinType findSkinType = findDailySkinType(user, createdAt);
 
         updateSkinNowStatus(requestDto.getSkinId(), findSkinType);
 
@@ -59,6 +59,7 @@ public class SkinService {
     private void updateSkinNowStatus(Long id, SkinType findSkinType) throws PlaluvsException {
         CurrentSkinStatus currentSkinStatus = CurrentSkinStatus.findQuestionOne(id);
         CurrentSkinStatus nowSkinStatus = findSkinType.getCurrentSkinStatus();
+
 
         if( nowSkinStatus == null){
             updateCurrentStatusByCurrentSkinStatus(currentSkinStatus, findSkinType);
@@ -104,8 +105,8 @@ public class SkinService {
     }
 
 
-    public void skinWorryUpdate(SkinWorryRequestDto requestDto, UserDetailsImpl userDetails) throws PlaluvsException {
-        SkinType findSkinType = findDailySkinType(userDetails);
+    public void skinWorryUpdate(SkinWorryRequestDto requestDto, User user, LocalDateTime createdAt) throws PlaluvsException {
+        SkinType findSkinType = findDailySkinType(user, createdAt);
 
         List<SkinTrouble> beforeSkinTroubleList = skinWorryRepository.findAllBySkinType(findSkinType);
 
@@ -220,8 +221,8 @@ public class SkinService {
 
 
     @Transactional
-    public void skinDailyStatus(SkinDailyStatusRequestDto requestDto, UserDetailsImpl userDetails) throws PlaluvsException {
-        SkinType findSkinType = findDailySkinType(userDetails);
+    public void skinDailyStatus(SkinDailyStatusRequestDto requestDto, User user, LocalDateTime createdAt) throws PlaluvsException {
+        SkinType findSkinType = findDailySkinType(user, createdAt);
 
         List<SkinDailyStatus> skinDailyStatusList = skinDailyStatusRepository.findAllBySkinType(findSkinType);
 
@@ -365,11 +366,31 @@ public class SkinService {
 
         Double averageCustom = skinTypeRepository.findAverageCustom(userDetails);
 
+        if(result != null){
+            Status newStatusList = null;
+            int i = 0;
+            for (SkinType skinType : result) {
+                LocalDateTime createdAt = skinType.getCreatedAt();
+                newStatusList = new Status(skinType.getScore(), getDate(createdAt));
+                statusList.add(newStatusList);
+                i++;
+            }
 
-        for (SkinType skinType : result) {
-            LocalDateTime createdAt = skinType.getCreatedAt();
-            Status newStatusList = new Status(skinType.getScore(), getDate(createdAt));
-            statusList.add(newStatusList);
+            for (; i < 7; i++) {
+                String substring1 = statusList.get(0).getDate().substring(0, 1);
+                Long num = Long.valueOf(substring1);
+
+                String substring = statusList.get(0).getDate().substring(1, 4);
+                newStatusList = new Status(1L, num+1 + substring    );
+
+                statusList.add(0, newStatusList);
+            }
+        }
+        else{
+            for (int i = 0; i < 7; i++) {
+                Status stauts = new Status(1L, i + "일 전");
+                statusList.add(0, stauts);
+            }
         }
 
 
@@ -400,31 +421,53 @@ public class SkinService {
     }
 
 
-    private SkinType findDailySkinType(UserDetailsImpl userDetails) {
-        LocalDateTime startDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(0,0,0)); //오늘 00:00:00
-        LocalDateTime endDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(23,59,59)); //오늘 23:59:59
+    private SkinType findDailySkinType(User user, LocalDateTime createdAt) {
+        LocalDateTime startDatetime = null;
+        LocalDateTime endDatetime = null;
 
-        SkinType findDailySkinType = skinTypeRepository.findTopByUserAndCreatedAtBetween(userDetails.getUser(), startDatetime, endDatetime);
+        if(createdAt == null) {
+            startDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(0, 0, 0));; //오늘 00:00:00
+            endDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(23, 59, 59)); //오늘 23:59:59
+        }
+        else {
+            startDatetime = LocalDateTime.of(createdAt.toLocalDate(), LocalTime.of(0, 0, 0));
+            endDatetime = LocalDateTime.of(createdAt.toLocalDate(), LocalTime.of(23, 59, 59));
+        }
 
-        SkinType firstSkinType = skinTypeRepository.findTopByUserOrderByCreatedAtAsc(userDetails.getUser());
+        SkinType findDailySkinType = skinTypeRepository.findTopByUserAndCreatedAtBetween(user, startDatetime, endDatetime);
+
+        SkinType firstSkinType = skinTypeRepository.findTopByUserOrderByCreatedAtAsc(user);
         CurrentSkinStatus currentSkinStatus = null;
 
         if(firstSkinType != null)
             currentSkinStatus = firstSkinType.getCurrentSkinStatus();
 
         if(findDailySkinType == null){
-            SkinType newSkinType = new SkinType(currentSkinStatus, userDetails.getUser());
+            SkinType newSkinType = new SkinType(currentSkinStatus, user, createdAt);
             skinTypeRepository.save(newSkinType);
             return newSkinType;
         }
         else
             return findDailySkinType;
-
     }
 
+    private void setLocalDateTime( LocalDateTime startDatetime, LocalDateTime endDatetime, LocalDateTime createdAt){
+        if(createdAt == null) {
+            startDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(0, 0, 0));; //오늘 00:00:00
+            endDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(23, 59, 59)); //오늘 23:59:59
+        }
+        else {
+            startDatetime = LocalDateTime.of(createdAt.toLocalDate(), LocalTime.of(0, 0, 0));
+            endDatetime = LocalDateTime.of(createdAt.toLocalDate(), LocalTime.of(23, 59, 59));
+        }
+    }
+
+
+
+
     @Transactional
-    public void skinDailyStimulation(SkinDailyStimulationRequestDto requestDto, UserDetailsImpl userDetails) throws PlaluvsException {
-        SkinType findSkinType = findDailySkinType(userDetails);
+    public void skinDailyStimulation(SkinDailyStimulationRequestDto requestDto, User user, LocalDateTime createdAt) throws PlaluvsException {
+        SkinType findSkinType = findDailySkinType(user, createdAt);
         List<SkinDailyStimulation> skinDailyStimulationList = skinDailyStimulationRepository.findAllBySkinType(findSkinType);
 
         if(skinDailyStimulationList == null){
@@ -487,20 +530,20 @@ public class SkinService {
     }
 
     @Transactional
-    public void skinSelfCheck(SkinDailySefCheckRequestDto requestDto, UserDetailsImpl userDetails) throws PlaluvsException {
-        SkinType findSkinType = findDailySkinType(userDetails);
+    public void skinSelfCheck(SkinDailySefCheckRequestDto requestDto, User user, LocalDateTime createdAt) throws PlaluvsException {
+        SkinType findSkinType = findDailySkinType(user, createdAt);
 
         findSkinType.setSelfScore(requestDto.getScore());
     }
 
 
     @Transactional
-    public String skinBoumanCalucluate(UserDetailsImpl userDetails) throws PlaluvsException {
-        User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(
+    public String skinBoumanCalucluate(User user, LocalDateTime createdAt) throws PlaluvsException {
+        User findID = userRepository.findById(user.getId()).orElseThrow(
                 () -> new PlaluvsException(ErrorCode.USER_NOT_FOUND)
         );
 
-        SkinType dailySkinType = findDailySkinType(userDetails);
+        SkinType dailySkinType = findDailySkinType(findID, createdAt);
 
         String key = getBoumanKey(dailySkinType);
         log.info("key = {}", key);
@@ -553,29 +596,48 @@ public class SkinService {
         LocalDateTime endDatetimeWeek = LocalDateTime.of(LocalDate.now(), LocalTime.of(23,59,59));
 
 
-        LocalDateTime startDatetimeMonth = LocalDateTime.of(LocalDate.now().minusWeeks(2), LocalTime.of(0,0,0)); //오늘 00:00:00
-        LocalDateTime endDatetimeMonth = LocalDateTime.of(LocalDate.now().minusWeeks(1), LocalTime.of(23,59,59)); //오늘 23:59:59
+        LocalDateTime startDatetimeWeekAgo = LocalDateTime.of(LocalDate.now().minusWeeks(2), LocalTime.of(0,0,0)); //오늘 00:00:00
+        LocalDateTime endDatetimeWeekAgo = LocalDateTime.of(LocalDate.now().minusWeeks(1), LocalTime.of(23,59,59)); //오늘 23:59:59
 
-        LocalDateTime startDatetimeWeekAgo = LocalDateTime.of(LocalDate.now().minusMonths(2), LocalTime.of(0,0,0)); //오늘 00:00:00
-        LocalDateTime endDatetimeWeekAgo = LocalDateTime.of(LocalDate.now().minusWeeks(2), LocalTime.of(23,59,59)); //오늘 23:59:59
+        LocalDateTime startDatetimeMonth = LocalDateTime.of(LocalDate.now().minusMonths(2), LocalTime.of(0,0,0)); //오늘 00:00:00
+        LocalDateTime endDatetimeMonth = LocalDateTime.of(LocalDate.now().minusWeeks(2), LocalTime.of(23,59,59)); //오늘 23:59:59
 
-        startDatetime = LocalDateTime.of(LocalDate.now().minusWeeks(1), LocalTime.of(0,0,0)); //오늘 00:00:00
+        startDatetime = LocalDateTime.of(LocalDate.now().minusWeeks(1L), LocalTime.of(0,0,0)); //오늘 00:00:00
         endDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(23,59,59)); //오늘 23:59:59
 
         List<ScoreData> dryResult = skinTypeRepository.findSkinStatusBoumanCustom(userDetails, startDatetime, endDatetime, SkinTypeEnum.DRY);
-        Setting(startDatetimeWeek, endDatetimeWeek, startDatetimeWeekAgo, dryResult, Long.valueOf(100/5) );
+        Setting(startDatetimeWeek, endDatetimeWeek,
+                startDatetimeWeekAgo, endDatetimeWeekAgo,
+                startDatetimeMonth, endDatetimeMonth,
+                dryResult, Long.valueOf(100/5) );
 
         List<ScoreData> oilResult = skinTypeRepository.findSkinStatusBoumanCustom(userDetails, startDatetime, endDatetime, SkinTypeEnum.OIL);
-        Setting(startDatetimeWeek, endDatetimeWeek, startDatetimeWeekAgo, oilResult, Long.valueOf(100/8) );
+        Setting(startDatetimeWeek, endDatetimeWeek,
+                startDatetimeWeekAgo, endDatetimeWeekAgo,
+                startDatetimeMonth, endDatetimeMonth,
+                oilResult, Long.valueOf(100/8) );
+
 
         List<ScoreData> senResult = skinTypeRepository.findSkinStatusBoumanCustom(userDetails, startDatetime, endDatetime, SkinTypeEnum.SEN);
-        Setting(startDatetimeWeek, endDatetimeWeek, startDatetimeWeekAgo, senResult, Long.valueOf(100/9));
+        Setting(startDatetimeWeek, endDatetimeWeek,
+                startDatetimeWeekAgo, endDatetimeWeekAgo,
+                startDatetimeMonth, endDatetimeMonth,
+                senResult, Long.valueOf(100/9) );
+
 
         List<ScoreData> winResult = skinTypeRepository.findSkinStatusBoumanCustom(userDetails, startDatetime, endDatetime, SkinTypeEnum.WIN);
-        Setting(startDatetimeWeek, endDatetimeWeek, startDatetimeWeekAgo, winResult, Long.valueOf(100/3));
+        Setting(startDatetimeWeek, endDatetimeWeek,
+                startDatetimeWeekAgo, endDatetimeWeekAgo,
+                startDatetimeMonth, endDatetimeMonth,
+                winResult, Long.valueOf(100/3) );
+
 
         List<ScoreData> pigResult = skinTypeRepository.findSkinStatusBoumanCustom(userDetails, startDatetime, endDatetime, SkinTypeEnum.PIG);
-        Setting(startDatetimeWeek, endDatetimeWeek, startDatetimeWeekAgo, pigResult, Long.valueOf(100/2));
+        Setting(startDatetimeWeek, endDatetimeWeek,
+                startDatetimeWeekAgo, endDatetimeWeekAgo,
+                startDatetimeMonth, endDatetimeMonth,
+                pigResult, Long.valueOf(100/2) );
+
 
         skinStatusBoumanResponseDto skinStatusBoumanResponseDto = new skinStatusBoumanResponseDto(dryResult, oilResult, senResult, pigResult, winResult);
 
@@ -583,8 +645,14 @@ public class SkinService {
     }
 
 
-    private void Setting(LocalDateTime startDatetimeWeek, LocalDateTime endDatetimeWeek, LocalDateTime startDatetimeWeekAgo, List<ScoreData> dryResult, Long rate) {
+    private void Setting(LocalDateTime startDatetimeWeek, LocalDateTime endDatetimeWeek,
+                         LocalDateTime startDatetimeWeekAgo, LocalDateTime endDatetimeWeekAgo,
+                         LocalDateTime startDatetimeMonth, LocalDateTime endDatetimeMonth,
+                         List<ScoreData> dryResult, Long rate) {
         Long beforeScore =null;
+
+        Collections.sort(dryResult, new  ScoreDataComparator());
+
         for (ScoreData scoreData : dryResult) {
 
             Long dryScore = scoreData.getScore() * rate;
@@ -598,18 +666,18 @@ public class SkinService {
                 scoreData.setColor("959698");
             }
             //일주일전엔
-            else if(createdAt.isAfter(startDatetimeWeekAgo)&& createdAt.isBefore(endDatetimeWeek)){
+            else if(createdAt.isAfter(startDatetimeWeekAgo)&& createdAt.isBefore(endDatetimeWeekAgo)){
                 scoreData.setTag("일주일전엔 "+ dryScore+ "점이에요");
                 scoreData.setColor("EFC2C2");
             }
             //한달전엔
-            else if(createdAt.isAfter(startDatetimeWeekAgo)&& createdAt.isBefore(endDatetimeWeek)){
+            else if(createdAt.isAfter(startDatetimeMonth)&& createdAt.isBefore(endDatetimeMonth)){
                 scoreData.setTag("한달전엔 "+ dryScore+ "점이었어요");
                 scoreData.setColor("C14242");
             }
 
             if(beforeScore != null){
-                scoreData.setRate(beforeScore - dryScore);
+                scoreData.setRate(dryScore - beforeScore);
                 beforeScore = scoreData.getScore();
             }
             else{

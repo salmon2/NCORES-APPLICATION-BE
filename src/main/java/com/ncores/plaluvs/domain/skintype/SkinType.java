@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -90,6 +91,20 @@ public class SkinType extends Timestamped {
         this.currentSkinStatus = questionOne;
         this.user = user;
     }
+
+    public SkinType(CurrentSkinStatus questionOne, User user, LocalDateTime localDateTime) {
+        this.oilIndicateScore = 8L;
+        this.dryScore = 5L;
+        this.sensitivityScore = 9L;
+        this.winkleScore = 3L;
+        this.pigmentScore = 2L;
+        this.bouman = Bouman.ORNT;
+        this.setCreatedAt(localDateTime);
+        this.setModifiedAt(localDateTime);
+        this.currentSkinStatus = questionOne;
+        this.user = user;
+    }
+
 
     public SkinType(User user) {
         this.oilIndicateScore = 8L;

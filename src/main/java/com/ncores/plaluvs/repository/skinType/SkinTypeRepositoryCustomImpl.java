@@ -26,6 +26,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.ncores.plaluvs.domain.skintype.QSkinType.skinType;
@@ -49,6 +50,7 @@ public class SkinTypeRepositoryCustomImpl implements SkinTypeRepositoryCustom{
 
 
         return PageableExecutionUtils.getPage(result, pageRequest, countQuery::fetchCount);
+
     }
 
     @Override
@@ -63,7 +65,7 @@ public class SkinTypeRepositoryCustomImpl implements SkinTypeRepositoryCustom{
                 .fetch();
         Double average = fetch.get(0).get(skinType.score.avg());
 
-        return average;
+        return null;
     }
 
     @Override
@@ -92,15 +94,13 @@ public class SkinTypeRepositoryCustomImpl implements SkinTypeRepositoryCustom{
         LocalDateTime endDatetimeWeek = LocalDateTime.of(LocalDate.now(), LocalTime.of(23,59,59));
 
 
-        LocalDateTime startDatetimeMonth = LocalDateTime.of(LocalDate.now().minusWeeks(2), LocalTime.of(0,0,0)); //오늘 00:00:00
-        LocalDateTime endDatetimeMonth = LocalDateTime.of(LocalDate.now().minusWeeks(1), LocalTime.of(23,59,59)); //오늘 23:59:59
+        LocalDateTime startDatetimeWeekAgo = LocalDateTime.of(LocalDate.now().minusWeeks(2), LocalTime.of(0,0,0)); //오늘 00:00:00
+        LocalDateTime endDatetimeWeekAgo = LocalDateTime.of(LocalDate.now().minusWeeks(1), LocalTime.of(23,59,59)); //오늘 23:59:59
 
-        LocalDateTime startDatetimeWeekAgo = LocalDateTime.of(LocalDate.now().minusMonths(2), LocalTime.of(0,0,0)); //오늘 00:00:00
-        LocalDateTime endDatetimeWeekAgo = LocalDateTime.of(LocalDate.now().minusWeeks(2), LocalTime.of(23,59,59)); //오늘 23:59:59
+        LocalDateTime startDatetimeMonth = LocalDateTime.of(LocalDate.now().minusMonths(2), LocalTime.of(0,0,0)); //오늘 00:00:00
+        LocalDateTime endDatetimeMonth = LocalDateTime.of(LocalDate.now().minusWeeks(2), LocalTime.of(23,59,59)); //오늘 23:59:59
 
-
-
-        List<ScoreData> result = queryFactory
+        ScoreData result = queryFactory
                 .select(
                         new QScoreData(
                                 getTypeQuery(sort),
@@ -108,22 +108,48 @@ public class SkinTypeRepositoryCustomImpl implements SkinTypeRepositoryCustom{
                         )
                 )
                 .from(skinType)
-                .where(skinType.user.eq(userDetails.getUser())
-                        .and(getBetween(startDatetimeWeek, endDatetimeWeek)
-                                .or(getBetween(startDatetimeMonth, endDatetimeMonth)
-                                        .or(getBetween(startDatetimeWeekAgo, endDatetimeWeekAgo)))))
+                .where(skinType.user.eq(userDetails.getUser()).and(getBetween(startDatetimeWeek, endDatetimeWeek)))
                 .orderBy(getTypeQueryOrderBy(sort))
-                .fetch();
+                .fetchOne();
+
+        ScoreData result1 = queryFactory
+                .select(
+                        new QScoreData(
+                                getTypeQuery(sort),
+                                skinType.createdAt
+                        )
+                )
+                .from(skinType)
+                .where(skinType.user.eq(userDetails.getUser()).and(getBetween(startDatetimeWeekAgo, endDatetimeWeekAgo)))
+                .orderBy(getTypeQueryOrderBy(sort))
+                .fetchOne();
+
+        ScoreData result2 = queryFactory
+                .select(
+                        new QScoreData(
+                                getTypeQuery(sort),
+                                skinType.createdAt
+                        )
+                )
+                .from(skinType)
+                .where(skinType.user.eq(userDetails.getUser()).and(getBetween(startDatetimeMonth, endDatetimeMonth)))
+                .orderBy(getTypeQueryOrderBy(sort))
+                .fetchOne();
+
+        List<ScoreData> totalResult = new ArrayList<>();
+        totalResult.add(result);
+        totalResult.add(result1);
+        totalResult.add(result2);
 
 
-        return result;
+        return totalResult;
     }
 
     private BooleanExpression getBetween(LocalDateTime startDatetime, LocalDateTime endDatetime) {
         return skinType.createdAt.between(startDatetime, endDatetime);
     }
 
-    private Expression<Long> getTypeQuery(SkinTypeEnum sort) throws PlaluvsException {
+    private NumberExpression<Long> getTypeQuery(SkinTypeEnum sort) throws PlaluvsException {
         if(sort.equals(SkinTypeEnum.DRY))
             return skinType.dryScore.avg().longValue();
         else if (sort.equals(SkinTypeEnum.OIL))

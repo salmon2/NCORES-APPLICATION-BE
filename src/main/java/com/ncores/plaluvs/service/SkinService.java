@@ -393,8 +393,6 @@ public class SkinService {
             }
         }
 
-
-
         return new PagingAveragingScoreResponseDto(statusList.size(), averageCustom.intValue(), result.getNumber(), result.getTotalPages(), statusList);
     }
 

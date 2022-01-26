@@ -65,7 +65,7 @@ public class SkinTypeRepositoryCustomImpl implements SkinTypeRepositoryCustom{
                 .fetch();
         Double average = fetch.get(0).get(skinType.score.avg());
 
-        return null;
+        return average;
     }
 
     @Override
@@ -137,10 +137,12 @@ public class SkinTypeRepositoryCustomImpl implements SkinTypeRepositoryCustom{
                 .fetchOne();
 
         List<ScoreData> totalResult = new ArrayList<>();
-        totalResult.add(result);
-        totalResult.add(result1);
-        totalResult.add(result2);
-
+        if(result.getScore() != null)
+            totalResult.add(result);
+        if(result1.getScore() != null)
+            totalResult.add(result1);
+        if(result2.getScore() != null)
+            totalResult.add(result2);
 
         return totalResult;
     }

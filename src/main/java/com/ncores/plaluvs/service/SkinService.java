@@ -595,7 +595,6 @@ public class SkinService {
         LocalDateTime startDatetimeWeek = LocalDateTime.of(LocalDate.now().minusWeeks(1), LocalTime.of(0,0,0));
         LocalDateTime endDatetimeWeek = LocalDateTime.of(LocalDate.now(), LocalTime.of(23,59,59));
 
-
         LocalDateTime startDatetimeWeekAgo = LocalDateTime.of(LocalDate.now().minusWeeks(2), LocalTime.of(0,0,0)); //오늘 00:00:00
         LocalDateTime endDatetimeWeekAgo = LocalDateTime.of(LocalDate.now().minusWeeks(1), LocalTime.of(23,59,59)); //오늘 23:59:59
 
@@ -649,6 +648,7 @@ public class SkinService {
                          LocalDateTime startDatetimeWeekAgo, LocalDateTime endDatetimeWeekAgo,
                          LocalDateTime startDatetimeMonth, LocalDateTime endDatetimeMonth,
                          List<ScoreData> dryResult, Long rate) {
+
         Long beforeScore =null;
 
         Collections.sort(dryResult, new  ScoreDataComparator());
@@ -775,6 +775,13 @@ public class SkinService {
     class ScoreDataComparator implements Comparator<ScoreData> {
         @Override
         public  int compare(ScoreData a, ScoreData b){
+            if(a == null){
+                return 0;
+            }
+            if (b == null){
+                return 0;
+            }
+
             if(a.getScore()>b.getScore()) return 1;
             if(a.getScore()<b.getScore()) return -1;
             return 0;

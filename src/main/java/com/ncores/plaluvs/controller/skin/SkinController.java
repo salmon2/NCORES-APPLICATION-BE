@@ -113,9 +113,12 @@ public class SkinController {
     }
 
     @GetMapping("/skin/status/bouman")
-    public ResponseEntity<?> skinStatusBouman(@AuthenticationPrincipal UserDetailsImpl userDetails){
+    public ResponseEntity<?> skinStatusBouman(@AuthenticationPrincipal UserDetailsImpl userDetails) throws PlaluvsException {
         log.info("skin/status/list");
-         skinStatusBoumanResponseDto result = skinService.skinStatusBouman(userDetails);
+
+        //skinStatusBoumanResponseDto result = skinService.skinStatusBoumanDummy(userDetails);
+        skinStatusBoumanResponseDto result = skinService.skinStatusBouman(userDetails);
+
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

@@ -6,6 +6,7 @@ import com.ncores.plaluvs.domain.dto.SkinNowStatusRequestDto;
 import com.ncores.plaluvs.domain.dto.SkinWorryRequestDto;
 import com.ncores.plaluvs.domain.skintype.Bouman;
 import com.ncores.plaluvs.domain.skintype.CurrentSkinStatus;
+import com.ncores.plaluvs.domain.skintype.SkinTypeEnum;
 import com.ncores.plaluvs.domain.skintype.skindailyStatus.SkinDailyStatus;
 import com.ncores.plaluvs.domain.skintype.skindailyStatus.SkinDailyStatusEnum;
 import com.ncores.plaluvs.domain.skintype.skindailystimulation.SkinDailyStimulation;
@@ -31,8 +32,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -378,19 +378,20 @@ public class SkinService {
     }
 
     private String getDate(LocalDateTime createdAt){
-        LocalDateTime now = LocalDateTime.now();
+        LocalDate createdAtLocalDate = createdAt.toLocalDate();
+        LocalDate now = LocalDateTime.now().toLocalDate();
 
-        long betWeenYear = ChronoUnit.YEARS.between(now, createdAt);
+        long betWeenYear = ChronoUnit.YEARS.between(createdAtLocalDate, now);
         if(betWeenYear != 0){
             return "1년 전";
         }
 
-        long betWeenMonth = ChronoUnit.MONTHS.between(now, createdAt);
+        long betWeenMonth = ChronoUnit.MONTHS.between(createdAtLocalDate, now);
         if(betWeenMonth != 0 ){
             return betWeenMonth +"달 전";
         }
 
-        long betWeenDay = ChronoUnit.DAYS.between(now, createdAt);
+        long betWeenDay = ChronoUnit.DAYS.between(createdAtLocalDate, now);
         if(betWeenDay != 0){
             return betWeenDay +"일 전";
         }
@@ -544,7 +545,82 @@ public class SkinService {
         return key;
     }
 
-    public skinStatusBoumanResponseDto skinStatusBouman(UserDetailsImpl userDetails) {
+    public skinStatusBoumanResponseDto skinStatusBouman(UserDetailsImpl userDetails) throws PlaluvsException {
+        LocalDateTime startDatetime;
+        LocalDateTime endDatetime;
+
+        LocalDateTime startDatetimeWeek = LocalDateTime.of(LocalDate.now().minusWeeks(1), LocalTime.of(0,0,0));
+        LocalDateTime endDatetimeWeek = LocalDateTime.of(LocalDate.now(), LocalTime.of(23,59,59));
+
+
+        LocalDateTime startDatetimeMonth = LocalDateTime.of(LocalDate.now().minusWeeks(2), LocalTime.of(0,0,0)); //오늘 00:00:00
+        LocalDateTime endDatetimeMonth = LocalDateTime.of(LocalDate.now().minusWeeks(1), LocalTime.of(23,59,59)); //오늘 23:59:59
+
+        LocalDateTime startDatetimeWeekAgo = LocalDateTime.of(LocalDate.now().minusMonths(2), LocalTime.of(0,0,0)); //오늘 00:00:00
+        LocalDateTime endDatetimeWeekAgo = LocalDateTime.of(LocalDate.now().minusWeeks(2), LocalTime.of(23,59,59)); //오늘 23:59:59
+
+        startDatetime = LocalDateTime.of(LocalDate.now().minusWeeks(1), LocalTime.of(0,0,0)); //오늘 00:00:00
+        endDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(23,59,59)); //오늘 23:59:59
+
+        List<ScoreData> dryResult = skinTypeRepository.findSkinStatusBoumanCustom(userDetails, startDatetime, endDatetime, SkinTypeEnum.DRY);
+        Setting(startDatetimeWeek, endDatetimeWeek, startDatetimeWeekAgo, dryResult, Long.valueOf(100/5) );
+
+        List<ScoreData> oilResult = skinTypeRepository.findSkinStatusBoumanCustom(userDetails, startDatetime, endDatetime, SkinTypeEnum.OIL);
+        Setting(startDatetimeWeek, endDatetimeWeek, startDatetimeWeekAgo, oilResult, Long.valueOf(100/8) );
+
+        List<ScoreData> senResult = skinTypeRepository.findSkinStatusBoumanCustom(userDetails, startDatetime, endDatetime, SkinTypeEnum.SEN);
+        Setting(startDatetimeWeek, endDatetimeWeek, startDatetimeWeekAgo, senResult, Long.valueOf(100/9));
+
+        List<ScoreData> winResult = skinTypeRepository.findSkinStatusBoumanCustom(userDetails, startDatetime, endDatetime, SkinTypeEnum.WIN);
+        Setting(startDatetimeWeek, endDatetimeWeek, startDatetimeWeekAgo, winResult, Long.valueOf(100/3));
+
+        List<ScoreData> pigResult = skinTypeRepository.findSkinStatusBoumanCustom(userDetails, startDatetime, endDatetime, SkinTypeEnum.PIG);
+        Setting(startDatetimeWeek, endDatetimeWeek, startDatetimeWeekAgo, pigResult, Long.valueOf(100/2));
+
+        skinStatusBoumanResponseDto skinStatusBoumanResponseDto = new skinStatusBoumanResponseDto(dryResult, oilResult, senResult, pigResult, winResult);
+
+        return skinStatusBoumanResponseDto;
+    }
+
+
+    private void Setting(LocalDateTime startDatetimeWeek, LocalDateTime endDatetimeWeek, LocalDateTime startDatetimeWeekAgo, List<ScoreData> dryResult, Long rate) {
+        Long beforeScore =null;
+        for (ScoreData scoreData : dryResult) {
+
+            Long dryScore = scoreData.getScore() * rate;
+
+            scoreData.setScore(dryScore);
+            LocalDateTime createdAt = scoreData.getCreatedAt();
+
+            //이번 주 일이라면
+            if(createdAt.isAfter(startDatetimeWeek) && createdAt.isBefore(endDatetimeWeek)){
+                scoreData.setTag("이번주엔 "+dryScore+"점이에요");
+                scoreData.setColor("959698");
+            }
+            //일주일전엔
+            else if(createdAt.isAfter(startDatetimeWeekAgo)&& createdAt.isBefore(endDatetimeWeek)){
+                scoreData.setTag("일주일전엔 "+ dryScore+ "점이에요");
+                scoreData.setColor("EFC2C2");
+            }
+            //한달전엔
+            else if(createdAt.isAfter(startDatetimeWeekAgo)&& createdAt.isBefore(endDatetimeWeek)){
+                scoreData.setTag("한달전엔 "+ dryScore+ "점이었어요");
+                scoreData.setColor("C14242");
+            }
+
+            if(beforeScore != null){
+                scoreData.setRate(beforeScore - dryScore);
+                beforeScore = scoreData.getScore();
+            }
+            else{
+                scoreData.setRate(scoreData.getScore());
+                beforeScore = scoreData.getScore();
+            }
+
+        }
+    }
+
+    public skinStatusBoumanResponseDto skinStatusBoumanDummy(UserDetailsImpl userDetails) {
 
         skinStatusBoumanResponseDto result = new skinStatusBoumanResponseDto();
         LocalDateTime startDatetime;
@@ -627,4 +703,15 @@ public class SkinService {
 
         return result;
     }
+
+    class ScoreDataComparator implements Comparator<ScoreData> {
+        @Override
+        public  int compare(ScoreData a, ScoreData b){
+            if(a.getScore()>b.getScore()) return 1;
+            if(a.getScore()<b.getScore()) return -1;
+            return 0;
+        }
+    }
+
+
 }

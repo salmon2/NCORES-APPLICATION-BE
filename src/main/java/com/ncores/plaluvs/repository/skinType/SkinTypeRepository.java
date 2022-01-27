@@ -25,7 +25,11 @@ public interface SkinTypeRepository extends JpaRepository<SkinType, Long>, SkinT
 
     SkinType findTopByUserOrderByCreatedAtDesc(User user);
 
+    Boolean existsByUserAndCreatedAtBetween(User user, LocalDateTime start, LocalDateTime end);
+
     List<SkinType> findAllByUserOrderByCreatedAt(User user, Sort createdAt);
+
+    SkinType findTopByCreatedAtBetweenAndUser(LocalDateTime start, LocalDateTime endDatetime, User user);
 
 
     default SkinType findDailySkinType(UserDetailsImpl userDetails) {
@@ -102,5 +106,13 @@ public interface SkinTypeRepository extends JpaRepository<SkinType, Long>, SkinT
     }
 
 
-    SkinType findTopByCreatedAtBetweenAndUser(LocalDateTime startDatetime, LocalDateTime endDatetime, User user);
+    default Boolean findDailyExists(User user){
+        LocalDateTime startDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(0,0,0)); //오늘 00:00:00
+        LocalDateTime endDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(23,59,59)); //오늘 23:59:59
+
+        Boolean aBoolean = existsByUserAndCreatedAtBetween(user, startDatetime, endDatetime);
+        return aBoolean;
+    }
+
+
 }

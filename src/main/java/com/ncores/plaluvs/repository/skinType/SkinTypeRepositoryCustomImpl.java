@@ -147,6 +147,8 @@ public class SkinTypeRepositoryCustomImpl implements SkinTypeRepositoryCustom{
         return totalResult;
     }
 
+
+
     private BooleanExpression getBetween(LocalDateTime startDatetime, LocalDateTime endDatetime) {
         return skinType.createdAt.between(startDatetime, endDatetime);
     }

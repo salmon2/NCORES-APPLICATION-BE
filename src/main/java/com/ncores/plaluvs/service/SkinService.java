@@ -365,55 +365,166 @@ public class SkinService {
         PageRequest pageRequest = PageRequest.of(page.intValue(), 7);
         Page<SkinType> result =  skinTypeRepository.findAllCustom(userDetails, pageRequest, sort);
         List<Status> statusList = new ArrayList<>();
-        String buttonColor = "#323632";
+        Boolean todays = skinTypeRepository.findDailyExists(userDetails.getUser());
+        String buttonColor = (todays) ? "#F5EBE8": "#323632";
         String text = "hello world";
 
         if(result != null){
-            Status newStatusList = null;
-            int i = 0;
+            if(todays){
+                Status newStatusList = null;
+                int i = 0;
 
-            Long max = 0L;
+                Long max = 0L;
+                int maxIndex = -1;
 
-            Long min = 100L;
+                Long min = 100L;
+                int minIndex = -1;
 
-            for (SkinType skinType : result) {
-                if(skinType.getScore() == null){
-                    throw new PlaluvsException(ErrorCode.SKIN_TYPE_NOT_FOUND);
+                for (SkinType skinType : result) {
+                    if(skinType.getScore() == null){
+                        throw new PlaluvsException(ErrorCode.SKIN_TYPE_NOT_FOUND);
+                    }
+                    LocalDateTime createdAt = skinType.getCreatedAt();
+                    String date = getDate(createdAt);
+                    newStatusList = new Status(skinType.getScore(), date, "common");
+
+                    statusList.add(newStatusList);
+                    if(max < skinType.getScore()){
+                        max = skinType.getScore();
+                        maxIndex = i;
+                    }
+                    if(min > skinType.getScore()){
+                        min = skinType.getScore();
+                        minIndex = i;
+                    }
+
+                    i++;
                 }
-                LocalDateTime createdAt = skinType.getCreatedAt();
-                String date = getDate(createdAt);
-                if(date.equals("오늘")){
-                    buttonColor = "#F5EBE8";
-                }
-                newStatusList = new Status(skinType.getScore(), date, "common");
+                int count = 0;
 
-                statusList.add(newStatusList);
-                if(max < skinType.getScore()){
-                    max = skinType.getScore();
-                }
-                if(min > skinType.getScore()){
-                    min = skinType.getScore();
+                for (Status status : statusList) {
+                    if(status.getScore().equals(max) || status.getScore().equals(min)){
+                        status.setType("bold");
+                    }
+                    count++;
                 }
 
-                i++;
+                if(i == 1){
+                    text = "첫 진단이에요!\n" +
+                            "내일도 변화를 기록해 보세요";
+                }
+                else if(i == 2){
+                    if(statusList.get(0).getScore().equals(statusList.get(1).getScore())){
+                        text = "두번째 진단도 성공!\n" +
+                                "내일도 변화를 기록해 보세요";
+                    }
+                }
+                else if (i > 2){
+                    if(count == statusList.size()){
+                        text = "꾸준히 관리하는 피부는\n" +
+                                "시간이 지날수록 아름다워요";
+                    }
+                    else{
+                        if(statusList.get(0).getScore() > statusList.get(1).getScore()){
+                            text = "오늘 피부 점수가\n" +
+                                    statusList.get(1).getDate()+"보다 " + (statusList.get(0).getScore() - statusList.get(1).getScore()) +"점이 올랐어요";
+                        }
+                        else if(statusList.get(0).getScore() < statusList.get(1).getScore()){
+                            text = "오늘 피부 점수가\n" +
+                                    statusList.get(1).getDate()+"보다 " + (statusList.get(1).getScore() - statusList.get(0).getScore()) +"점이 떨어졌어요";
+                        }
+                        else{
+                            text = "꾸준히 관리하는 피부는\n" +
+                                    "시간이 지날수록 아름다워요";
+                        }
+                    }
+                }
+
+
+                for (; i < 7; i++) {
+                    String substring1 = statusList.get(0).getDate().substring(0, 1);
+                    Long num = Long.valueOf(substring1);
+
+                    String substring = statusList.get(0).getDate().substring(1, 4);
+                    newStatusList = new Status(1L, num+1 + substring    , "common");
+
+                    statusList.add(0, newStatusList);
+                }
+            }
+            else{
+                Status newStatusList = null;
+                int i = 0;
+
+                Long max = 0L;
+                int maxIndex = -1;
+
+                Long min = 100L;
+                int minIndex = -1;
+
+                for (SkinType skinType : result) {
+                    if(skinType.getScore() == null){
+                        throw new PlaluvsException(ErrorCode.SKIN_TYPE_NOT_FOUND);
+                    }
+                    LocalDateTime createdAt = skinType.getCreatedAt();
+                    String date = getDate(createdAt);
+                    newStatusList = new Status(skinType.getScore(), date, "common");
+
+                    statusList.add(newStatusList);
+                    if(max < skinType.getScore()){
+                        max = skinType.getScore();
+                        maxIndex = i;
+                    }
+                    if(min > skinType.getScore()){
+                        min = skinType.getScore();
+                        minIndex = i;
+                    }
+
+                    i++;
+                }
+                int count = 0;
+
+                for (Status status : statusList) {
+                    if(status.getScore().equals(max) || status.getScore().equals(min)){
+                        status.setType("bold");
+                    }
+                    count++;
+                }
+
+                if(i == 1){
+                    text = "꾸준한 피부 기록은\n" +
+                            "피부 변화의 시작이에요";
+                }
+                else if(i == 2){
+                    if(statusList.get(0).getScore() > statusList.get(1).getScore()){
+                        text = statusList.get(0).getDate() + " 피부 점수가\n" +
+                                statusList.get(1).getDate()+"보다 " + (statusList.get(0).getScore() - statusList.get(1).getScore()) +"점이 올랐어요";
+                    }
+                    else if(statusList.get(0).getScore() < statusList.get(1).getScore()){
+                        text =  statusList.get(0).getDate() +" 피부 점수가\n" +
+                                statusList.get(1).getDate()+"보다 " + (statusList.get(1).getScore() - statusList.get(0).getScore()) +"점이 떨어졌어요";
+                    }
+                    else{
+                        text = "꾸준히 관리하는 피부는\n" +
+                                "시간이 지날수록 아름다워요";
+                    }
+                }
+                else if (i > 2){
+                   text = "최근 피부 점수가 "+statusList.get(minIndex).getDate()+"에 가장 낮았고\n" +
+                           statusList.get(maxIndex).getDate()+"에 가장 높았어요";
+                }
+
+
+                for (; i < 7; i++) {
+                    String substring1 = statusList.get(0).getDate().substring(0, 1);
+                    Long num = Long.valueOf(substring1);
+
+                    String substring = statusList.get(0).getDate().substring(1, 4);
+                    newStatusList = new Status(1L, num+1 + substring    , "common");
+
+                    statusList.add(0, newStatusList);
+                }
             }
 
-            for (Status status : statusList) {
-                if(status.getScore().equals(max) || status.getScore().equals(min)){
-                    status.setType("bold");
-                }
-            }
-
-
-            for (; i < 7; i++) {
-                String substring1 = statusList.get(0).getDate().substring(0, 1);
-                Long num = Long.valueOf(substring1);
-
-                String substring = statusList.get(0).getDate().substring(1, 4);
-                newStatusList = new Status(1L, num+1 + substring    , "common");
-
-                statusList.add(0, newStatusList);
-            }
         }
         else{
             for (int i = 0; i < 7; i++) {

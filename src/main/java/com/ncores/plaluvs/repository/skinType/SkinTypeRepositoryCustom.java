@@ -5,6 +5,7 @@ import com.ncores.plaluvs.controller.skin.dto.SkinStatusRecordResponseDto;
 import com.ncores.plaluvs.domain.skintype.CurrentSkinStatus;
 import com.ncores.plaluvs.domain.skintype.SkinType;
 import com.ncores.plaluvs.domain.skintype.SkinTypeEnum;
+import com.ncores.plaluvs.domain.user.User;
 import com.ncores.plaluvs.exception.PlaluvsException;
 import com.ncores.plaluvs.security.UserDetailsImpl;
 import org.springframework.data.domain.Page;

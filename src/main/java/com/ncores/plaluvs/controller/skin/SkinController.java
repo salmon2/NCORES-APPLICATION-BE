@@ -104,7 +104,7 @@ public class SkinController {
 
     @GetMapping("/skin/status/list")
     public ResponseEntity<?> skinStatusList(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                            @RequestParam(defaultValue = "asc") String sort){
+                                            @RequestParam(defaultValue = "asc") String sort) throws PlaluvsException {
         log.info("skin/status/list");
         Long page = 0L;
         PagingAveragingScoreResponseDto result = skinService.skinStatusList(userDetails, page, sort);

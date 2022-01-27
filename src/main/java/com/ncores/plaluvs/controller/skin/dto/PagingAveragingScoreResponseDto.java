@@ -14,7 +14,8 @@ import java.util.List;
 @AllArgsConstructor
 public class PagingAveragingScoreResponseDto<T> {
     private int size;
-    private int averageScore;
+    private String text;
+    private String buttonColor;
     private int currentPage;
     private int maxPage;
     private T data;

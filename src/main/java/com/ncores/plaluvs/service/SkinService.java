@@ -34,6 +34,8 @@ import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
+import static com.ncores.plaluvs.domain.skintype.QSkinType.skinType;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -359,41 +361,68 @@ public class SkinService {
         return "";
     }
 
-    public PagingAveragingScoreResponseDto skinStatusList(UserDetailsImpl userDetails, Long page, String sort) {
+    public PagingAveragingScoreResponseDto skinStatusList(UserDetailsImpl userDetails, Long page, String sort) throws PlaluvsException {
         PageRequest pageRequest = PageRequest.of(page.intValue(), 7);
         Page<SkinType> result =  skinTypeRepository.findAllCustom(userDetails, pageRequest, sort);
         List<Status> statusList = new ArrayList<>();
-
-        Double averageCustom = skinTypeRepository.findAverageCustom(userDetails);
+        String buttonColor = "#323632";
+        String text = "hello world";
 
         if(result != null){
             Status newStatusList = null;
             int i = 0;
+
+            Long max = 0L;
+
+            Long min = 100L;
+
             for (SkinType skinType : result) {
+                if(skinType.getScore() == null){
+                    throw new PlaluvsException(ErrorCode.SKIN_TYPE_NOT_FOUND);
+                }
                 LocalDateTime createdAt = skinType.getCreatedAt();
-                newStatusList = new Status(skinType.getScore(), getDate(createdAt));
+                String date = getDate(createdAt);
+                if(date.equals("오늘")){
+                    buttonColor = "#F5EBE8";
+                }
+                newStatusList = new Status(skinType.getScore(), date, "common");
+
                 statusList.add(newStatusList);
+                if(max < skinType.getScore()){
+                    max = skinType.getScore();
+                }
+                if(min > skinType.getScore()){
+                    min = skinType.getScore();
+                }
+
                 i++;
             }
+
+            for (Status status : statusList) {
+                if(status.getScore().equals(max) || status.getScore().equals(min)){
+                    status.setType("bold");
+                }
+            }
+
 
             for (; i < 7; i++) {
                 String substring1 = statusList.get(0).getDate().substring(0, 1);
                 Long num = Long.valueOf(substring1);
 
                 String substring = statusList.get(0).getDate().substring(1, 4);
-                newStatusList = new Status(1L, num+1 + substring    );
+                newStatusList = new Status(1L, num+1 + substring    , "common");
 
                 statusList.add(0, newStatusList);
             }
         }
         else{
             for (int i = 0; i < 7; i++) {
-                Status stauts = new Status(1L, i + "일 전");
+                Status stauts = new Status(1L, i + "일 전", "common");
                 statusList.add(0, stauts);
             }
         }
 
-        return new PagingAveragingScoreResponseDto(statusList.size(), averageCustom.intValue(), result.getNumber(), result.getTotalPages(), statusList);
+        return new PagingAveragingScoreResponseDto(statusList.size(), text, buttonColor, result.getNumber(), result.getTotalPages(), statusList);
     }
 
     private String getDate(LocalDateTime createdAt){

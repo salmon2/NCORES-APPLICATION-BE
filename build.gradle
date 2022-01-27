@@ -57,6 +57,8 @@ dependencies {
 	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
 	implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
 
+	implementation group: 'org.python', name: 'jython-standalone', version: '2.7.2'
+
 }
 
 

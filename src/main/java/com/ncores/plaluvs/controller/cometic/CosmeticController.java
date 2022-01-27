@@ -86,7 +86,7 @@ public class CosmeticController {
         return new ResponseEntity<>(new PagingResponseDto(result.getContent().size(), result.getNumber(), result.getTotalPages(), result.getContent()), HttpStatus.OK);
     }
 
-    @GetMapping("/cosmetic/worry-recommends")
+    @PostMapping("/cosmetic/worry-recommends")
     public ResponseEntity<?> cosmeticWorry(@AuthenticationPrincipal UserDetailsImpl userDetails) throws PlaluvsException {
         List<SimpleCosmeticDto> result = cosmeticService.cosmeticWorry(userDetails);
 
@@ -97,6 +97,7 @@ public class CosmeticController {
     public ResponseEntity<?> cosmeticMark(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long cosmetic) throws PlaluvsException {
+
         String result = cosmeticService.cosmeticMark(userDetails, cosmetic);
 
         return new ResponseEntity<>(result, HttpStatus.OK);

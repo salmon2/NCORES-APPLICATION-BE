@@ -26,11 +26,20 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
 
-    //회원탈퇴
-    @DeleteMapping("/user")
-    public ResponseEntity<?> deleteUser(@AuthenticationPrincipal UserDetailsImpl userDetails) throws PlaluvsException {
+    @GetMapping("/user/info")
+    public ResponseEntity<?> getUser(@AuthenticationPrincipal UserDetailsImpl userDetails) throws PlaluvsException{
         UserDetailsImpl.UserCheck(userDetails);
-        userService.deleteUser(userDetails);
+        UserInfoDto responseDto = new UserInfoDto(userDetails.getUser().getId(), userDetails.getUser().getNickname());
+
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    }
+
+    //회원탈퇴
+    @PostMapping("/user/delete")
+    public ResponseEntity<?> deleteUser(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody DeleteUserRequestDto requestDto) throws PlaluvsException {
+        UserDetailsImpl.UserCheck(userDetails);
+
+        userService.deleteUser(userDetails, requestDto);
 
         return new ResponseEntity<>("정상적으로 삭제되었습니다.", HttpStatus.OK);
     }
@@ -107,21 +116,21 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/user/elements/{page}")
-    public ResponseEntity<?> userElements(@PathVariable Long page, @AuthenticationPrincipal UserDetailsImpl userDetails) throws PlaluvsException {
+    @GetMapping("/user/elements")
+    public ResponseEntity<?> userElements(@AuthenticationPrincipal UserDetailsImpl userDetails) throws PlaluvsException {
 
-        Page<ElementsDto> result = userService.getUserElements(userDetails, page);
+        List<ElementsDto> result = userService.getUserElements(userDetails);
 
-        return new ResponseEntity<>(new PagingResponseDto<>(result.getContent().size(), result.getNumber(), result.getTotalPages(), result.getContent()), HttpStatus.OK);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
 
-    @GetMapping("/user/cosmetics/{page}")
-    public ResponseEntity<?> userCosmetic(@PathVariable Long page, @AuthenticationPrincipal UserDetailsImpl userDetails) throws PlaluvsException {
+    @GetMapping("/user/cosmetic")
+    public ResponseEntity<?> userCosmetic(@AuthenticationPrincipal UserDetailsImpl userDetails) throws PlaluvsException {
 
-        Page<CosmeticDto> result = userService.getUserCosmetics(userDetails, page);
+        List<CosmeticDto> result = userService.getUserCosmetics(userDetails);
 
-        return new ResponseEntity<>(new PagingResponseDto(result.getContent().size(), result.getNumber(), result.getTotalPages(), result.getContent()), HttpStatus.OK);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
 

@@ -1,6 +1,5 @@
 package com.ncores.plaluvs.service;
 
-import com.ncores.plaluvs.controller.cometic.dto.SimpleCosmeticDto;
 import com.ncores.plaluvs.controller.user.dto.*;
 import com.ncores.plaluvs.domain.dto.ElementsDto;
 import com.ncores.plaluvs.domain.skintype.SkinType;
@@ -16,8 +15,6 @@ import com.ncores.plaluvs.repository.UserRepository;
 import com.ncores.plaluvs.security.UserDetailsImpl;
 import com.ncores.plaluvs.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -197,11 +194,10 @@ public class UserService {
         user.changeGender(requestDto.getGender());
     }
 
-    public Page<ElementsDto> getUserElements(UserDetailsImpl userDetails, Long page) throws PlaluvsException {
+    public List<ElementsDto> getUserElements(UserDetailsImpl userDetails) throws PlaluvsException {
         UserDetailsImpl.UserCheck(userDetails);
-        PageRequest pageRequest = PageRequest.of(page.intValue(), 5);
 
-        Page<ElementsDto> result = elementsRepository.findAllByUserCustom(userDetails.getUser(), pageRequest);
+        List<ElementsDto> result = elementsRepository.findAllByUserCustom(userDetails.getUser());
         for (ElementsDto elementsDto : result) {
            elementsDto.setImg(getImgSRc(elementsDto.getLevel()));
         }
@@ -260,16 +256,17 @@ public class UserService {
         return "";
     }
 
-    public Page<CosmeticDto> getUserCosmetics(UserDetailsImpl userDetails, Long page) throws PlaluvsException {
-        PageRequest pageRequest = PageRequest.of(page.intValue(), 5);
+    public List<CosmeticDto> getUserCosmetics(UserDetailsImpl userDetails) throws PlaluvsException {
         UserDetailsImpl.UserCheck(userDetails);
 
-        Page<CosmeticDto> result = cosmeticRepository.findAllByUserCustom(userDetails.getUser(), pageRequest);
+        List<CosmeticDto> result = cosmeticRepository.findAllByUserCustom(userDetails.getUser());
+        naverUrl(result);
 
 
         return result;
     }
-    private void naverUrl(Page<CosmeticDto> result) {
+
+    private void naverUrl(List<CosmeticDto> result) {
         for (CosmeticDto cosmeticDto : result){
 
             String name = cosmeticDto.getKorName();
@@ -287,10 +284,17 @@ public class UserService {
         }
     }
 
-    public void deleteUser(UserDetailsImpl userDetails) throws PlaluvsException {
+    public void deleteUser(UserDetailsImpl userDetails, DeleteUserRequestDto requestDto) throws PlaluvsException {
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(
                 () -> new PlaluvsException(ErrorCode.USER_NOT_FOUND)
         );
+
+        if(requestDto.getPassword() == null){
+            throw new PlaluvsException(ErrorCode.PASSWORD_EMPTY);
+        }
+        if(!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())){
+            throw new PlaluvsException(ErrorCode.PASSWORD_NOT_EQUAL);
+        }
 
         userRepository.deleteById(user.getId());
     }

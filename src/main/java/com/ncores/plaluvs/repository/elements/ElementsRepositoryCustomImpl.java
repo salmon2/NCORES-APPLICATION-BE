@@ -19,18 +19,13 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 import static com.ncores.plaluvs.controller.QUserElements.userElements;
-import static com.ncores.plaluvs.domain.QCosmetic.cosmetic;
 import static com.ncores.plaluvs.domain.QElements.elements;
 import static com.ncores.plaluvs.domain.QSkinTypeGoodElements.skinTypeGoodElements;
-import static com.ncores.plaluvs.domain.QUserCosmetic.userCosmetic;
 import static com.ncores.plaluvs.domain.skintype.skintrouble.QSkinTrouble.skinTrouble;
 import static com.ncores.plaluvs.domain.skintype.skintrouble.QSkinTroubleElements.skinTroubleElements;
 
@@ -64,7 +59,7 @@ public class ElementsRepositoryCustomImpl implements ElementsRepositoryCustom{
     }
 
     @Override
-    public Page<ElementsDto> findAllByUserCustom(User user, PageRequest pageRequest) {
+    public List<ElementsDto> findAllByUserCustom(User user) {
         List<ElementsDto> result = queryFactory
                 .select(
                         new QElementsDto(
@@ -78,13 +73,10 @@ public class ElementsRepositoryCustomImpl implements ElementsRepositoryCustom{
                 .join(userElements.elements, elements)
                 .join(userElements.user, QUser.user)
                 .where(QUser.user.id.eq(user.getId()))
-                .offset(pageRequest.getOffset())
-                .limit(pageRequest.getPageSize())
                 .fetch();
 
-        JPAQuery<UserElements> countQuery = countDetailElemnetsByElement(user);
 
-        return PageableExecutionUtils.getPage(result, pageRequest, countQuery::fetchCount);
+        return result;
     }
 
     private Expression<Boolean> setTrue() {

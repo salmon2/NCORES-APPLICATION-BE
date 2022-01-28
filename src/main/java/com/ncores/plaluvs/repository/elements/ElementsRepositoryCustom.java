@@ -7,8 +7,6 @@ import com.ncores.plaluvs.domain.skintype.SkinType;
 import com.ncores.plaluvs.domain.skintype.skintrouble.SkinTrouble;
 import com.ncores.plaluvs.domain.user.User;
 import com.ncores.plaluvs.security.UserDetailsImpl;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,7 +17,7 @@ public interface ElementsRepositoryCustom {
 
     List<Elements> findAllBySkinTypeGoodElements(SkinType skinTypeGoodElementsList);
 
-    Page<ElementsDto> findAllByUserCustom(User user, PageRequest pageRequest);
+    List<ElementsDto> findAllByUserCustom(User user);
 
     List<SkinElementsDto> findSkinElementsDtoListBySkinTypeGoodElements(SkinType dailySkinTYpe, UserDetailsImpl userDetails);
 }

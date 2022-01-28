@@ -289,7 +289,7 @@ public class SkinService {
     public SkinStatusResponseDto skinStatus(UserDetailsImpl userDetails) throws PlaluvsException {
         UserDetailsImpl.UserCheck(userDetails);
 
-        SkinType dailySkinTYpe = skinTypeRepository.findDailySkinTypeException(userDetails);
+        SkinType dailySkinTYpe = skinTypeRepository.findDailySkinTypeException(userDetails.getUser());
         List<SkinElementsDto> elementsDtoList = elementsRepository.findSkinElementsDtoListBySkinTypeGoodElements(dailySkinTYpe, userDetails);
         for (SkinElementsDto skinElementsDto : elementsDtoList) {
             skinElementsDto.setImg(getImgSRc(skinElementsDto.getLevel()));
@@ -368,9 +368,11 @@ public class SkinService {
         Boolean todays = skinTypeRepository.findDailyExists(userDetails.getUser());
         String buttonColor = (todays) ? "#F5EBE8": "#323632";
         String text = "hello world";
+        String statusText = "";
 
         if(result != null){
             if(todays){
+                text = "today data exist";
                 Status newStatusList = null;
                 int i = 0;
 
@@ -452,6 +454,7 @@ public class SkinService {
                 }
             }
             else{
+                statusText = "today no data";
                 Status newStatusList = null;
                 int i = 0;
 
@@ -527,13 +530,15 @@ public class SkinService {
 
         }
         else{
+
             for (int i = 0; i < 7; i++) {
                 Status stauts = new Status(1L, i + "일 전", "common");
                 statusList.add(0, stauts);
             }
+            statusText = "no data";
         }
 
-        return new PagingAveragingScoreResponseDto(statusList.size(), text, buttonColor, result.getNumber(), result.getTotalPages(), statusList);
+        return new PagingAveragingScoreResponseDto(statusList.size(), text, buttonColor, statusText, result.getNumber(), result.getTotalPages(), statusList);
     }
 
     private String getDate(LocalDateTime createdAt){
@@ -746,7 +751,7 @@ public class SkinService {
         Setting(startDatetimeWeek, endDatetimeWeek,
                 startDatetimeWeekAgo, endDatetimeWeekAgo,
                 startDatetimeMonth, endDatetimeMonth,
-                dryResult, Long.valueOf(100/5) );
+                dryResult, Long.valueOf(100/6) );
 
         List<ScoreData> oilResult = skinTypeRepository.findSkinStatusBoumanCustom(userDetails, startDatetime, endDatetime, SkinTypeEnum.OIL);
         Setting(startDatetimeWeek, endDatetimeWeek,

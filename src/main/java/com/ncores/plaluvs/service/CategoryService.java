@@ -16,6 +16,7 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
 
     public  List<CategoryResponseDto> findAll() {
+
         List<Category> all = categoryRepository.findAll();
         List<CategoryResponseDto> result = new ArrayList<>();
 

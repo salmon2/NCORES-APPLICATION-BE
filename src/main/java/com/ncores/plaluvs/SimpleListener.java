@@ -10,6 +10,7 @@ import com.ncores.plaluvs.domain.dto.SkinWorryRequestDto;
 import com.ncores.plaluvs.domain.user.User;
 import com.ncores.plaluvs.domain.user.UserRoleEnum;
 import com.ncores.plaluvs.exception.PlaluvsException;
+import com.ncores.plaluvs.repository.CategoryRepository;
 import com.ncores.plaluvs.repository.skinType.SkinTypeRepository;
 import com.ncores.plaluvs.repository.UserRepository;
 import com.ncores.plaluvs.service.SkinService;
@@ -22,17 +23,15 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 
 @NoArgsConstructor
-//@Component
+@Component
 public class SimpleListener implements ApplicationListener<ApplicationStartedEvent> {
     @Autowired
     private UserRepository userRepository;
@@ -51,14 +50,17 @@ public class SimpleListener implements ApplicationListener<ApplicationStartedEve
     @Autowired
     private SkinTypeService skinTypeService;
 
+    @Autowired
+    private CategoryRepository categoryRepository;
+
     @SneakyThrows
     @Override
     public void onApplicationEvent(ApplicationStartedEvent event) {
-        makeData();
-        //initAndCreatedUser();
+        Long id = initAndCreatedUser(592801L);
+        makeData(id);
     }
 
-    private void makeData() throws PlaluvsException {
+    private void makeData(Long id) throws PlaluvsException {
         Random rand = new Random();
         //initAndCreatedUser();
         LocalDateTime newNow1  = LocalDateTime.of(LocalDate.now().minusMonths(3), LocalTime.of(12,12,12));
@@ -76,8 +78,9 @@ public class SimpleListener implements ApplicationListener<ApplicationStartedEve
         list.add(newNow5);
         list.add(newNow6);
 
-        User findUser = userRepository.findById(592046L).get();
+        User findUser = userRepository.findById(id).get();
 
+        int i = 0;
         for (LocalDateTime localDateTime : list) {
             SkinNowStatusRequestDto skinNowStatus = new SkinNowStatusRequestDto(  Long.valueOf(rand.nextInt(5) + 1)  );
 
@@ -96,19 +99,22 @@ public class SimpleListener implements ApplicationListener<ApplicationStartedEve
 
             SkinDailySefCheckRequestDto skinDailySefCheckRequestDto = new SkinDailySefCheckRequestDto(Math.round(rand.nextDouble()*10)/10.0);
 
-            skinService.currentSkinStatus(skinNowStatus, findUser, localDateTime);
-            skinService.skinWorryUpdate(skinWorry, findUser, localDateTime);
+            if(i == 0){
+                skinService.currentSkinStatus(skinNowStatus, findUser, localDateTime);
+                skinService.skinWorryUpdate(skinWorry, findUser, localDateTime);
+            }
             skinService.skinDailyStatus(skinDailyStatus, findUser, localDateTime);
             skinService.skinDailyStimulation(skinDailyStimulation, findUser, localDateTime);
             skinService.skinSelfCheck(skinDailySefCheckRequestDto, findUser, localDateTime);
             skinService.skinBoumanCalucluate(findUser, localDateTime);
             skinTypeService.findSkinElements(findUser, localDateTime);
+            i++;
         }
     }
 
-    private void initAndCreatedUser() {
+    private Long initAndCreatedUser(Long id) {
         //userRepository.deleteAll();
-        userRepository.deleteById(591597L);
+        userRepository.deleteById(id);
 
         User newUser2 = new User(
                 "dys04076@naver.com",
@@ -117,7 +123,8 @@ public class SimpleListener implements ApplicationListener<ApplicationStartedEve
                 UserRoleEnum.ADMIN
         );
 
-        userRepository.save(newUser2);
+        User save = userRepository.save(newUser2);
+        return save.getId();
 
 //        User newUser1 = new User(
 //                "asdf1234",
@@ -127,6 +134,7 @@ public class SimpleListener implements ApplicationListener<ApplicationStartedEve
 //        );
 //
 //        userRepository.save(newUser1);
+
     }
 
 }

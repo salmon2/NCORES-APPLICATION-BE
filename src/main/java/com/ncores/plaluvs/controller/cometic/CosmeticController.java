@@ -86,7 +86,7 @@ public class CosmeticController {
         return new ResponseEntity<>(new PagingResponseDto(result.getContent().size(), result.getNumber(), result.getTotalPages(), result.getContent()), HttpStatus.OK);
     }
 
-    @PostMapping("/cosmetic/worry-recommends")
+    @GetMapping("/cosmetic/worry-recommends")
     public ResponseEntity<?> cosmeticWorry(@AuthenticationPrincipal UserDetailsImpl userDetails) throws PlaluvsException {
         List<SimpleCosmeticDto> result = cosmeticService.cosmeticWorry(userDetails);
 

@@ -183,7 +183,7 @@ public class CosmeticRepositoryCustomImpl implements CosmeticRepositoryCustom{
     }
 
     @Override
-    public Page<CosmeticDto> findAllByUserCustom(User user, PageRequest pageRequest) {
+    public List<CosmeticDto> findAllByUserCustom(User user) {
         List<CosmeticDto> result = queryFactory
                 .select(
                         new QCosmeticDto(
@@ -199,13 +199,10 @@ public class CosmeticRepositoryCustomImpl implements CosmeticRepositoryCustom{
                 .join(userCosmetic.cosmetic, cosmetic)
                 .join(userCosmetic.user, QUser.user)
                 .where(QUser.user.id.eq(user.getId()).and(userCosmetic.cosmetic.id.eq(cosmetic.id)))
-                .offset(pageRequest.getOffset())
-                .limit(pageRequest.getPageSize())
                 .fetch();
 
-        JPAQuery<UserCosmetic> countQuery = countMyBookmarkUserCosmetic(user);
 
-        return PageableExecutionUtils.getPage(result, pageRequest, countQuery::fetchCount);
+        return result;
     }
 
     @Override

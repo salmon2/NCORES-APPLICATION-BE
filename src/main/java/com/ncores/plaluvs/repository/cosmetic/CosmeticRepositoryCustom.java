@@ -24,7 +24,7 @@ public interface CosmeticRepositoryCustom {
 
     Page<DetailCosmeticDto> findCosmeticByElementsCustom(UserDetailsImpl userDetails, Elements findElements, Category findCategory, PageRequest pageRequest, String sort);
 
-    Page<CosmeticDto> findAllByUserCustom(User user, PageRequest pageRequest);
+    List<CosmeticDto> findAllByUserCustom(User usert);
 
     List<SimpleCosmeticDto> findCosmeticNoneWorry(User user);
 

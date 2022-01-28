@@ -15,6 +15,7 @@ import com.ncores.plaluvs.repository.skinType.SkinTypeRepository;
 import com.ncores.plaluvs.repository.UserRepository;
 import com.ncores.plaluvs.service.SkinService;
 import com.ncores.plaluvs.service.SkinTypeService;
+import com.ncores.plaluvs.service.UserService;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ import java.util.List;
 import java.util.Random;
 
 @NoArgsConstructor
-@Component
+//@Component
 public class SimpleListener implements ApplicationListener<ApplicationStartedEvent> {
     @Autowired
     private UserRepository userRepository;
@@ -53,11 +54,20 @@ public class SimpleListener implements ApplicationListener<ApplicationStartedEve
     @Autowired
     private CategoryRepository categoryRepository;
 
+    @Autowired
+    private UserService userService;
+
     @SneakyThrows
     @Override
     public void onApplicationEvent(ApplicationStartedEvent event) {
-        Long id = initAndCreatedUser(592801L);
-        makeData(id);
+        //Long id = initAndCreatedUser(593044L);
+        //makeData(id);
+
+        for (int i = 10; i < 30; i++) {
+            initAndCreatedUser2(i);
+        }
+
+
     }
 
     private void makeData(Long id) throws PlaluvsException {
@@ -85,19 +95,25 @@ public class SimpleListener implements ApplicationListener<ApplicationStartedEve
             SkinNowStatusRequestDto skinNowStatus = new SkinNowStatusRequestDto(  Long.valueOf(rand.nextInt(5) + 1)  );
 
             List<Long> skinWorryId = new ArrayList<>();
-            skinWorryId.add(Long.valueOf(rand.nextInt(5) + 1));
+            Long skinWorryId1 = Long.valueOf(rand.nextInt(5) + 1);
+            skinWorryId.add(skinWorryId1);
+            skinWorryId.add( randomId(skinWorryId1)    );
             SkinWorryRequestDto skinWorry = new SkinWorryRequestDto(   skinWorryId  );
 
             List<Long> skinDailyStatusId = new ArrayList<>();
-            skinDailyStatusId.add(Long.valueOf(rand.nextInt(5)+1));
+            Long skinDailyStatusId1 =    Long.valueOf(rand.nextInt(5) + 1);
+            skinDailyStatusId.add(skinDailyStatusId1);
             SkinDailyStatusRequestDto skinDailyStatus = new SkinDailyStatusRequestDto(skinDailyStatusId);
 
 
             List<Long> skinDailyStimulationId = new ArrayList<>();
-            skinDailyStimulationId.add(Long.valueOf(rand.nextInt(5)+1));
+            Long a = Long.valueOf(rand.nextInt(5) + 1);
+            skinDailyStimulationId.add(a);
+            skinDailyStimulationId.add(randomId(a));
             SkinDailyStimulationRequestDto skinDailyStimulation = new SkinDailyStimulationRequestDto(skinDailyStimulationId);
 
-            SkinDailySefCheckRequestDto skinDailySefCheckRequestDto = new SkinDailySefCheckRequestDto(Math.round(rand.nextDouble()*10)/10.0);
+
+            SkinDailySefCheckRequestDto skinDailySefCheckRequestDto = new SkinDailySefCheckRequestDto((double)Math.round(Math.random()* 5));
 
             if(i == 0){
                 skinService.currentSkinStatus(skinNowStatus, findUser, localDateTime);
@@ -110,6 +126,15 @@ public class SimpleListener implements ApplicationListener<ApplicationStartedEve
             skinTypeService.findSkinElements(findUser, localDateTime);
             i++;
         }
+    }
+
+    private Long randomId(Long id){
+        Random rand = new Random();
+        Long getId = Long.valueOf(rand.nextInt(5) + 1);
+        while( !getId.equals(id) ){
+            getId = Long.valueOf(rand.nextInt(5) + 1);
+        }
+        return getId;
     }
 
     private Long initAndCreatedUser(Long id) {
@@ -134,6 +159,20 @@ public class SimpleListener implements ApplicationListener<ApplicationStartedEve
 //        );
 //
 //        userRepository.save(newUser1);
+
+    }
+
+    private Long initAndCreatedUser2(int i) {
+
+        User newUser2 = new User(
+                "admin" + i,
+                passwordEncoder.encode("admin" + i),
+                "test",
+                UserRoleEnum.ADMIN
+        );
+
+        User save = userRepository.save(newUser2);
+        return save.getId();
 
     }
 

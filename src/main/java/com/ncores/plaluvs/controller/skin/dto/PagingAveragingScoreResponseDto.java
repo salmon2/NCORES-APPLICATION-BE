@@ -16,7 +16,7 @@ public class PagingAveragingScoreResponseDto<T> {
     private int size;
     private String text;
     private String buttonColor;
-    private String status;
+    private Long status;
     private int currentPage;
     private int maxPage;
     private T data;

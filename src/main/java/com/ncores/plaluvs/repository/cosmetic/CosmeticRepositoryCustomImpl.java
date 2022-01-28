@@ -221,7 +221,6 @@ public class CosmeticRepositoryCustomImpl implements CosmeticRepositoryCustom{
                 .from(cosmetic)
                 .limit(7)
                 .fetch();
-
     }
 
 

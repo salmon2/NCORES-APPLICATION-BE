@@ -293,7 +293,7 @@ public class UserService {
             throw new PlaluvsException(ErrorCode.PASSWORD_EMPTY);
         }
         if(!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())){
-            throw new PlaluvsException(ErrorCode.PASSWORD_NOT_EQUAL);
+            throw new PlaluvsException(ErrorCode.PASSWORD_NOT_EQAUL_DELETE);
         }
 
         userRepository.deleteById(user.getId());

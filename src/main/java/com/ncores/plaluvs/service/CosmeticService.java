@@ -36,7 +36,7 @@ public class CosmeticService {
             return result;
         }
 
-        else if (dailySkinType.getBouman().equals("ORNT")){
+        else if (dailySkinType.getBouman().getName().equals("ORNT")){
             List<SimpleCosmeticDto> result = cosmeticRepository.findCosmeticNoneWorry(userDetails.getUser());
             naverUrl(result);
             return result;

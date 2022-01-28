@@ -54,6 +54,15 @@ public interface SkinTypeRepository extends JpaRepository<SkinType, Long>, SkinT
 
     }
 
+    default SkinType findDailySkinTypeOrReturnNull(UserDetailsImpl userDetails) {
+        LocalDateTime startDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(0,0,0)); //오늘 00:00:00
+        LocalDateTime endDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(23,59,59)); //오늘 23:59:59
+
+        SkinType findDailySkinType = findTopByUserAndCreatedAtBetween(userDetails.getUser(), startDatetime, endDatetime);
+
+        return findDailySkinType;
+    }
+
     default SkinType findDailySkinTypeException(User user) throws PlaluvsException {
         LocalDateTime startDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(0,0,0)); //오늘 00:00:00
         LocalDateTime endDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(23,59,59)); //오늘 23:59:59

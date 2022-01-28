@@ -9,16 +9,21 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.FormHttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -43,5 +48,33 @@ public class PhotoController {
 
         return new ResponseEntity<>(url, HttpStatus.OK);
     }
+
+    @PostMapping("/restTest")
+    public String restTest(@RequestParam String str){
+        return str + " : Rest Test 완료!!!";
+    }
+
+    @GetMapping(value = "/photo/cal")
+    public ResponseEntity<?> cal(@AuthenticationPrincipal UserDetailsImpl userDetails){
+        // RestTemplate 에 MessageConverter 세팅
+        List<HttpMessageConverter<?>> converters = new ArrayList<HttpMessageConverter<?>>();
+        converters.add(new FormHttpMessageConverter());
+        converters.add(new StringHttpMessageConverter());
+
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setMessageConverters(converters);
+
+        // parameter 세팅
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+        map.add("str", "thisistest");
+
+        // REST API 호출
+        String result = restTemplate.postForObject("http://localhost:8080/restTest/", map, String.class);
+        System.out.println("------------------ TEST 결과 ------------------");
+        System.out.println(result);
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
 
 }

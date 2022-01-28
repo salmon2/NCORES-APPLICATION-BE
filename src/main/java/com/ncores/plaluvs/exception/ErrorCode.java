@@ -19,6 +19,7 @@ public enum ErrorCode {
 
     PASSWORD_NOT_EQUAL(HttpStatus.FORBIDDEN, "비밀번호와 비밀번화 확인과 일치하지 않습니다."),
     PASSWORD_FAIL(HttpStatus.FORBIDDEN, "비밀번호는 8자 이상 필요합니다."),
+    PASSWORD_NOT_EQAUL_DELETE(HttpStatus.FORBIDDEN, "비밀번호가 일치하지 않습니다."),
 
     USER_NOT_FOUND(HttpStatus.FORBIDDEN, "유저를 찾을 수 없습니다."),
     USER_NOT_LOGIN(HttpStatus.UNAUTHORIZED, "로그인 상태가 아닙니다."),

@@ -31,6 +31,10 @@ public class Photo extends Timestamped {
 
     private String stored_file_path;
 
+    private Long noseTrouble = 0L;
+    private Long leftCheckTrouble = 0L;
+    private Long rightCheckTrouble = 0L;
+
     public static void FileCheck(MultipartFile file) throws PlaluvsException {
         if(file.isEmpty()) {
             throw new PlaluvsException(ErrorCode.DATA_EMPTY);

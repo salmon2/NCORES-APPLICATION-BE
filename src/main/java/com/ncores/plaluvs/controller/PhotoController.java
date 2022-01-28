@@ -42,11 +42,13 @@ public class PhotoController {
         UserDetailsImpl.UserCheck(userDetails);
         Photo.FileCheck(file);
 
-        String url = photoService.upload(file, "static", userDetails);
-        log.info("url = {}", url);
+        Photo savePhoto = photoService.upload(file, "static", userDetails);
+        log.info("url = {}", savePhoto.getStored_file_path());
 
+        Photo result = photoService.makeGetImageData(savePhoto);
+        photoService.setSkinStatus(userDetails.getUser(), result);
 
-        return new ResponseEntity<>(url, HttpStatus.OK);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @PostMapping("/restTest")
@@ -54,27 +56,14 @@ public class PhotoController {
         return str + " : Rest Test 완료!!!";
     }
 
+
+
     @GetMapping(value = "/photo/cal")
     public ResponseEntity<?> cal(@AuthenticationPrincipal UserDetailsImpl userDetails){
-        // RestTemplate 에 MessageConverter 세팅
-        List<HttpMessageConverter<?>> converters = new ArrayList<HttpMessageConverter<?>>();
-        converters.add(new FormHttpMessageConverter());
-        converters.add(new StringHttpMessageConverter());
-
-        RestTemplate restTemplate = new RestTemplate();
-        restTemplate.setMessageConverters(converters);
-
-        // parameter 세팅
-        MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
-        map.add("str", "thisistest");
-
-        // REST API 호출
-        String result = restTemplate.postForObject("http://localhost:8080/restTest/", map, String.class);
-        System.out.println("------------------ TEST 결과 ------------------");
-        System.out.println(result);
-
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        //return new ResponseEntity<>(result, HttpStatus.OK);
+        return null;
     }
+
 
 
 }

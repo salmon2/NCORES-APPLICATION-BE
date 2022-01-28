@@ -4,17 +4,31 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.ncores.plaluvs.domain.Photo;
+import com.ncores.plaluvs.domain.skintype.SkinType;
+import com.ncores.plaluvs.domain.user.User;
+import com.ncores.plaluvs.exception.ErrorCode;
+import com.ncores.plaluvs.exception.PlaluvsException;
 import com.ncores.plaluvs.repository.PhotoRepository;
+import com.ncores.plaluvs.repository.skinType.SkinTypeRepository;
 import com.ncores.plaluvs.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.converter.FormHttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,19 +38,20 @@ import java.util.UUID;
 public class PhotoService {
     private final AmazonS3Client amazonS3Client;
     private final PhotoRepository photoRepository;
+    private final SkinTypeRepository skinTypeRepository;
 
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;  // S3 버킷 이름
 
-    public String upload(MultipartFile multipartFile, String dirName, UserDetailsImpl userDetails) throws IOException {
+    public Photo upload(MultipartFile multipartFile, String dirName, UserDetailsImpl userDetails) throws IOException {
         File uploadFile = convert(multipartFile)  // 파일 변환할 수 없으면 에러
                 .orElseThrow(() -> new IllegalArgumentException("error: MultipartFile -> File convert fail"));
 
         String uploadURL = upload(uploadFile, dirName);
         Photo photo = new Photo(userDetails.getUser(), multipartFile.getOriginalFilename(), uploadURL);
-        photoRepository.save(photo);
+        Photo save = photoRepository.save(photo);
 
-        return uploadURL;
+        return save;
     }
 
     // S3로 파일 업로드하기
@@ -77,4 +92,62 @@ public class PhotoService {
         return Optional.empty();
     }
 
+    @Transactional
+    public Photo makeGetImageData(Photo photo) throws PlaluvsException {
+        String result = makeGetAPI(photo.getStored_file_path());
+
+        if(result.equals("-1"))
+            throw new PlaluvsException(ErrorCode.PHOTO_FACE_EMPTY);
+        else if(result.equals("-2"))
+            throw new PlaluvsException(ErrorCode.PHOTO_FACE_MANY);
+
+        String[]  resultList = result.split("\n");
+        System.out.println("resultList = " + resultList);
+
+        String nose = resultList[0].split(" : ")[1];
+        String leftCheck = resultList[1].split(" : ")[1];
+        String rightCheck = resultList[2].split(" : ")[1];
+
+        Long noseScore = Long.valueOf((long) ((7 - Double.valueOf(nose)) * 100 /7));
+        Long leftScore = Long.valueOf((long) ((7 - Double.valueOf(leftCheck)) * 100 /7));
+        Long rightScore = Long.valueOf((long) ((7 - Double.valueOf(rightCheck)) * 100 /7));
+
+        photo.setNoseTrouble(noseScore);
+        photo.setLeftCheckTrouble(leftScore);
+        photo.setRightCheckTrouble(rightScore);
+
+
+        return photo;
+    }
+    private String makeGetAPI(String url) {
+        String pythonURL = "http://localhost:5000/image?url=";
+        List<HttpMessageConverter<?>> converters = new ArrayList<HttpMessageConverter<?>>();
+        converters.add(new FormHttpMessageConverter());
+        converters.add(new StringHttpMessageConverter());
+
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setMessageConverters(converters);
+
+        // parameter 세팅
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+        map.add("str", "thisistest");
+
+        String resultURL = pythonURL + url;
+
+        // REST API 호출
+        String result = restTemplate.getForObject(resultURL, String.class);
+
+
+
+        return result;
+
+    }
+
+    @Transactional
+    public void setSkinStatus(User user, Photo result) throws PlaluvsException {
+        SkinType dailySkinType = skinTypeRepository.findDailySkinTypeException(user);
+        long skinTypeScore = dailySkinType.getScore() * 60 / 100;
+        long photoScore = (result.getNoseTrouble() + result.getLeftCheckTrouble() + result.getRightCheckTrouble()) * 40 /300;
+        dailySkinType.setScore( skinTypeScore +photoScore );
+    }
 }

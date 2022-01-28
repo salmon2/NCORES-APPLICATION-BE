@@ -615,7 +615,7 @@ public class SkinService {
             throw new PlaluvsException(ErrorCode.SKIN_TYPE_NOT_FOUND);
 
         double selfScore = dailySkinType.getSelfScore() * 20;
-        dailySkinType.setScore(dailySkinType.getBouman().getScore()*40/100 + (long)selfScore*20/100 + 40L);
+        dailySkinType.setScore(dailySkinType.getBouman().getScore()*80/100 + (long)selfScore*20/100);
 
         return dailySkinType.getBouman().getName();
     }

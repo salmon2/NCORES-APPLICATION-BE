@@ -43,6 +43,7 @@ public class SimpleListener implements ApplicationListener<ApplicationStartedEve
 
     @Autowired
     private ReadJsonFile readJsonFile;
+
     @Autowired
     private SkinTypeRepository skinTypeRepository;
 
@@ -62,19 +63,10 @@ public class SimpleListener implements ApplicationListener<ApplicationStartedEve
     @SneakyThrows
     @Override
     public void onApplicationEvent(ApplicationStartedEvent event) {
-        //Long id = initAndCreatedUser(593044L);
-        //makeData(id);
 
 
-//        for (int i = 0; i < 20; i++) {
-////            initAndCreatedUser2(i);
-////        }
 
 
-        FiveWeekago(594902L);
-        TWOWeekago(594902L);
-        Weekago(594902L);
-        yesterday(594902L);
 
     }
     private void TWOWeekago(Long id) throws PlaluvsException {

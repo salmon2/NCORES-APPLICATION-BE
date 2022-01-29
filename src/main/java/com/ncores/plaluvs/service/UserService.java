@@ -271,7 +271,7 @@ public class UserService {
 
             String name = cosmeticDto.getKorName();
             String brand = cosmeticDto.getBrandName();
-            String url = "https://search.shopping.naver.com/search/all?frm=NVSHATC" +
+            String url = "https://m.shopping.naver.com/search/all?frm=NVSHATC" +
                     "&origQuery=" + brand+name +
                     "&pagingIndex=1&pagingSize=40" +
                     "&productSet=total" +

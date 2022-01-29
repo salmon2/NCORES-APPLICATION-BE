@@ -54,7 +54,7 @@ public class CosmeticService {
 
             String name = simpleCosmeticDto.getName();
             String brand = simpleCosmeticDto.getBrandName();
-            String url = "https://search.shopping.naver.com/search/all?frm=NVSHATC" +
+            String url = "https://m.shopping.naver.com/search/all?frm=NVSHATC" +
                     "&origQuery=" + brand+name +
                     "&pagingIndex=1&pagingSize=40" +
                     "&productSet=total" +
@@ -71,7 +71,7 @@ public class CosmeticService {
         for (DetailCosmeticDto detailCosmeticDto : result) {
             String brand = detailCosmeticDto.getBrand();
             String name = detailCosmeticDto.getName();
-            String url = "https://search.shopping.naver.com/search/all?frm=NVSHATC" +
+            String url = "https://m.shopping.naver.com/search/all?frm=NVSHATC" +
                     "&origQuery=" + brand+name +
                     "&pagingIndex=1&pagingSize=40" +
                     "&productSet=total" +

@@ -19,6 +19,7 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -44,52 +45,64 @@ public class SkinTypeService {
         if(type.equals("DRNT")){
             saveSTGoodElements(skinType, DRNTGood.values(), "DRNT");
         }
-        if(type.equals("DRNW")){
+        else if(type.equals("DRNW")){
             saveSTGoodElements(skinType, DRNWGood.values(), "DRNW");
         }
-        if(type.equals("DRPT")){
+        else if(type.equals("DRPT")){
             saveSTGoodElements(skinType, DRPTGood.values(), "DRPT");
         }
-        if(type.equals("DRPW")){
+        else if(type.equals("DRPW")){
             saveSTGoodElements(skinType, DRPWGood.values(), "DRPW");
         }
-        if(type.equals("DSNW")){
+        else if(type.equals("DSNW")){
             saveSTGoodElements(skinType, DSNWGood.values(), "DSNW");
         }
-        if(type.equals("DSPT")){
+        else if(type.equals("DSPT")){
             saveSTGoodElements(skinType, DSPTGood.values(), "DSPT");
         }
-        if(type.equals("DRPW")){
+        else if(type.equals("DRPW")){
             saveSTGoodElements(skinType, DRPWGood.values(), "DRPW");
         }
-        if(type.equals("ORNT")){
+        else if(type.equals("DSNT")){
+            saveSTGoodElements(skinType, DSNTGood.values(), "DSNT");
+        }
+        else if(type.equals("ORNT")){
             saveSTGoodElements(skinType, ORNTGood.values(), "ORNT");
         }
-        if(type.equals("ORNW")){
+        else if(type.equals("ORNW")){
             saveSTGoodElements(skinType, ORNWGood.values(), "ORNW");
         }
-        if(type.equals("ORPT")){
+        else if(type.equals("ORPT")){
             saveSTGoodElements(skinType, ORPTGood.values(), "ORPT");
         }
-        if(type.equals("OSPW")){
+        else if(type.equals("OSPW")){
             saveSTGoodElements(skinType, OSPWGood.values(), "OSPW");
         }
-        if(type.equals("OSNT")){
+        else if(type.equals("OSNT")){
             saveSTGoodElements(skinType, OSNTGood.values(), "OSNT");
         }
-        if(type.equals("OSNW")){
+        else if(type.equals("OSNW")){
             saveSTGoodElements(skinType, OSNWGood.values(), "OSNW");
         }
-        if(type.equals("OSPT")){
+        else if(type.equals("OSPT")){
             saveSTGoodElements(skinType, OSPTGood.values(), "OSPT");
         }
-        if(type.equals("OSPW")){
+        else if(type.equals("OSPW")){
             saveSTGoodElements(skinType, OSPWGood.values(), "OSPW");
         }
     }
 
 
     private <T> void saveSTGoodElements(SkinType skinType, T[] array, String type) {
+        if(skinType.getBouman().equals(Bouman.ORNT)){
+            List<Elements> elements = elementsRepository.findTop10ByOrderByIdAsc();
+            for (Elements element : elements) {
+                SkinTypeGoodElements newSkinTypeGood
+                        = new SkinTypeGoodElements(skinType, element, type);
+                stGoodElementsRepository.save(newSkinTypeGood);
+            }
+        }
+
         for (T value : array) {
             String name = value.toString();
             Elements findElements = elementsRepository.findByKorean(name);

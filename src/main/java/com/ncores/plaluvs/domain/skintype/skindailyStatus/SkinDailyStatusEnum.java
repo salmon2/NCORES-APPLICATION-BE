@@ -20,6 +20,7 @@ public enum SkinDailyStatusEnum {
 
 
 
+
     private String content;
     private Long id;
 

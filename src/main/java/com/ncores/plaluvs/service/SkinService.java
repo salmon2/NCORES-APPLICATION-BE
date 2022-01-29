@@ -60,7 +60,6 @@ public class SkinService {
         CurrentSkinStatus currentSkinStatus = CurrentSkinStatus.findQuestionOne(id);
         CurrentSkinStatus nowSkinStatus = findSkinType.getCurrentSkinStatus();
 
-
         if( nowSkinStatus == null){
             updateCurrentStatusByCurrentSkinStatus(currentSkinStatus, findSkinType);
         }
@@ -288,7 +287,10 @@ public class SkinService {
         UserDetailsImpl.UserCheck(userDetails);
 
         SkinType dailySkinTYpe = skinTypeRepository.findDailySkinTypeException(userDetails.getUser());
+
         List<SkinElementsDto> elementsDtoList = elementsRepository.findSkinElementsDtoListBySkinTypeGoodElements(dailySkinTYpe, userDetails);
+
+
         for (SkinElementsDto skinElementsDto : elementsDtoList) {
             skinElementsDto.setImg(getImgSRc(skinElementsDto.getLevel()));
         }
@@ -298,11 +300,11 @@ public class SkinService {
                 dailySkinTYpe.getScore().toString() + "점",
                 "수분이 부족한 중/복합성 피부네요. 피부에 수분이 부족한 탓에 색소침착이 있네요. 다행히 피부가 저항성을 갖고 있어 외부 환경에 아주 민감 하진 않아요." +
                         "그래도 주름과 색소침착을 예방하기 위해 자외선은 각별히 신경을 써주셔야해요.외출 시에는 꼭! 자외선 차단제를 자주 덧 발라주세요",
-                dailySkinTYpe.getOilIndicateScore() * 100 /9,
-                dailySkinTYpe.getDryScore()  * 100 / 5,
-                dailySkinTYpe.getSensitivityScore() * 100 / 9,
-                dailySkinTYpe.getPigmentScore() * 100 / 2,
-                dailySkinTYpe.getWinkleScore() *100 /3,
+                (dailySkinTYpe.getOilIndicateScore() * 100) / 8,
+                (dailySkinTYpe.getDryScore()  * 100) / 5,
+                (dailySkinTYpe.getSensitivityScore() * 100) / 9,
+                (dailySkinTYpe.getPigmentScore() * 100) / 3,
+                (dailySkinTYpe.getWinkleScore() *100) /3,
                 elementsDtoList
         );
 
@@ -394,13 +396,15 @@ public class SkinService {
             }
         }
         for (int j = statusList.size(); j < 7; j++) {
-            Status status = new Status(1L, j+3 + "달 후", "common");
+            Status status = new Status(1L, j+3 + "달 전", "common");
             statusList.add(0,status);
         }
 
         Long k = 0L;
+        Long trueSize =0L;
         for (Status status : statusList) {
             if(!status.getScore().equals(1L)){
+
                 if(max < status.getScore()){
                     max = status.getScore();
                     maxIndex = k;
@@ -409,48 +413,60 @@ public class SkinService {
                     min = status.getScore();
                     minIndex = k;
                 }
+                trueSize++;
             }
             k++;
         }
 
+        //오늘 함
         if(todays != null && todays.getScore() != null){
             statusData = 2L;
             text = "첫 진단이에요!\n" +
                     "내일도 변화를 기록해 보세요";
 
-            if(i == 2){
-                if(statusList.get(0).getScore().equals(statusList.get(1).getScore())){
+            if(trueSize == 2){
+                if(statusList.get(statusList.size()-1).getScore().equals(statusList.get(statusList.size()-2).getScore())){
                     text = "두번째 진단도 성공!\n" +
                             "내일도 변화를 기록해 보세요";
                 }
             }
 
-            else if(maxIndex.equals(minIndex)){
+            else if (!maxIndex.equals(minIndex) && trueSize >=2 ){
+                Status today = statusList.get(statusList.size()-1);
+
+                if(today.getScore() > statusList.get(minIndex.intValue()).getScore()){
+                    text = today.getDate() +" 피부 점수가\n" +
+                            statusList.get(minIndex.intValue()).getDate()+ "보다" +
+                            (today.getScore() - statusList.get(minIndex.intValue()).getScore())+"이 올랐어요";
+                }
+                else{
+                    text = "꾸준히 관리하는 피부는\n" +
+                            "시간이 지날수록 아름다워요";
+                }
+
+            }
+            else if(maxIndex.equals(minIndex) && trueSize >= 3){
                 text = "꾸준히 관리하는 피부는\n" +
                         "시간이 지날수록 아름다워요";
             }
-
-            else if (i >=2 && !statusList.get(0).equals(minIndex)){
-                Status today = statusList.get(0);
-
-                text = today.getDate() +"피부 점수가\n" +
-                        statusList.get(minIndex.intValue()).getDate()+ "보다" +
-                        (today.getScore() - statusList.get(minIndex.intValue()).getScore())+"이 올랐어요";
-
-            }
         }
+        // 오늘 안함
         else{
             statusData = 1L;
             text = "꾸준한 피부 기록은\n" +
                     "피부 변화의 시작이에요";
-            if(i == 2){
-                Status newSt = statusList.get(0);
-                Status oldSt = statusList.get(1);
+            if(trueSize == 2){
+                Status newSt = statusList.get(statusList.size()-1);
+                Status oldSt = statusList.get(statusList.size()-2);
 
                 if(!newSt.getScore().equals(oldSt.getScore())){
                     text = "피부 점수가 "+   (newSt.getScore() > oldSt.getScore() ? oldSt.getDate() : newSt.getDate()) +"보다\n"
                             + (newSt.getScore() < oldSt.getScore() ? oldSt.getDate() : newSt.getDate()) +"이 높았어요";
                 }
+            }
+            else if( trueSize >= 3L){
+                text = "최근 피부 점수가 "+ statusList.get(minIndex.intValue()).getDate()+"에 가장 낮았고\n" +
+                        statusList.get(maxIndex.intValue()).getDate()+"에 가장 높았어요";
             }
         }
 
@@ -569,12 +585,15 @@ public class SkinService {
             findSkinType.setSensitivityScore(findSkinType.getSensitivityScore() + 1);
         }
         else if (skinDailyStimulation.getSkinDaily().getId() == 3L){
-            findSkinType.setOilIndicateScore( findSkinType.getOilIndicateScore() - 1);
             findSkinType.setSensitivityScore(findSkinType.getSensitivityScore() + 1);
         }
         else if (skinDailyStimulation.getSkinDaily().getId() == 4L){
             findSkinType.setSensitivityScore(findSkinType.getSensitivityScore() + 1);
         }
+        else if (skinDailyStimulation.getSkinDaily().getId() == 5L){
+            findSkinType.setPigmentScore(findSkinType.getPigmentScore() + 1);
+        }
+
     }
 
     private void saveDailyStimulation(SkinType findSkinType, Long id, SkinDailyStimulation skinDailyStimulation) {
@@ -585,11 +604,13 @@ public class SkinService {
             findSkinType.setSensitivityScore(findSkinType.getSensitivityScore() -1);
         }
         else if (id == 3L){
-            findSkinType.setOilIndicateScore( findSkinType.getOilIndicateScore() + 1);
             findSkinType.setSensitivityScore(findSkinType.getSensitivityScore() -1);
         }
         else if (id == 4L){
             findSkinType.setSensitivityScore(findSkinType.getSensitivityScore() -1);
+        }
+        else if (skinDailyStimulation.getSkinDaily().getId() == 5L){
+            findSkinType.setPigmentScore(findSkinType.getPigmentScore() - 1);
         }
 
         skinDailyStimulationRepository.save(skinDailyStimulation);
@@ -616,12 +637,19 @@ public class SkinService {
         dailySkinType.setBouman(Bouman.findBoumanBySkinType(key));
 
 
-        Double selfScore1 = dailySkinType.getSelfScore();
+        Double selfScore1 = dailySkinType.getSelfScore() * 20;
         if(selfScore1 == null)
             throw new PlaluvsException(ErrorCode.SKIN_TYPE_NOT_FOUND);
 
-        double selfScore = dailySkinType.getSelfScore() * 20;
-        dailySkinType.setScore(dailySkinType.getBouman().getScore()*80/100 + (long)selfScore*20/100);
+        long oil = (dailySkinType.getOilIndicateScore() * 100) / 8;
+        long dry = (dailySkinType.getDryScore() * 100) / 5;
+        long sen = (dailySkinType.getSensitivityScore() * 100) / 9;
+        long pig = (dailySkinType.getPigmentScore() * 100) / 3;
+        long win = (dailySkinType.getWinkleScore() * 100) / 3;
+
+        long score = (oil + dry + sen + pig + win) / 5;
+
+        dailySkinType.setScore(score * 80/100 + (long)selfScore1.intValue()*20/100);
 
         return dailySkinType.getBouman().getName();
     }
@@ -634,18 +662,18 @@ public class SkinService {
         else
             key += "D";
 
-        if(dailySkinType.getSensitivityScore() < 0){
+        if(dailySkinType.getSensitivityScore() < 4){
             key += "S";
         }
         else
             key += "R";
 
-        if(dailySkinType.getPigmentScore() < 0){
+        if(dailySkinType.getPigmentScore() < 1){
             key += "P";
         }
         else
             key += "N";
-        if(dailySkinType.getWinkleScore() < 0){
+        if(dailySkinType.getWinkleScore() < 1){
             key += "W";
         }
         else {
@@ -664,8 +692,7 @@ public class SkinService {
         LocalDateTime startDatetimeWeekAgo = LocalDateTime.of(LocalDate.now().minusWeeks(2), LocalTime.of(0,0,0)); //오늘 00:00:00
         LocalDateTime endDatetimeWeekAgo = LocalDateTime.of(LocalDate.now().minusWeeks(1), LocalTime.of(23,59,59)); //오늘 23:59:59
 
-        LocalDateTime startDatetimeMonth = LocalDateTime.of(LocalDate.now().minusMonths(2), LocalTime.of(0,0,0)); //오늘 00:00:00
-        LocalDateTime endDatetimeMonth = LocalDateTime.of(LocalDate.now().minusWeeks(2), LocalTime.of(23,59,59)); //오늘 23:59:59
+        LocalDateTime endDatetimeMonth = LocalDateTime.of(LocalDate.now().minusMonths(1), LocalTime.of(23,59,59)); //오늘 23:59:59
 
         startDatetime = LocalDateTime.of(LocalDate.now().minusWeeks(1L), LocalTime.of(0,0,0)); //오늘 00:00:00
         endDatetime = LocalDateTime.of(LocalDate.now(), LocalTime.of(23,59,59)); //오늘 23:59:59
@@ -673,35 +700,35 @@ public class SkinService {
         List<ScoreData> dryResult = skinTypeRepository.findSkinStatusBoumanCustom(userDetails, startDatetime, endDatetime, SkinTypeEnum.DRY);
         Setting(startDatetimeWeek, endDatetimeWeek,
                 startDatetimeWeekAgo, endDatetimeWeekAgo,
-                startDatetimeMonth, endDatetimeMonth,
-                dryResult, Long.valueOf(100/6) );
+                 endDatetimeMonth,
+                dryResult, 100L, 5L );
 
         List<ScoreData> oilResult = skinTypeRepository.findSkinStatusBoumanCustom(userDetails, startDatetime, endDatetime, SkinTypeEnum.OIL);
         Setting(startDatetimeWeek, endDatetimeWeek,
                 startDatetimeWeekAgo, endDatetimeWeekAgo,
-                startDatetimeMonth, endDatetimeMonth,
-                oilResult, Long.valueOf(100/8) );
+                 endDatetimeMonth,
+                oilResult, 100L, 8L );
 
 
         List<ScoreData> senResult = skinTypeRepository.findSkinStatusBoumanCustom(userDetails, startDatetime, endDatetime, SkinTypeEnum.SEN);
         Setting(startDatetimeWeek, endDatetimeWeek,
                 startDatetimeWeekAgo, endDatetimeWeekAgo,
-                startDatetimeMonth, endDatetimeMonth,
-                senResult, Long.valueOf(100/9) );
+                 endDatetimeMonth,
+                senResult, 100L, 9L );
 
 
         List<ScoreData> winResult = skinTypeRepository.findSkinStatusBoumanCustom(userDetails, startDatetime, endDatetime, SkinTypeEnum.WIN);
         Setting(startDatetimeWeek, endDatetimeWeek,
                 startDatetimeWeekAgo, endDatetimeWeekAgo,
-                startDatetimeMonth, endDatetimeMonth,
-                winResult, Long.valueOf(100/3) );
+                 endDatetimeMonth,
+                winResult, 100L, 3L );
 
 
         List<ScoreData> pigResult = skinTypeRepository.findSkinStatusBoumanCustom(userDetails, startDatetime, endDatetime, SkinTypeEnum.PIG);
         Setting(startDatetimeWeek, endDatetimeWeek,
                 startDatetimeWeekAgo, endDatetimeWeekAgo,
-                startDatetimeMonth, endDatetimeMonth,
-                pigResult, Long.valueOf(100/2) );
+                 endDatetimeMonth,
+                pigResult, 100L, 3L );
 
 
         skinStatusBoumanResponseDto skinStatusBoumanResponseDto = new skinStatusBoumanResponseDto(dryResult, oilResult, senResult, pigResult, winResult);
@@ -712,8 +739,8 @@ public class SkinService {
 
     private void Setting(LocalDateTime startDatetimeWeek, LocalDateTime endDatetimeWeek,
                          LocalDateTime startDatetimeWeekAgo, LocalDateTime endDatetimeWeekAgo,
-                         LocalDateTime startDatetimeMonth, LocalDateTime endDatetimeMonth,
-                         List<ScoreData> dryResult, Long rate) {
+                         LocalDateTime endDatetimeMonth,
+                         List<ScoreData> dryResult, Long rate1, Long rate2) {
 
         Long beforeScore =null;
 
@@ -721,24 +748,31 @@ public class SkinService {
 
         for (ScoreData scoreData : dryResult) {
 
-            Long dryScore = scoreData.getScore() * rate;
+            Long dryScore = scoreData.getScore() * rate1 /rate2 ;
 
+            if(dryScore.equals(99L)){
+                dryScore = 100L;
+            }
+
+            if(dryScore.equals(99L)){
+                dryScore = 100L;
+            }
             scoreData.setScore(dryScore);
             LocalDateTime createdAt = scoreData.getCreatedAt();
 
             //이번 주 일이라면
             if(createdAt.isAfter(startDatetimeWeek) && createdAt.isBefore(endDatetimeWeek)){
-                scoreData.setTag("이번주엔 "+dryScore+"점이에요");
+                scoreData.setTag("이번 주 엔 "+dryScore+"점이에요");
                 scoreData.setColor("323632");
             }
             //일주일전엔
             else if(createdAt.isAfter(startDatetimeWeekAgo)&& createdAt.isBefore(endDatetimeWeekAgo)){
-                scoreData.setTag("일주일전엔 "+ dryScore+ "점이에요");
+                scoreData.setTag("일주일 전 엔 "+ dryScore+ "점이에요");
                 scoreData.setColor("607060");
             }
             //한달전엔
-            else if(createdAt.isAfter(startDatetimeMonth)&& createdAt.isBefore(endDatetimeMonth)){
-                scoreData.setTag("한달전엔 "+ dryScore+ "점이었어요");
+            else if(createdAt.isBefore(endDatetimeMonth)){
+                scoreData.setTag("한달 전 엔 "+ dryScore+ "점이었어요");
                 scoreData.setColor("8D998D");
             }
 

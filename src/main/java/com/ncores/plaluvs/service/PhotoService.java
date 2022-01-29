@@ -102,7 +102,7 @@ public class PhotoService {
             throw new PlaluvsException(ErrorCode.PHOTO_FACE_MANY);
 
         String[]  resultList = result.split("\n");
-        System.out.println("resultList = " + resultList);
+        log.info("resultList = {}", resultList);
 
         String nose = resultList[0].split(" : ")[1];
         String leftCheck = resultList[1].split(" : ")[1];

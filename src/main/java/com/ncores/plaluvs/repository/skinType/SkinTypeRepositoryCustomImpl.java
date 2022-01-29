@@ -13,6 +13,7 @@ import com.ncores.plaluvs.security.UserDetailsImpl;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.*;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -93,12 +94,10 @@ public class SkinTypeRepositoryCustomImpl implements SkinTypeRepositoryCustom{
         LocalDateTime startDatetimeWeek = LocalDateTime.of(LocalDate.now().minusWeeks(1), LocalTime.of(0,0,0));
         LocalDateTime endDatetimeWeek = LocalDateTime.of(LocalDate.now(), LocalTime.of(23,59,59));
 
-
         LocalDateTime startDatetimeWeekAgo = LocalDateTime.of(LocalDate.now().minusWeeks(2), LocalTime.of(0,0,0)); //오늘 00:00:00
         LocalDateTime endDatetimeWeekAgo = LocalDateTime.of(LocalDate.now().minusWeeks(1), LocalTime.of(23,59,59)); //오늘 23:59:59
 
-        LocalDateTime startDatetimeMonth = LocalDateTime.of(LocalDate.now().minusMonths(2), LocalTime.of(0,0,0)); //오늘 00:00:00
-        LocalDateTime endDatetimeMonth = LocalDateTime.of(LocalDate.now().minusWeeks(2), LocalTime.of(23,59,59)); //오늘 23:59:59
+       LocalDateTime endDatetimeMonth = LocalDateTime.of(LocalDate.now().minusMonths(1), LocalTime.of(23,59,59)); //오늘 23:59:59
 
         ScoreData result = queryFactory
                 .select(
@@ -132,7 +131,7 @@ public class SkinTypeRepositoryCustomImpl implements SkinTypeRepositoryCustom{
                         )
                 )
                 .from(skinType)
-                .where(skinType.user.eq(userDetails.getUser()).and(getBetween(startDatetimeMonth, endDatetimeMonth)))
+                .where(skinType.user.eq(userDetails.getUser()).and(getBefore(endDatetimeMonth)))
                 .orderBy(getTypeQueryOrderBy(sort))
                 .fetchOne();
 
@@ -147,6 +146,9 @@ public class SkinTypeRepositoryCustomImpl implements SkinTypeRepositoryCustom{
         return totalResult;
     }
 
+    private Predicate getBefore(LocalDateTime endDatetimeMonth) {
+        return skinType.createdAt.before(endDatetimeMonth);
+    }
 
 
     private BooleanExpression getBetween(LocalDateTime startDatetime, LocalDateTime endDatetime) {

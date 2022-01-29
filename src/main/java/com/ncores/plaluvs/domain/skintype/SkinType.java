@@ -85,7 +85,7 @@ public class SkinType extends Timestamped {
         this.dryScore = 5L;
         this.sensitivityScore = 9L;
         this.winkleScore = 3L;
-        this.pigmentScore = 2L;
+        this.pigmentScore = 3L;
         this.bouman = Bouman.ORNT;
 
         this.currentSkinStatus = questionOne;
@@ -97,7 +97,7 @@ public class SkinType extends Timestamped {
         this.dryScore = 5L;
         this.sensitivityScore = 9L;
         this.winkleScore = 3L;
-        this.pigmentScore = 2L;
+        this.pigmentScore = 3L;
         this.bouman = Bouman.ORNT;
         this.setCreatedAt(localDateTime);
         this.setModifiedAt(localDateTime);
@@ -111,7 +111,7 @@ public class SkinType extends Timestamped {
         this.dryScore = 5L;
         this.sensitivityScore = 9L;
         this.winkleScore = 3L;
-        this.pigmentScore = 2L;
+        this.pigmentScore = 3L;
 
         this.user = user;
     }

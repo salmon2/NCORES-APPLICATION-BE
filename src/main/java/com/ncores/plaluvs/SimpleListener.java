@@ -7,6 +7,7 @@ import com.ncores.plaluvs.controller.skin.dto.SkinDailyStimulationRequestDto;
 import com.ncores.plaluvs.crawling.ReadJsonFile;
 import com.ncores.plaluvs.domain.dto.SkinNowStatusRequestDto;
 import com.ncores.plaluvs.domain.dto.SkinWorryRequestDto;
+import com.ncores.plaluvs.domain.skintype.SkinType;
 import com.ncores.plaluvs.domain.user.User;
 import com.ncores.plaluvs.domain.user.UserRoleEnum;
 import com.ncores.plaluvs.exception.PlaluvsException;
@@ -57,18 +58,76 @@ public class SimpleListener implements ApplicationListener<ApplicationStartedEve
     @Autowired
     private UserService userService;
 
+
     @SneakyThrows
     @Override
     public void onApplicationEvent(ApplicationStartedEvent event) {
         //Long id = initAndCreatedUser(593044L);
         //makeData(id);
 
-        for (int i = 30; i < 51; i++) {
-            initAndCreatedUser2(i);
-        }
 
+//        for (int i = 0; i < 20; i++) {
+////            initAndCreatedUser2(i);
+////        }
+
+
+        FiveWeekago(594902L);
+        TWOWeekago(594902L);
+        Weekago(594902L);
+        yesterday(594902L);
 
     }
+    private void TWOWeekago(Long id) throws PlaluvsException {
+        Random rand = new Random();
+        LocalDateTime newNow1  = LocalDateTime.of(LocalDate.now().minusWeeks(2).minusDays(1), LocalTime.of(12,12,12));
+
+        List<LocalDateTime> list = new ArrayList<>();
+        list.add(newNow1);
+
+        User findUser = userRepository.findById(id).get();
+
+        makeData(rand, list, findUser);
+    }
+
+    private void FiveWeekago(Long id) throws PlaluvsException {
+        Random rand = new Random();
+
+        LocalDateTime newNow1  = LocalDateTime.of(LocalDate.now().minusWeeks(5).minusDays(1), LocalTime.of(12,12,12));
+
+        List<LocalDateTime> list = new ArrayList<>();
+        list.add(newNow1);
+
+        User findUser = userRepository.findById(id).get();
+
+        makeData(rand, list, findUser);
+    }
+
+    private void Weekago(Long id)throws PlaluvsException{
+        Random rand = new Random();
+
+        LocalDateTime newNow1  = LocalDateTime.of(LocalDate.now().minusWeeks(1).minusDays(1), LocalTime.of(12,12,12));
+
+        List<LocalDateTime> list = new ArrayList<>();
+        list.add(newNow1);
+
+        User findUser = userRepository.findById(id).get();
+
+        makeData(rand, list, findUser);
+    }
+
+    private void yesterday(Long id)throws PlaluvsException{
+        Random rand = new Random();
+
+        LocalDateTime newNow1  = LocalDateTime.of(LocalDate.now().minusDays(1), LocalTime.of(12,12,12));
+
+        List<LocalDateTime> list = new ArrayList<>();
+        list.add(newNow1);
+
+        User findUser = userRepository.findById(id).get();
+
+        makeData(rand, list, findUser);
+    }
+
 
     private void makeData(Long id) throws PlaluvsException {
         Random rand = new Random();
@@ -90,8 +149,13 @@ public class SimpleListener implements ApplicationListener<ApplicationStartedEve
 
         User findUser = userRepository.findById(id).get();
 
+        makeData(rand, list, findUser);
+    }
+
+    private void makeData(Random rand, List<LocalDateTime> list, User findUser) throws PlaluvsException {
         int i = 0;
         for (LocalDateTime localDateTime : list) {
+
             SkinNowStatusRequestDto skinNowStatus = new SkinNowStatusRequestDto(  Long.valueOf(rand.nextInt(5) + 1)  );
 
             List<Long> skinWorryId = new ArrayList<>();

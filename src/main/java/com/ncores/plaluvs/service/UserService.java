@@ -15,6 +15,7 @@ import com.ncores.plaluvs.repository.UserRepository;
 import com.ncores.plaluvs.security.UserDetailsImpl;
 import com.ncores.plaluvs.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,9 +23,12 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
@@ -74,6 +78,14 @@ public class UserService {
 
         if(email.length() < 8){
             throw new PlaluvsException(ErrorCode.USERNAME_LENGTH_MIN);
+        }
+
+        String regx = "^(.+)@(.+)$";
+        Pattern pattern = Pattern.compile(regx);
+        Matcher matcher = pattern.matcher(email);
+        boolean matches = matcher.matches();
+        if(matches != true){
+            throw new PlaluvsException(ErrorCode.USERNAME_NOT_TYPE);
         }
 
         Optional<User> found = userRepository.findByUsername(email);
@@ -297,6 +309,44 @@ public class UserService {
         }
 
         userRepository.deleteById(user.getId());
+    }
+
+    public SignInResponseDto registerKaKaoUser(KaKaoRequestDto kaKaoRequestDto) {
+        log.info("password = {}", kaKaoRequestDto.getPassword());
+        User user = null;
+        Optional<User> findOptionalUser = userRepository.findByUsername(kaKaoRequestDto.getEmail() + "kakao");
+
+        if(findOptionalUser.isEmpty()){
+            User newUser = new User(
+                    kaKaoRequestDto.getEmail() + "kakao",
+                    passwordEncoder.encode(kaKaoRequestDto.getPassword()),
+                    kaKaoRequestDto.getNickname(),
+                    UserRoleEnum.USER
+            );
+
+            user = userRepository.save(newUser);
+        }
+        else{
+            user = findOptionalUser.get();
+        }
+
+
+        String token = jwtTokenProvider.createToken(user.getUsername(), user.getUsername(), user.getNickname());
+        SkinType skinType = skinTypeRepository.findTopByUserOrderByCreatedAtDesc(user);
+
+
+        SignInResponseDto signInResponseDto = new SignInResponseDto(
+                token,
+                user.getId(),
+                user.getNickname(),
+                (user.getGender() == null) ? Boolean.FALSE : Boolean.TRUE,
+                (user.getAge() == null) ? Boolean.FALSE : Boolean.TRUE,
+                getCurrentSKinStatusExist(skinType),
+                getCurrentSKinWorryExist(skinType)
+        );
+
+
+        return signInResponseDto;
     }
 
 }

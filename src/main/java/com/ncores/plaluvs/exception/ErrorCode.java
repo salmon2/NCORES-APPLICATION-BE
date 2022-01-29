@@ -38,7 +38,9 @@ public enum ErrorCode {
     SKIN_WORRY_EMPTY(HttpStatus.FORBIDDEN, "피부 걱정 설문조사를 해주세요"),
     CATEGORY_NOT_FOUND(HttpStatus.FORBIDDEN, "해당하는 카테고리가 없습니다." ),
     COSMETIC_NOT_FOUND(HttpStatus.FORBIDDEN, "해당하는 화장품이 없습니다." ),
-    PHOTO_FACE_EMPTY(HttpStatus.FORBIDDEN, "사진에 얼굴이 존재하지않습니다."), PHOTO_FACE_MANY(HttpStatus.FORBIDDEN, "사진에 얼굴이 너무 많습니다.");
+    PHOTO_FACE_EMPTY(HttpStatus.FORBIDDEN, "사진에 얼굴이 존재하지않습니다."),
+    PHOTO_FACE_MANY(HttpStatus.FORBIDDEN, "사진에 얼굴이 너무 많습니다."),
+    USERNAME_NOT_TYPE(HttpStatus.FORBIDDEN,"적합한 이메일 형식이 아닙니다." );
 
 
 

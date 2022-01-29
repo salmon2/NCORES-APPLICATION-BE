@@ -67,7 +67,6 @@ public class SimpleListener implements ApplicationListener<ApplicationStartedEve
 
 
 
-
     }
     private void TWOWeekago(Long id) throws PlaluvsException {
         Random rand = new Random();

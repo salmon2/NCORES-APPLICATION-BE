@@ -26,6 +26,16 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
 
+
+    @PostMapping("/user/kakao/login")
+    public ResponseEntity<?> kakaoLogin(@RequestBody KaKaoRequestDto  kaKaoRequestDto) {
+        log.info("passoword = {}", kaKaoRequestDto.getPassword());
+        SignInResponseDto signInResponseDto = userService.registerKaKaoUser(kaKaoRequestDto);
+
+
+        return new ResponseEntity<>(signInResponseDto, HttpStatus.OK);
+    }
+
     @GetMapping("/user/info")
     public ResponseEntity<?> getUser(@AuthenticationPrincipal UserDetailsImpl userDetails) throws PlaluvsException{
         UserDetailsImpl.UserCheck(userDetails);

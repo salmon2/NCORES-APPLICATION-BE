@@ -133,6 +133,7 @@ public class PhotoService {
         map.add("str", "thisistest");
 
         String resultURL = pythonURL + url;
+        log.info(resultURL);
 
         // REST API 호출
         String result = restTemplate.getForObject(resultURL, String.class);

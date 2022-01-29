@@ -213,7 +213,7 @@ public class CosmeticRepositoryCustomImpl implements CosmeticRepositoryCustom{
                                 cosmetic.id,
                                 cosmetic.itemImg,
                                 cosmetic.itemName,
-                                (user == null) ? setFalse() : distinguishBookmarkExistUser(cosmeticElements.cosmetic, user),
+                                (user == null) ? setFalse() : distinguishBookmarkExistUser(cosmetic, user),
                                 cosmetic.itemBrand,
                                 cosmetic.category.id
                         )

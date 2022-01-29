@@ -63,7 +63,7 @@ public class SimpleListener implements ApplicationListener<ApplicationStartedEve
         //Long id = initAndCreatedUser(593044L);
         //makeData(id);
 
-        for (int i = 10; i < 30; i++) {
+        for (int i = 30; i < 51; i++) {
             initAndCreatedUser2(i);
         }
 

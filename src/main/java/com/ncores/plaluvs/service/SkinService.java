@@ -366,7 +366,8 @@ public class SkinService {
 
         SkinType todays = skinTypeRepository.findDailySkinTypeOrReturnNull(userDetails);
 
-        String buttonColor = (todays.getScore() != null) ? "#F5EBE8": "#323632";
+
+        String buttonColor = (todays != null && todays.getScore() != null) ? "#F5EBE8": "#323632";
         String text = "hello world";
 
         // 데이터 없음 0, 오늘 안함 1, 있고 함 2
@@ -379,37 +380,40 @@ public class SkinService {
 
         Long doNotTest = 0L;
         int i = 0;
+
         for (; i < result.getContent().size(); i++) {
             SkinType skinType = result.getContent().get(i);
             if(skinType.getScore() != null){
-                Status status = new Status(skinType.getScore(), getDate(skinType.getCreatedAt()));
+                Status status = new Status(skinType.getScore(), getDate(skinType.getCreatedAt()), "common");
                 statusList.add(status);
             }
+
             else{
                 doNotTest++;
                 continue;
             }
         }
         for (int j = statusList.size(); j < 7; j++) {
-            Status status = new Status(1L, i + "년 후");
-            statusList.add(status);
+            Status status = new Status(1L, j+3 + "달 후", "common");
+            statusList.add(0,status);
         }
 
         Long k = 0L;
         for (Status status : statusList) {
-            if(max < status.getScore()){
-                max = status.getScore();
-                maxIndex = k;
+            if(!status.getScore().equals(1L)){
+                if(max < status.getScore()){
+                    max = status.getScore();
+                    maxIndex = k;
+                }
+                if(min > status.getScore()){
+                    min = status.getScore();
+                    minIndex = k;
+                }
             }
-            if(min > status.getScore()){
-                min = status.getScore();
-                minIndex = k;
-            }
-
             k++;
         }
 
-        if(todays.getScore() != null){
+        if(todays != null && todays.getScore() != null){
             statusData = 2L;
             text = "첫 진단이에요!\n" +
                     "내일도 변화를 기록해 보세요";
@@ -454,6 +458,8 @@ public class SkinService {
         statusList.get(maxIndex.intValue()).setType("bold");
         statusList.get(minIndex.intValue()).setType("bold");
 
+
+        Collections.reverse(statusList);
 
         return new PagingAveragingScoreResponseDto(statusList.size(), text, buttonColor, statusData, result.getNumber(), result.getTotalPages(), statusList);
     }
@@ -723,17 +729,17 @@ public class SkinService {
             //이번 주 일이라면
             if(createdAt.isAfter(startDatetimeWeek) && createdAt.isBefore(endDatetimeWeek)){
                 scoreData.setTag("이번주엔 "+dryScore+"점이에요");
-                scoreData.setColor("959698");
+                scoreData.setColor("323632");
             }
             //일주일전엔
             else if(createdAt.isAfter(startDatetimeWeekAgo)&& createdAt.isBefore(endDatetimeWeekAgo)){
                 scoreData.setTag("일주일전엔 "+ dryScore+ "점이에요");
-                scoreData.setColor("EFC2C2");
+                scoreData.setColor("607060");
             }
             //한달전엔
             else if(createdAt.isAfter(startDatetimeMonth)&& createdAt.isBefore(endDatetimeMonth)){
                 scoreData.setTag("한달전엔 "+ dryScore+ "점이었어요");
-                scoreData.setColor("C14242");
+                scoreData.setColor("8D998D");
             }
 
             if(beforeScore != null){

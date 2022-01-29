@@ -136,17 +136,18 @@ public class CosmeticService {
         SkinType dailySkinType = skinTypeRepository.findDailySkinTypeOrLatestSkinTypeNotException(userDetails);
 
         if(dailySkinType != null){
-
             List<SkinTrouble> skinTroubleList = dailySkinType.getSkinTroubleList();
-            if(skinTroubleList == null)
-                throw new PlaluvsException(ErrorCode.SKIN_WORRY_EMPTY);
-
-            List<Elements> elements = elementsRepository.findAllBySkinTroubleCustom(skinTroubleList);
-
-            List<SimpleCosmeticDto> result = cosmeticRepository.findCosmeticWorry(elements, userDetails);
-            naverUrl(result);
-
-            return result;
+            if(skinTroubleList.size() == 0){
+                List<SimpleCosmeticDto> result = cosmeticRepository.findCosmeticNoneWorry(userDetails.getUser());
+                naverUrl(result);
+                return result;
+            }
+            else{
+                List<Elements> elements = elementsRepository.findAllBySkinTroubleCustom(skinTroubleList);
+                List<SimpleCosmeticDto> result = cosmeticRepository.findCosmeticWorry(elements, userDetails);
+                naverUrl(result);
+                return result;
+            }
         }
         else{
             List<SimpleCosmeticDto> result = cosmeticRepository.findCosmeticNoneWorry(userDetails.getUser());

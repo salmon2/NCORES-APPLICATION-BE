@@ -128,6 +128,7 @@ public class SkinTypeRepositoryCustomImpl implements SkinTypeRepositoryCustom{
                         new QScoreData(
                                 getTypeQuery(sort),
                                 skinType.createdAt
+
                         )
                 )
                 .from(skinType)

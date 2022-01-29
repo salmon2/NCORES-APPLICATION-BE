@@ -77,7 +77,7 @@ public class CosmeticRepositoryCustomImpl implements CosmeticRepositoryCustom{
                 .from(cosmeticElements)
                 .join(cosmeticElements.elements, elements)
                 .where(cosmeticElements.elements.in(findElements))
-                .limit(7)
+                .limit(15)
                 .fetch();
 
         return result;
@@ -89,7 +89,7 @@ public class CosmeticRepositoryCustomImpl implements CosmeticRepositoryCustom{
         List<DetailCosmeticDto> result = queryFactory
                 .select(
                         new QDetailCosmeticDto(
-                               cosmeticElements.cosmetic.id,
+                                cosmeticElements.cosmetic.id,
                                 cosmeticElements.cosmetic.itemImg,
                                 cosmeticElements.cosmetic.itemBrand,
                                 cosmeticElements.cosmetic.itemName,
@@ -130,7 +130,7 @@ public class CosmeticRepositoryCustomImpl implements CosmeticRepositoryCustom{
                                 cosmetic.itemBrand,
                                 cosmetic.itemName,
                                 cosmetic.price,
-                                (userDetails == null) ? setFalse() : distinguishBookmarkExistUser(cosmeticElements.cosmetic, userDetails.getUser()),
+                                (userDetails == null) ? setFalse() : distinguishBookmarkExistUser(cosmetic, userDetails.getUser()),
                                 cosmetic.category.id
                         )
                 )
@@ -219,7 +219,7 @@ public class CosmeticRepositoryCustomImpl implements CosmeticRepositoryCustom{
                         )
                 )
                 .from(cosmetic)
-                .limit(7)
+                .limit(15)
                 .fetch();
     }
 

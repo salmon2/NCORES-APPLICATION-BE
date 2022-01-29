@@ -1,5 +1,6 @@
 package com.ncores.plaluvs.service;
 
+import com.ncores.plaluvs.controller.category.dto.CategoryEnum;
 import com.ncores.plaluvs.controller.category.dto.CategoryResponseDto;
 import com.ncores.plaluvs.domain.Category;
 import com.ncores.plaluvs.repository.CategoryRepository;
@@ -17,13 +18,16 @@ public class CategoryService {
 
     public  List<CategoryResponseDto> findAll() {
 
-        List<Category> all = categoryRepository.findAll();
+//        List<Category> all = categoryRepository.findAll();
         List<CategoryResponseDto> result = new ArrayList<>();
 
-        for (Category category : all) {
-            CategoryResponseDto categoryResponseDto = new CategoryResponseDto(category.getId(), category.getCategoryLarge());
-            result.add(categoryResponseDto);
-        }
+        result.add(new CategoryResponseDto(617L, "에센스토너"));
+        result.add(new CategoryResponseDto(687L, "로션/에멀젼"));
+        result.add(new CategoryResponseDto(582L, "에센스/세럼"));
+        result.add(new CategoryResponseDto(608L, "크림"));
+        result.add(new CategoryResponseDto(757L, "클렌징워터"));
+        result.add(new CategoryResponseDto(23L, "립케어"));
+        result.add(new CategoryResponseDto(679L, "선크림"));
 
         return result;
     }

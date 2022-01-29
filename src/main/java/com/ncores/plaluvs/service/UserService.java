@@ -99,10 +99,6 @@ public class UserService {
             throw new PlaluvsException(ErrorCode.NICKNAME_EMPTY);
         }
 
-        if(nickname.length() >= 8) {
-            throw new PlaluvsException(ErrorCode.NICKNAME_LENGTH_MAX);
-        }
-
         Optional<User> found2 = userRepository.findByNickname(nickname);
         if (found2.isPresent()) {
             throw new PlaluvsException(ErrorCode.NICKNAME_DUPLICATE);
@@ -191,8 +187,11 @@ public class UserService {
 
         if(requestDto.getAge() == null)
             throw new PlaluvsException(ErrorCode.DATA_EMPTY);
-        if(requestDto.getAge() >= nowYear || requestDto.getAge() < 1920 )
+        if(requestDto.getAge() >= nowYear || requestDto.getAge() < 1920 ){
+            requestDto.setAge(null);
             throw new PlaluvsException(ErrorCode.AGE_TYPE_NOT_SUITABLE);
+        }
+
 
         user.changeAge(requestDto.getAge());
     }

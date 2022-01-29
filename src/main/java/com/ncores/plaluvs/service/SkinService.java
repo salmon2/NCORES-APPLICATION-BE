@@ -396,14 +396,14 @@ public class SkinService {
             }
         }
         for (int j = statusList.size(); j < 7; j++) {
-            Status status = new Status(1L, j+3 + "달 전", "common");
+            Status status = new Status(0L, j+3 + "달 전", "common");
             statusList.add(0,status);
         }
 
         Long k = 0L;
         Long trueSize =0L;
         for (Status status : statusList) {
-            if(!status.getScore().equals(1L)){
+            if(!status.getScore().equals(0L)){
 
                 if(max < status.getScore()){
                     max = status.getScore();
@@ -471,8 +471,14 @@ public class SkinService {
         }
 
 
-        statusList.get(maxIndex.intValue()).setType("bold");
-        statusList.get(minIndex.intValue()).setType("bold");
+        if(trueSize != 0L){
+            statusList.get(maxIndex.intValue()).setType("bold");
+            statusList.get(minIndex.intValue()).setType("bold");
+        }
+
+        if(trueSize == 0L){
+            statusData = 0L;
+        }
 
 
         Collections.reverse(statusList);

@@ -3,6 +3,7 @@ package com.ncores.plaluvs.service;
 import com.ncores.plaluvs.controller.cometic.dto.DetailCosmeticDto;
 import com.ncores.plaluvs.controller.cometic.dto.SimpleCosmeticDto;
 import com.ncores.plaluvs.domain.*;
+import com.ncores.plaluvs.domain.skintype.Bouman;
 import com.ncores.plaluvs.domain.skintype.SkinType;
 import com.ncores.plaluvs.domain.skintype.skintrouble.*;
 import com.ncores.plaluvs.exception.ErrorCode;
@@ -97,7 +98,7 @@ public class CosmeticService {
 
             return result;
         }
-        else if(dailySkinType.getBouman().equals("ORNT")){
+        else if(dailySkinType.getBouman().equals(Bouman.ORNT)){
             Page<DetailCosmeticDto> result = cosmeticRepository.findAllByCategoryCustom(userDetails, findCategory, pageRequest, sort);
             naverUrl2(result);
 

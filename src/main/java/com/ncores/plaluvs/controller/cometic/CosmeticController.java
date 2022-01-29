@@ -56,30 +56,31 @@ public class CosmeticController {
         return new ResponseEntity<>(new PagingSimpleResponseDto(result.size(), result), HttpStatus.OK);
     }
 
-    @GetMapping("/cosmetic/detail-recommends/{category}/{page}")
+    @GetMapping(value = {"/cosmetic/detail-recommends/{category}/{page}", "/cosmetic/detail-recommends"})
     public ResponseEntity<?> cosmeticDetailRecommends(
-            @PathVariable("category") Long categoryId,
-            @PathVariable() Long page,
+            @PathVariable(value = "category", required = false) Long categoryId,
+            @PathVariable(required = false) Long page,
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestParam(defaultValue = "asc") String sort
     ) throws PlaluvsException {
-
         UserDetailsImpl.UserCheck(userDetails);
         page = (page == null) ? 0L : page;
+        categoryId = (categoryId == null) ? 617L : categoryId;
 
         Page<DetailCosmeticDto> result = cosmeticService.cosmeticDetailRecommends(userDetails, categoryId, page, sort);
 
         return new ResponseEntity<>(new PagingResponseDto(result.getContent().size(), result.getNumber(), result.getTotalPages(), result.getContent()), HttpStatus.OK);
     }
 
-    @GetMapping("/cosmetic/elements-recommend/{elements}/{category}/{page}")
+    @GetMapping(value = {"/cosmetic/elements-recommend/{elements}/{category}/{page}", "/cosmetic/elements-recommend/{elements}"})
     public ResponseEntity<?> cosmeticElements(@PathVariable(value = "elements") Long elementsId,
-                                              @PathVariable("category") Long categoryId,
-                                              @PathVariable Long page,
+                                              @PathVariable(value = "category", required = false) Long categoryId,
+                                              @PathVariable(required = false) Long page,
                                               @AuthenticationPrincipal UserDetailsImpl userDetails,
                                               @RequestParam(defaultValue = "asc") String sort
                                               ) throws PlaluvsException {
-
+        page = (page == null) ? 0L : page;
+        categoryId = (categoryId == null) ? 617L : categoryId;
         Page<DetailCosmeticDto> result = cosmeticService.cosmeticContainsElements(userDetails, elementsId, categoryId, page, sort);
 
 

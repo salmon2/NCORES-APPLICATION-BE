@@ -40,7 +40,7 @@ public enum ErrorCode {
     COSMETIC_NOT_FOUND(HttpStatus.FORBIDDEN, "해당하는 화장품이 없습니다." ),
     PHOTO_FACE_EMPTY(HttpStatus.FORBIDDEN, "사진에 얼굴이 존재하지않습니다."),
     PHOTO_FACE_MANY(HttpStatus.FORBIDDEN, "사진에 얼굴이 너무 많습니다."),
-    USERNAME_NOT_TYPE(HttpStatus.FORBIDDEN,"적합한 이메일 형식이 아닙니다." );
+    USERNAME_NOT_TYPE(HttpStatus.FORBIDDEN,"이메일 형식에 맞지 않는 메일 주소입니다. 다시 입력해 주세요." );
 
 
 

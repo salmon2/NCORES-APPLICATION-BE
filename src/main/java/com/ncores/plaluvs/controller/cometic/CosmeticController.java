@@ -65,7 +65,7 @@ public class CosmeticController {
     ) throws PlaluvsException {
         UserDetailsImpl.UserCheck(userDetails);
         page = (page == null) ? 0L : page;
-        categoryId = (categoryId == null) ? 617L : categoryId;
+        categoryId = (categoryId == null) ? 618L : categoryId;
 
         Page<DetailCosmeticDto> result = cosmeticService.cosmeticDetailRecommends(userDetails, categoryId, page, sort);
 
@@ -80,7 +80,7 @@ public class CosmeticController {
                                               @RequestParam(defaultValue = "asc") String sort
                                               ) throws PlaluvsException {
         page = (page == null) ? 0L : page;
-        categoryId = (categoryId == null) ? 617L : categoryId;
+        categoryId = (categoryId == null) ? 618L : categoryId;
         Page<DetailCosmeticDto> result = cosmeticService.cosmeticContainsElements(userDetails, elementsId, categoryId, page, sort);
 
 

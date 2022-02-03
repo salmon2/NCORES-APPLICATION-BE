@@ -142,9 +142,7 @@ public class PhotoService {
         String result = restTemplate.getForObject(resultURL, String.class);
 
 
-
         return result;
-
     }
 
     @Transactional

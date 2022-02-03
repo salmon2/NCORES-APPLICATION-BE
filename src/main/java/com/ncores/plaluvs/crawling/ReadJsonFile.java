@@ -49,7 +49,7 @@ public class ReadJsonFile {
         //FileReader reader = new FileReader("C:\\Users\\박기남\\Desktop\\회사\\data\\item_small_json.json");
 
         //집 컴
-       // FileReader reader = new FileReader("D:\\회사\\item_json.json");
+        //FileReader reader = new FileReader("D:\\회사\\item_json.json");
 
         //회사컴
         FileReader reader = new FileReader("C:\\Users\\user\\Desktop\\작업\\data\\item_json.json");

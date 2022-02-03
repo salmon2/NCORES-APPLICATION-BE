@@ -21,13 +21,13 @@ public class CategoryService {
 //        List<Category> all = categoryRepository.findAll();
         List<CategoryResponseDto> result = new ArrayList<>();
 
-        result.add(new CategoryResponseDto(617L, "에센스토너"));
-        result.add(new CategoryResponseDto(687L, "로션/에멀젼"));
-        result.add(new CategoryResponseDto(582L, "에센스/세럼"));
-        result.add(new CategoryResponseDto(608L, "크림"));
-        result.add(new CategoryResponseDto(757L, "클렌징워터"));
-        result.add(new CategoryResponseDto(23L, "립케어"));
-        result.add(new CategoryResponseDto(679L, "선크림"));
+        result.add(new CategoryResponseDto(618L, "에센스토너"));
+        result.add(new CategoryResponseDto(688L, "로션/에멀젼"));
+        result.add(new CategoryResponseDto(583L, "에센스/세럼"));
+        result.add(new CategoryResponseDto(609L, "크림"));
+        result.add(new CategoryResponseDto(758L, "클렌징워터"));
+        result.add(new CategoryResponseDto(24L, "립케어"));
+        result.add(new CategoryResponseDto(680L, "선크림"));
 
         return result;
     }

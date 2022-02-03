@@ -64,8 +64,9 @@ public class SimpleListener implements ApplicationListener<ApplicationStartedEve
     @Override
     public void onApplicationEvent(ApplicationStartedEvent event) {
 
-
-
+        for (int i = 0; i < 30; i++) {
+            initAndCreatedUser2(i);
+        }
 
     }
     private void TWOWeekago(Long id) throws PlaluvsException {

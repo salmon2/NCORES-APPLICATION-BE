@@ -46,6 +46,8 @@ public class PhotoController {
         log.info("url = {}", savePhoto.getStored_file_path());
 
         Photo result = photoService.makeGetImageData(savePhoto);
+        log.info("photo = {}", result);
+
         photoService.setSkinStatus(userDetails.getUser(), result);
 
         return new ResponseEntity<>(result, HttpStatus.OK);

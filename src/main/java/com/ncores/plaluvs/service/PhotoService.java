@@ -27,6 +27,9 @@ import javax.transaction.Transactional;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -147,8 +150,10 @@ public class PhotoService {
     @Transactional
     public void setSkinStatus(User user, Photo result) throws PlaluvsException {
         SkinType dailySkinType = skinTypeRepository.findDailySkinTypeException(user);
+
         long skinTypeScore = dailySkinType.getScore() * 60 / 100;
         long photoScore = (result.getNoseTrouble() + result.getLeftCheckTrouble() + result.getRightCheckTrouble()) * 40 /300;
-        dailySkinType.setScore( skinTypeScore +photoScore );
+
+        dailySkinType.setTotalScore( skinTypeScore + photoScore );
     }
 }

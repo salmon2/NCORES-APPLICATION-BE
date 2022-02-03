@@ -63,9 +63,11 @@ public class SkinType extends Timestamped {
     //skin/daily/sef-check 카메라 측정 전 설문조사 3번 (자기 점수)
     private Double selfScore;
 
-    //최종 점수
+    //설문지 점수
     private Long score;
 
+    //종합 점수
+    private Long totalScore;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -81,11 +83,11 @@ public class SkinType extends Timestamped {
 
 
     public SkinType(CurrentSkinStatus questionOne, User user) {
-        this.oilIndicateScore = 8L;
+        this.oilIndicateScore = 11L;
         this.dryScore = 5L;
-        this.sensitivityScore = 9L;
-        this.winkleScore = 3L;
-        this.pigmentScore = 3L;
+        this.sensitivityScore = 7L;
+        this.winkleScore = 1L;
+        this.pigmentScore = 2L;
         this.bouman = Bouman.ORNT;
 
         this.currentSkinStatus = questionOne;
@@ -93,11 +95,11 @@ public class SkinType extends Timestamped {
     }
 
     public SkinType(CurrentSkinStatus questionOne, User user, LocalDateTime localDateTime) {
-        this.oilIndicateScore = 8L;
+        this.oilIndicateScore = 11L;
         this.dryScore = 5L;
-        this.sensitivityScore = 9L;
-        this.winkleScore = 3L;
-        this.pigmentScore = 3L;
+        this.sensitivityScore = 7L;
+        this.winkleScore = 1L;
+        this.pigmentScore = 2L;
         this.bouman = Bouman.ORNT;
         this.setCreatedAt(localDateTime);
         this.setModifiedAt(localDateTime);
@@ -107,11 +109,11 @@ public class SkinType extends Timestamped {
 
 
     public SkinType(User user) {
-        this.oilIndicateScore = 8L;
+        this.oilIndicateScore = 11L;
         this.dryScore = 5L;
-        this.sensitivityScore = 9L;
-        this.winkleScore = 3L;
-        this.pigmentScore = 3L;
+        this.sensitivityScore = 7L;
+        this.winkleScore = 1L;
+        this.pigmentScore = 2L;
 
         this.user = user;
     }

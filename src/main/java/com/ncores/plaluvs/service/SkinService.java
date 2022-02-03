@@ -95,7 +95,7 @@ public class SkinService {
             findSkinType.setDryScore( findSkinType.getDryScore() - 1);
         }
         else if (currentSkinStatus.getId() == 3L){
-            findSkinType.setOilIndicateScore( findSkinType.getOilIndicateScore() - 1);
+            findSkinType.setOilIndicateScore( findSkinType.getOilIndicateScore() - 2);
         }
         else if (currentSkinStatus.getId() == 4L){
             findSkinType.setOilIndicateScore( findSkinType.getOilIndicateScore() - 1);
@@ -287,24 +287,25 @@ public class SkinService {
         UserDetailsImpl.UserCheck(userDetails);
 
         SkinType dailySkinTYpe = skinTypeRepository.findDailySkinTypeException(userDetails.getUser());
+        if(dailySkinTYpe.getTotalScore() == null){
+            throw new PlaluvsException(ErrorCode.SKIN_TYPE_NOT_FOUND);
+        }
 
         List<SkinElementsDto> elementsDtoList = elementsRepository.findSkinElementsDtoListBySkinTypeGoodElements(dailySkinTYpe, userDetails);
-
 
         for (SkinElementsDto skinElementsDto : elementsDtoList) {
             skinElementsDto.setImg(getImgSRc(skinElementsDto.getLevel()));
         }
 
-        
         SkinStatusResponseDto result = new SkinStatusResponseDto(
-                dailySkinTYpe.getScore().toString() + "점",
+                dailySkinTYpe.getTotalScore().toString() + "점",
                 "수분이 부족한 중/복합성 피부네요. 피부에 수분이 부족한 탓에 색소침착이 있네요. 다행히 피부가 저항성을 갖고 있어 외부 환경에 아주 민감 하진 않아요." +
                         "그래도 주름과 색소침착을 예방하기 위해 자외선은 각별히 신경을 써주셔야해요.외출 시에는 꼭! 자외선 차단제를 자주 덧 발라주세요",
-                (dailySkinTYpe.getOilIndicateScore() * 100) / 8,
+                (dailySkinTYpe.getOilIndicateScore() * 100) / 11,
                 (dailySkinTYpe.getDryScore()  * 100) / 5,
-                (dailySkinTYpe.getSensitivityScore() * 100) / 9,
-                (dailySkinTYpe.getPigmentScore() * 100) / 3,
-                (dailySkinTYpe.getWinkleScore() *100) /3,
+                (dailySkinTYpe.getSensitivityScore() * 100) / 7,
+                (dailySkinTYpe.getPigmentScore() * 100) / 2,
+                (dailySkinTYpe.getWinkleScore() *100) /1,
                 elementsDtoList
         );
 
@@ -369,7 +370,7 @@ public class SkinService {
         SkinType todays = skinTypeRepository.findDailySkinTypeOrReturnNull(userDetails);
 
 
-        String buttonColor = (todays != null && todays.getScore() != null) ? "#F5EBE8": "#323632";
+        String buttonColor = (todays != null && todays.getTotalScore() != null) ? "#F5EBE8": "#323632";
         String text = "hello world";
 
         // 데이터 없음 0, 오늘 안함 1, 있고 함 2
@@ -385,8 +386,8 @@ public class SkinService {
 
         for (; i < result.getContent().size(); i++) {
             SkinType skinType = result.getContent().get(i);
-            if(skinType.getScore() != null){
-                Status status = new Status(skinType.getScore(), getDate(skinType.getCreatedAt()), "common");
+            if(skinType.getTotalScore() != null){
+                Status status = new Status(skinType.getTotalScore(), getDate(skinType.getCreatedAt()), "common");
                 statusList.add(status);
             }
 
@@ -419,7 +420,7 @@ public class SkinService {
         }
 
         //오늘 함
-        if(todays != null && todays.getScore() != null){
+        if(todays != null && todays.getTotalScore() != null){
             statusData = 2L;
             text = "첫 진단이에요!\n" +
                     "내일도 변화를 기록해 보세요";
@@ -647,11 +648,11 @@ public class SkinService {
         if(selfScore1 == null)
             throw new PlaluvsException(ErrorCode.SKIN_TYPE_NOT_FOUND);
 
-        long oil = (dailySkinType.getOilIndicateScore() * 100) / 8;
+        long oil = (dailySkinType.getOilIndicateScore() * 100) / 11;
         long dry = (dailySkinType.getDryScore() * 100) / 5;
-        long sen = (dailySkinType.getSensitivityScore() * 100) / 9;
-        long pig = (dailySkinType.getPigmentScore() * 100) / 3;
-        long win = (dailySkinType.getWinkleScore() * 100) / 3;
+        long sen = (dailySkinType.getSensitivityScore() * 100) / 7;
+        long pig = (dailySkinType.getPigmentScore() * 100) / 2;
+        long win = (dailySkinType.getWinkleScore() * 100) / 1;
 
         long score = (oil + dry + sen + pig + win) / 5;
 
@@ -713,28 +714,28 @@ public class SkinService {
         Setting(startDatetimeWeek, endDatetimeWeek,
                 startDatetimeWeekAgo, endDatetimeWeekAgo,
                  endDatetimeMonth,
-                oilResult, 100L, 8L );
+                oilResult, 100L, 11L );
 
 
         List<ScoreData> senResult = skinTypeRepository.findSkinStatusBoumanCustom(userDetails, startDatetime, endDatetime, SkinTypeEnum.SEN);
         Setting(startDatetimeWeek, endDatetimeWeek,
                 startDatetimeWeekAgo, endDatetimeWeekAgo,
                  endDatetimeMonth,
-                senResult, 100L, 9L );
+                senResult, 100L, 7L );
 
 
         List<ScoreData> winResult = skinTypeRepository.findSkinStatusBoumanCustom(userDetails, startDatetime, endDatetime, SkinTypeEnum.WIN);
         Setting(startDatetimeWeek, endDatetimeWeek,
                 startDatetimeWeekAgo, endDatetimeWeekAgo,
                  endDatetimeMonth,
-                winResult, 100L, 3L );
+                winResult, 100L, 1L );
 
 
         List<ScoreData> pigResult = skinTypeRepository.findSkinStatusBoumanCustom(userDetails, startDatetime, endDatetime, SkinTypeEnum.PIG);
         Setting(startDatetimeWeek, endDatetimeWeek,
                 startDatetimeWeekAgo, endDatetimeWeekAgo,
                  endDatetimeMonth,
-                pigResult, 100L, 3L );
+                pigResult, 100L, 2L );
 
 
         skinStatusBoumanResponseDto skinStatusBoumanResponseDto = new skinStatusBoumanResponseDto(dryResult, oilResult, senResult, pigResult, winResult);

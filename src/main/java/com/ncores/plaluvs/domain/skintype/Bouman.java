@@ -8,25 +8,24 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum Bouman {
-    DRPT("DRPT", 70L),
-    DRNT("DRNT", 85L),
-    DSPT("DSPT", 55L),
-    DSNT("DSNT", 70L),
-    DRPW("DRPW", 55L),
-    DRNW("DRNW", 70L),
-    DSPW("DSPW", 40L),
-    DSNW("DSNW", 55L),
-    ORPT("ORPT", 85L),
-    ORNT("ORNT", 100L),
-    OSPT("OSPT", 70L),
-    OSNT("OSNT", 85L),
-    ORPW("ORPW", 70L),
-    ORNW("ORNW", 85L),
-    OSPW("OSPW", 55L),
-    OSNW("OSNW", 70L);
+    DRPT("DRPT" ),
+    DRNT("DRNT" ),
+    DSPT("DSPT" ),
+    DSNT("DSNT" ),
+    DRPW("DRPW" ),
+    DRNW("DRNW" ),
+    DSPW("DSPW" ),
+    DSNW("DSNW" ),
+    ORPT("ORPT" ),
+    ORNT("ORNT" ),
+    OSPT("OSPT" ),
+    OSNT("OSNT" ),
+    ORPW("ORPW" ),
+    ORNW("ORNW" ),
+    OSPW("OSPW" ),
+    OSNW("OSNW" );
 
     private String name;
-    private Long score;
 
     public static Bouman findBoumanBySkinType(String skinType) throws PlaluvsException {
 

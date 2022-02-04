@@ -20,6 +20,7 @@ import com.ncores.plaluvs.repository.*;
 import com.ncores.plaluvs.repository.elements.ElementsRepository;
 import com.ncores.plaluvs.repository.skinType.SkinTypeRepository;
 import com.ncores.plaluvs.security.UserDetailsImpl;
+import com.ncores.plaluvs.service.skin.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -45,6 +46,7 @@ public class SkinService {
     private final SkinDailyStimulationRepository skinDailyStimulationRepository;
     private final UserRepository userRepository;
     private final SkinTroubleElementsRepository skinTroubleElementsRepository;
+    private final PhotoRepository photoRepository;
 
 
     @Transactional
@@ -60,26 +62,24 @@ public class SkinService {
         CurrentSkinStatus currentSkinStatus = CurrentSkinStatus.findQuestionOne(id);
         CurrentSkinStatus nowSkinStatus = findSkinType.getCurrentSkinStatus();
 
-        if( nowSkinStatus == null){
-            updateCurrentStatusByCurrentSkinStatus(currentSkinStatus, findSkinType);
+        if (nowSkinStatus != null) {
+            rollbackCurrentStatus(findSkinType, nowSkinStatus);
         }
-        else{
-            if(nowSkinStatus.getId() == 1L) {
-                findSkinType.setOilIndicateScore( findSkinType.getOilIndicateScore() + 2);
-                findSkinType.setDryScore( findSkinType.getDryScore() + 1);
-            }
-            else if  (nowSkinStatus.getId()== 2L){
-                findSkinType.setOilIndicateScore( findSkinType.getOilIndicateScore() + 1);
-                findSkinType.setDryScore( findSkinType.getDryScore() + 1);
-            }
-            else if (nowSkinStatus.getId() == 3L){
-                findSkinType.setOilIndicateScore( findSkinType.getOilIndicateScore() + 2);
-            }
-            else if (nowSkinStatus.getId() == 4L){
-                findSkinType.setOilIndicateScore( findSkinType.getOilIndicateScore() + 1);
-                findSkinType.setDryScore( findSkinType.getDryScore() + 1);
-            }
-            updateCurrentStatusByCurrentSkinStatus(currentSkinStatus, findSkinType);
+        updateCurrentStatusByCurrentSkinStatus(currentSkinStatus, findSkinType);
+    }
+
+    private void rollbackCurrentStatus(SkinType findSkinType, CurrentSkinStatus nowSkinStatus) {
+        if (nowSkinStatus.getId() == 1L) {
+            findSkinType.setOilIndicateScore(findSkinType.getOilIndicateScore() + 2);
+            findSkinType.setDryScore(findSkinType.getDryScore() + 1);
+        } else if (nowSkinStatus.getId() == 2L) {
+            findSkinType.setOilIndicateScore(findSkinType.getOilIndicateScore() + 1);
+            findSkinType.setDryScore(findSkinType.getDryScore() + 1);
+        } else if (nowSkinStatus.getId() == 3L) {
+            findSkinType.setOilIndicateScore(findSkinType.getOilIndicateScore() + 2);
+        } else if (nowSkinStatus.getId() == 4L) {
+            findSkinType.setOilIndicateScore(findSkinType.getOilIndicateScore() + 1);
+            findSkinType.setDryScore(findSkinType.getDryScore() + 1);
         }
     }
 
@@ -297,15 +297,82 @@ public class SkinService {
             skinElementsDto.setImg(getImgSRc(skinElementsDto.getLevel()));
         }
 
+        long oilScore = (dailySkinTYpe.getOilIndicateScore() * 100) / 11;
+        long dryScore = (dailySkinTYpe.getDryScore()  * 100) / 5;
+        long senScore = (dailySkinTYpe.getSensitivityScore() * 100) / 7;
+        long pigScore = (dailySkinTYpe.getPigmentScore() * 100) / 2;
+        long winScore = (dailySkinTYpe.getWinkleScore() *100) /1;
+
+        String text ="";
+
+        Long age = userDetails.getUser().getAge();
+        int year = LocalDateTime.now().getYear();
+        long a = year - age;
+
+        if(a >= 25 && a <30){
+            text += ageMinText.getEnum().getText();
+            text += " ";
+        }
+        else if(a >=30 && a<40){
+            text += ageMiddleText.getEnum().getText();
+            text += " ";
+        }
+        else{
+            text += ageMaxText.getEnum().getText();
+            text += " ";
+        }
+
+        if(oilScore > dryScore){
+            text += oilText.getEnum().getText();
+            text += " ";
+        }
+        else{
+            text += dryText.getEnum().getText();
+            text += " ";
+        }
+        if(senScore < 50){
+            text += senMinText.getEnum().getText();
+            text += " ";
+        }
+        else{
+            text += senMaxText.getEnum().getText();
+            text += " ";
+        }
+        if(pigScore > 50){
+            text += pigMaxText.getEnum().getText();
+            text+= " ";
+        }
+        if(winScore > 50){
+            text += winMaxText.getEnum().getText();
+            text += " ";
+        }
+        else{
+            text += winMinText.getEnum().getText();
+        }
+
+        long troubleScore = dailySkinTYpe.getTotalScore() - ((long) dailySkinTYpe.getScore() * 6 / 10);
+        if(troubleScore < 20){
+            text += troubleMaxText.getEnum().getText();
+            text += " ";
+        }
+        else if (troubleScore > 20 && troubleScore <=30){
+            text += troubleMiddleText.getEnum().getText();
+            text += " ";
+        }
+        else{
+            text += troubleMinText.One.getText();
+            text += " ";
+        }
+
+
         SkinStatusResponseDto result = new SkinStatusResponseDto(
                 dailySkinTYpe.getTotalScore().toString() + "점",
-                "수분이 부족한 중/복합성 피부네요. 피부에 수분이 부족한 탓에 색소침착이 있네요. 다행히 피부가 저항성을 갖고 있어 외부 환경에 아주 민감 하진 않아요." +
-                        "그래도 주름과 색소침착을 예방하기 위해 자외선은 각별히 신경을 써주셔야해요.외출 시에는 꼭! 자외선 차단제를 자주 덧 발라주세요",
-                (dailySkinTYpe.getOilIndicateScore() * 100) / 11,
-                (dailySkinTYpe.getDryScore()  * 100) / 5,
-                (dailySkinTYpe.getSensitivityScore() * 100) / 7,
-                (dailySkinTYpe.getPigmentScore() * 100) / 2,
-                (dailySkinTYpe.getWinkleScore() *100) /1,
+                text,
+                oilScore,
+                dryScore,
+                senScore,
+                pigScore,
+                winScore,
                 elementsDtoList
         );
 
@@ -425,30 +492,30 @@ public class SkinService {
             text = "첫 진단이에요!\n" +
                     "내일도 변화를 기록해 보세요";
 
-            if(trueSize == 2){
-                if(statusList.get(statusList.size()-1).getScore().equals(statusList.get(statusList.size()-2).getScore())){
+            if(trueSize >=2){
+                if(trueSize == 2 &&
+                        statusList.get(statusList.size()-1).getScore().equals(statusList.get(statusList.size()-2).getScore())){
                     text = "두번째 진단도 성공!\n" +
                             "내일도 변화를 기록해 보세요";
                 }
-            }
+                else if (!maxIndex.equals(minIndex) && trueSize >=2 ){
+                    Status today = statusList.get(statusList.size()-1);
 
-            else if (!maxIndex.equals(minIndex) && trueSize >=2 ){
-                Status today = statusList.get(statusList.size()-1);
+                    if(today.getScore() > statusList.get(minIndex.intValue()).getScore()){
+                        text = today.getDate() +" 피부 점수가\n" +
+                                statusList.get(minIndex.intValue()).getDate()+ "보다" +
+                                (today.getScore() - statusList.get(minIndex.intValue()).getScore())+"이 올랐어요";
+                    }
+                    else{
+                        text = "꾸준히 관리하는 피부는\n" +
+                                "시간이 지날수록 아름다워요";
+                    }
 
-                if(today.getScore() > statusList.get(minIndex.intValue()).getScore()){
-                    text = today.getDate() +" 피부 점수가\n" +
-                            statusList.get(minIndex.intValue()).getDate()+ "보다" +
-                            (today.getScore() - statusList.get(minIndex.intValue()).getScore())+"이 올랐어요";
                 }
-                else{
+                else if(maxIndex.equals(minIndex) && trueSize >= 3){
                     text = "꾸준히 관리하는 피부는\n" +
                             "시간이 지날수록 아름다워요";
                 }
-
-            }
-            else if(maxIndex.equals(minIndex) && trueSize >= 3){
-                text = "꾸준히 관리하는 피부는\n" +
-                        "시간이 지날수록 아름다워요";
             }
         }
         // 오늘 안함
@@ -471,7 +538,6 @@ public class SkinService {
             }
         }
 
-
         if(trueSize != 0L){
             statusList.get(maxIndex.intValue()).setType("bold");
             statusList.get(minIndex.intValue()).setType("bold");
@@ -480,7 +546,6 @@ public class SkinService {
         if(trueSize == 0L){
             statusData = 0L;
         }
-
 
         Collections.reverse(statusList);
 

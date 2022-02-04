@@ -48,13 +48,6 @@ standard_category = [
 
 
 path = './data/GP/'
-def setStdCategory():
-    std_category = []
-    with open(path + 'glowpick_ctg.txt', 'r',encoding='utf-8') as f:
-        temp = f.readlines()
-        for c in temp:
-            std_category.append(c.strip())
-    return std_category
 
 
 def getProductInfo(driver):
@@ -94,27 +87,6 @@ def getProductInfo(driver):
 
     return {'name':p_name, 'image' : img, 'volume':p_volume, 'price':p_price, 'brand':p_brand, 'discription' :p_discription, 'tags':p_tags, 'elements':elements, 'colors':colors} 
 
-def getProductReviews(id, driver):
-    result = []
-    reviews = driver.find_elements_by_class_name('review-list-cosmetic')
-    for review in reviews:
-        infos = review.find_element_by_class_name('info').find_element_by_class_name('txt').text.split('·')
-        age = (int)(infos[0].strip()[:-1])
-        skin_type = infos[1].strip()
-        icons = review.find_elements_by_class_name('icon-sprite')
-        gender = icons[0].get_attribute('class').split(' ')[-1][-1]
-        score = icons[1].get_attribute('class').split(' ')[-1].split('-')[1]
-        gender = '여' if gender == 'f' else '남'
-        if score == 'best': score = 5
-        elif score == 'good': score = 4
-        elif score == 'soso': score = 3
-        elif score == 'bad': score = 2
-        else : score = 1
-        content = review.find_element_by_class_name('review').text
-        
-        review_info = {'cosmetic':id, 'age' : age, 'skinType' : skin_type, 'gender':gender, 'score':score, 'content':content}
-        result.append(review_info)
-    return result
 
 def writeJsonFile(start_num, end_num, items):
     file_path = path + "/output/"
@@ -126,7 +98,6 @@ def writeJsonFile(start_num, end_num, items):
         json.dump(items, of, ensure_ascii=False, indent="\t")
 
 def getProducts(start_num, end_num):
-    std_category = setStdCategory()
     options = webdriver.ChromeOptions() 
     options.add_experimental_option("excludeSwitches", ["enable-logging"])
 
@@ -171,23 +142,7 @@ def getProducts(start_num, end_num):
     writeJsonFile(start_num, end_num, items)
     driver.quit()
     
-def getItemsReviews():
-    file_path = path + 'output/'
-    file_list = os.listdir(file_path)
-    items = []
-    reviews = []
-
-    for f_name in file_list:
-        with open(file_path + f_name, 'r',encoding='utf-8') as f:
-            json_data = json.load(f)
-            if 'cosmetic' in f_name:
-                items += json_data
-            else:
-                reviews += json_data
-    
-    return items, reviews
 
 if __name__ == '__main__':
-    # 숫자 바꿔서 크롤링 예시 (10001~20000) #145498
     getProducts(4,15)
 

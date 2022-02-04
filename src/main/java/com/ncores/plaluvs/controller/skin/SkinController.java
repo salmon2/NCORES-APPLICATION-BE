@@ -43,7 +43,7 @@ public class SkinController {
 
         log.info("/skin/worry");
         log.info("requestDto = {}", requestDto);
-        //skinworry 없으면 걸기
+
         UserDetailsImpl.UserCheck(userDetails);
         skinService.skinWorryUpdate(requestDto, userDetails.getUser(), null);
 

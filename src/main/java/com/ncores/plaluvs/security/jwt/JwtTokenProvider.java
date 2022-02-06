@@ -23,9 +23,9 @@ import java.util.Date;
 public class JwtTokenProvider {
     private String secretKey = "star";
 
-    private Long day = 24*60*60*1000L;
+    private Long day = 24 * 60 * 60 * 1000L;
     //토큰 유효시간
-    private Long tokenValidTime = day*365;
+    private Long tokenValidTime = day* 365;
 
     private final UserDetailsService userDetailsService;
 

@@ -1,4 +1,4 @@
-package com.ncores.plaluvs.service.skin;
+package com.ncores.plaluvs.service.skin.text;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,6 +21,16 @@ public enum troubleMaxText {
         }
         return troubleMaxText.One;
     }
+
+    public static troubleMaxText getEnum(Long id) {
+        for (troubleMaxText value : troubleMaxText.values()) {
+            if (value.getId() == id)
+                return value;
+        }
+        return troubleMaxText.One;
+    }
+
+
 
 
 }

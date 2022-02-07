@@ -1,9 +1,7 @@
-package com.ncores.plaluvs.service.skin;
+package com.ncores.plaluvs.service.skin.text;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import java.util.Random;
 
 @Getter
 @AllArgsConstructor
@@ -20,6 +18,14 @@ public enum dryText {
 
         for (dryText value : dryText.values()) {
             if(value.getId() == index)
+                return value;
+        }
+        return dryText.one;
+    }
+
+    public static dryText getEnum(Long id) {
+        for (dryText value : dryText.values()) {
+            if (value.getId() == id)
                 return value;
         }
         return dryText.one;

@@ -1,4 +1,4 @@
-package com.ncores.plaluvs.service.skin;
+package com.ncores.plaluvs.service.skin.text;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,6 +18,14 @@ public enum senMaxText {
 
         for (senMaxText value : senMaxText.values()) {
             if(value.getId() == index)
+                return value;
+        }
+        return senMaxText.One;
+    }
+
+    public static senMaxText getEnum(Long id) {
+        for (senMaxText value : senMaxText.values()) {
+            if (value.getId() == id)
                 return value;
         }
         return senMaxText.One;

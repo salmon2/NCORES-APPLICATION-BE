@@ -42,7 +42,7 @@ public class SkinController {
                                                @AuthenticationPrincipal UserDetailsImpl userDetails) throws PlaluvsException {
 
         log.info("/skin/worry");
-        log.info("requestDto = {}", requestDto);
+        log.info("requestDto = {}", requestDto.getId());
 
         UserDetailsImpl.UserCheck(userDetails);
         skinService.skinWorryUpdate(requestDto, userDetails.getUser(), null);

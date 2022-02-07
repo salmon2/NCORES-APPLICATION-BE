@@ -1,4 +1,4 @@
-package com.ncores.plaluvs.service.skin;
+package com.ncores.plaluvs.service.skin.text;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,11 +12,20 @@ public enum ageMaxText {
     private String text;
     private int id;
 
+
     public static ageMaxText getEnum(){
         int index = (int)(Math.random() * 3 +1);
 
         for (ageMaxText value : ageMaxText.values()) {
             if(value.getId() == index)
+                return value;
+        }
+        return ageMaxText.One;
+    }
+
+    public static ageMaxText getEnum(Long id) {
+        for (ageMaxText value : ageMaxText.values()) {
+            if (value.getId() == id)
                 return value;
         }
         return ageMaxText.One;

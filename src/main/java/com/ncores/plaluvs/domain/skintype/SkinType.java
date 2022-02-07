@@ -40,6 +40,13 @@ public class SkinType extends Timestamped {
 
     private Long pigmentScore;
 
+    private Long ageText;
+    private Long oilDryText;
+    private Long senText;
+    private Long pigText;
+    private Long winText;
+    private Long troubleText;
+
     @Enumerated(value = EnumType.STRING)
     private Bouman bouman;
 

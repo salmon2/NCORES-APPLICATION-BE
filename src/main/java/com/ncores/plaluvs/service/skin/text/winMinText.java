@@ -1,4 +1,4 @@
-package com.ncores.plaluvs.service.skin;
+package com.ncores.plaluvs.service.skin.text;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,6 +21,16 @@ public enum winMinText {
         }
         return winMinText.One;
     }
+
+    public static winMinText getEnum(Long id) {
+        for (winMinText value : winMinText.values()) {
+            if (value.getId() == id)
+                return value;
+        }
+        return winMinText.One;
+    }
+
+
 
 
 }

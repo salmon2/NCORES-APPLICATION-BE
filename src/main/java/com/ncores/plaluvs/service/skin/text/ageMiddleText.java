@@ -1,4 +1,4 @@
-package com.ncores.plaluvs.service.skin;
+package com.ncores.plaluvs.service.skin.text;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,6 +17,14 @@ public enum ageMiddleText {
 
         for (ageMiddleText value : ageMiddleText.values()) {
             if(value.getId() == index)
+                return value;
+        }
+        return ageMiddleText.One;
+    }
+
+    public static ageMiddleText getEnum(Long id){
+        for (ageMiddleText value : ageMiddleText.values()) {
+            if(value.getId() == id)
                 return value;
         }
         return ageMiddleText.One;

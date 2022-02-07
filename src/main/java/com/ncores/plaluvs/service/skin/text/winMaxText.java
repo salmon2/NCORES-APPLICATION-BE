@@ -1,4 +1,4 @@
-package com.ncores.plaluvs.service.skin;
+package com.ncores.plaluvs.service.skin.text;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,6 +26,13 @@ public enum winMaxText {
         return winMaxText.One;
     }
 
+    public static winMaxText getEnum(Long id) {
+        for (winMaxText value : winMaxText.values()) {
+            if (value.getId() == id)
+                return value;
+        }
+        return winMaxText.One;
+    }
 
 
 }

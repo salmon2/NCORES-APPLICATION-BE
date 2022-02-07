@@ -1,4 +1,4 @@
-package com.ncores.plaluvs.service.skin;
+package com.ncores.plaluvs.service.skin.text;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,6 +18,14 @@ public enum pigMaxText {
 
         for (pigMaxText value : pigMaxText.values()) {
             if(value.getId() == index)
+                return value;
+        }
+        return pigMaxText.One;
+    }
+
+    public static pigMaxText getEnum(Long id) {
+        for (pigMaxText value : pigMaxText.values()) {
+            if (value.getId() == id)
                 return value;
         }
         return pigMaxText.One;

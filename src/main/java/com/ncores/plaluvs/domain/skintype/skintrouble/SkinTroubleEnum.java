@@ -25,6 +25,7 @@ public enum SkinTroubleEnum {
 
 
     public static SkinTroubleEnum findSkinTroubleEnum(Long id) throws PlaluvsException {
+        log.info("id = {}", id);
         for (SkinTroubleEnum value : SkinTroubleEnum.values()) {
             if(value.getId().equals(id)){
                 log.info("skinEnum = {}", value);

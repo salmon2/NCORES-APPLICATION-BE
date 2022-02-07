@@ -20,7 +20,7 @@ import com.ncores.plaluvs.repository.*;
 import com.ncores.plaluvs.repository.elements.ElementsRepository;
 import com.ncores.plaluvs.repository.skinType.SkinTypeRepository;
 import com.ncores.plaluvs.security.UserDetailsImpl;
-import com.ncores.plaluvs.service.skin.*;
+import com.ncores.plaluvs.service.skin.text.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -105,6 +105,7 @@ public class SkinService {
 
 
     public void skinWorryUpdate(SkinWorryRequestDto requestDto, User user, LocalDateTime createdAt) throws PlaluvsException {
+        log.info("id = {}", requestDto.getId());
         SkinType findSkinType = findDailySkinType(user, createdAt);
 
         List<SkinTrouble> beforeSkinTroubleList = skinWorryRepository.findAllBySkinType(findSkinType);
@@ -283,6 +284,7 @@ public class SkinService {
     }
 
 
+    @Transactional
     public SkinStatusResponseDto skinStatus(UserDetailsImpl userDetails) throws PlaluvsException {
         UserDetailsImpl.UserCheck(userDetails);
 
@@ -309,60 +311,8 @@ public class SkinService {
         int year = LocalDateTime.now().getYear();
         long a = year - age;
 
-        if(a >= 25 && a <30){
-            text += ageMinText.getEnum().getText();
-            text += " ";
-        }
-        else if(a >=30 && a<40){
-            text += ageMiddleText.getEnum().getText();
-            text += " ";
-        }
-        else{
-            text += ageMaxText.getEnum().getText();
-            text += " ";
-        }
 
-        if(oilScore > dryScore){
-            text += oilText.getEnum().getText();
-            text += " ";
-        }
-        else{
-            text += dryText.getEnum().getText();
-            text += " ";
-        }
-        if(senScore < 50){
-            text += senMinText.getEnum().getText();
-            text += " ";
-        }
-        else{
-            text += senMaxText.getEnum().getText();
-            text += " ";
-        }
-        if(pigScore > 50){
-            text += pigMaxText.getEnum().getText();
-            text+= " ";
-        }
-        if(winScore > 50){
-            text += winMaxText.getEnum().getText();
-            text += " ";
-        }
-        else{
-            text += winMinText.getEnum().getText();
-        }
-
-        long troubleScore = dailySkinTYpe.getTotalScore() - ((long) dailySkinTYpe.getScore() * 6 / 10);
-        if(troubleScore < 20){
-            text += troubleMaxText.getEnum().getText();
-            text += " ";
-        }
-        else if (troubleScore > 20 && troubleScore <=30){
-            text += troubleMiddleText.getEnum().getText();
-            text += " ";
-        }
-        else{
-            text += troubleMinText.One.getText();
-            text += " ";
-        }
+        text = getString(dailySkinTYpe, oilScore, dryScore, senScore, pigScore, winScore, text, a);
 
 
         SkinStatusResponseDto result = new SkinStatusResponseDto(
@@ -378,6 +328,130 @@ public class SkinService {
 
         return result;
     }
+
+    private String getString(SkinType dailySkinTYpe, long oilScore, long dryScore, long senScore, long pigScore, long winScore, String text, long a) {
+
+        if(dailySkinTYpe.getOilDryText() == null){
+            //age text
+            if(a >= 25 && a <30){
+                dailySkinTYpe.setAgeText(Long.valueOf(ageMinText.getEnum().getId()));
+            }
+            else if(a >=30 && a <40){
+                dailySkinTYpe.setAgeText(Long.valueOf(ageMiddleText.getEnum().getId()));
+            }
+            else{
+                dailySkinTYpe.setAgeText(Long.valueOf(ageMaxText.getEnum().getId()));
+            }
+
+            //oil,dry text
+            if(oilScore > dryScore){
+                dailySkinTYpe.setOilDryText( Long.valueOf(oilText.getEnum().getId()));
+            }
+            else{
+                dailySkinTYpe.setOilDryText( Long.valueOf(dryText.getEnum().getId()));
+            }
+
+            //sen text
+            if(senScore < 50){
+                dailySkinTYpe.setSenText( Long.valueOf(senMinText.getEnum().getId()));
+            }
+            else{
+                dailySkinTYpe.setSenText( Long.valueOf(senMaxText.getEnum().getId()));
+            }
+
+            //pig text
+            if(pigScore > 50){
+                dailySkinTYpe.setPigText( Long.valueOf(pigMaxText.getEnum().getId()));
+            }
+            //win text
+            if(winScore > 50){
+                dailySkinTYpe.setWinText( Long.valueOf(winMaxText.getEnum().getId()));
+            }
+            else{
+                dailySkinTYpe.setWinText( Long.valueOf(winMinText.getEnum().getId()));
+            }
+
+            //trouble text
+            long troubleScore = dailySkinTYpe.getTotalScore() - ((long) dailySkinTYpe.getScore() * 6 / 10);
+            if(troubleScore < 20){
+                dailySkinTYpe.setTroubleText( Long.valueOf(troubleMaxText.getEnum().getId()));
+            }
+            else if (troubleScore > 20 && troubleScore <=30){
+                dailySkinTYpe.setTroubleText( Long.valueOf(troubleMiddleText.getEnum().getId()));
+            }
+            else{
+                dailySkinTYpe.setTroubleText( Long.valueOf(troubleMinText.getEnum().getId()));
+            }
+        }
+
+        //age text
+        if(a >= 25 && a <30){
+            text += ageMinText.getEnum(dailySkinTYpe.getAgeText()).getText();
+            text += " ";
+        }
+        else if(a >=30 && a <40){
+            text += ageMiddleText.getEnum(dailySkinTYpe.getAgeText()).getText();
+            text += " ";
+        }
+        else{
+            text += ageMaxText.getEnum(dailySkinTYpe.getAgeText()).getText();
+            text += " ";
+        }
+
+        //oil,dry text
+        if(oilScore > dryScore){
+            text += oilText.getEnum(dailySkinTYpe.getOilDryText()).getText();
+            text += " ";
+        }
+        else{
+            text += dryText.getEnum(dailySkinTYpe.getOilDryText()).getText();
+            text += " ";
+        }
+
+        //sen text
+        if(senScore < 50){
+            text += senMinText.getEnum(dailySkinTYpe.getSenText()).getText();
+            text += " ";
+        }
+        else{
+            text += senMaxText.getEnum(dailySkinTYpe.getSenText()).getText();
+            text += " ";
+        }
+
+
+        //pig text
+        if(pigScore > 50){
+            text += pigMaxText.getEnum(dailySkinTYpe.getPigText()).getText();
+            text += " ";
+        }
+
+        //win text
+        if(winScore > 50){
+            text += winMaxText.getEnum(dailySkinTYpe.getWinText()).getText();
+            text += " ";
+        }
+        else{
+            text += winMinText.getEnum(dailySkinTYpe.getWinText()).getText();
+        }
+
+        //trouble text
+        long troubleScore = dailySkinTYpe.getTotalScore() - ((long) dailySkinTYpe.getScore() * 6 / 10);
+        if(troubleScore < 20){
+            text += troubleMaxText.getEnum(dailySkinTYpe.getTroubleText()).getText();
+            text += " ";
+        }
+        else if (troubleScore > 20 && troubleScore <=30){
+            text += troubleMiddleText.getEnum(dailySkinTYpe.getTroubleText()).getText();
+            text += " ";
+        }
+        else{
+            text += troubleMinText.One.getText();
+            text += " ";
+        }
+
+        return text;
+    }
+
     private String getImgSRc(String level) {
         String low = "https://plaluvs-image.s3.ap-northeast-2.amazonaws.com/rank/row_rank.png";
         String middle = "https://plaluvs-image.s3.ap-northeast-2.amazonaws.com/rank/middle_rank.png";

@@ -1,4 +1,4 @@
-package com.ncores.plaluvs.service.skin;
+package com.ncores.plaluvs.service.skin.text;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,11 +11,19 @@ public enum troubleMinText {
     private String text;
     private int id;
 
-    public troubleMinText getEnum(){
+    public static troubleMinText getEnum(){
         int index = (int)(Math.random() * 3 +1);
 
         for (troubleMinText value : troubleMinText.values()) {
             if(value.getId() == index)
+                return value;
+        }
+        return troubleMinText.One;
+    }
+
+    public static troubleMinText getEnum(Long id) {
+        for (troubleMinText value : troubleMinText.values()) {
+            if (value.getId() == id)
                 return value;
         }
         return troubleMinText.One;

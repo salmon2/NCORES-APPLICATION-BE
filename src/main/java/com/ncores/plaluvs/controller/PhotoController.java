@@ -35,7 +35,7 @@ public class PhotoController {
     @PostMapping(value = "/photo")
     public ResponseEntity<?> uploadFile(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @RequestParam("image") MultipartFile file) throws PlaluvsException, IOException {
+            @RequestParam("image") MultipartFile file) throws Exception {
 
         log.info("/photo");
         log.info("file = {}", file.getOriginalFilename());

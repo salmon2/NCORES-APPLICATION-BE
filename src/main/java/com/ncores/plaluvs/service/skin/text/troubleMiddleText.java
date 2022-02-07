@@ -1,4 +1,4 @@
-package com.ncores.plaluvs.service.skin;
+package com.ncores.plaluvs.service.skin.text;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,5 +21,15 @@ public enum troubleMiddleText {
         }
         return troubleMiddleText.One;
     }
+
+    public static troubleMiddleText getEnum(Long id) {
+        for (troubleMiddleText value : troubleMiddleText.values()) {
+            if (value.getId() == id)
+                return value;
+        }
+        return troubleMiddleText.One;
+    }
+
+
 
 }

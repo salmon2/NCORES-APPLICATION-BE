@@ -1,4 +1,4 @@
-package com.ncores.plaluvs.service.skin;
+package com.ncores.plaluvs.service.skin.text;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,6 +18,15 @@ public enum senMinText {
 
         for (senMinText value : senMinText.values()) {
             if(value.getId() == index)
+                return value;
+        }
+        return senMinText.One;
+    }
+
+
+    public static senMinText getEnum(Long id) {
+        for (senMinText value : senMinText.values()) {
+            if (value.getId() == id)
                 return value;
         }
         return senMinText.One;

@@ -14,8 +14,6 @@ import com.ncores.plaluvs.security.UserDetailsImpl;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.StringExpression;
-import com.querydsl.core.types.dsl.StringPath;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -40,7 +38,7 @@ public class CosmeticRepositoryCustomImpl implements CosmeticRepositoryCustom{
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<SimpleCosmeticDto> findCosmeticWorry(List<Elements> findElements, UserDetailsImpl userDetails) {
+    public List<SimpleCosmeticDto> findCosmeticWorry(List<Elements> findElements, UserDetailsImpl userDetails, Category category) {
         List<SimpleCosmeticDto> result = queryFactory
                 .select(
                         new QSimpleCosmeticDto(
@@ -54,7 +52,7 @@ public class CosmeticRepositoryCustomImpl implements CosmeticRepositoryCustom{
                 )
                 .from(cosmeticElements)
                 .join(cosmeticElements.elements, elements)
-                .where(cosmeticElements.elements.in(findElements))
+                .where(cosmeticElements.elements.in(findElements).and(cosmeticElements.cosmetic.category.eq(category)))
                 .limit(7)
                 .fetch();
 
@@ -62,7 +60,7 @@ public class CosmeticRepositoryCustomImpl implements CosmeticRepositoryCustom{
     }
 
     @Override
-    public List<SimpleCosmeticDto> findAllbyBouman(UserDetailsImpl userDetails, List<Elements> findElements) {
+    public List<SimpleCosmeticDto> findAllbyBouman(UserDetailsImpl userDetails, List<Elements> findElements, Category category) {
         List<SimpleCosmeticDto> result = queryFactory
                 .select(
                         new QSimpleCosmeticDto(
@@ -76,7 +74,7 @@ public class CosmeticRepositoryCustomImpl implements CosmeticRepositoryCustom{
                 )
                 .from(cosmeticElements)
                 .join(cosmeticElements.elements, elements)
-                .where(cosmeticElements.elements.in(findElements))
+                .where(cosmeticElements.elements.in(findElements).and(cosmeticElements.cosmetic.category.eq(category)))
                 .limit(15)
                 .fetch();
 
@@ -206,7 +204,7 @@ public class CosmeticRepositoryCustomImpl implements CosmeticRepositoryCustom{
     }
 
     @Override
-    public List<SimpleCosmeticDto> findCosmeticNoneWorry(User user) {
+    public List<SimpleCosmeticDto> findCosmeticNoneWorry(User user, Category category) {
         return queryFactory
                 .select(
                         new QSimpleCosmeticDto(
@@ -219,6 +217,7 @@ public class CosmeticRepositoryCustomImpl implements CosmeticRepositoryCustom{
                         )
                 )
                 .from(cosmetic)
+                .where(cosmetic.category.eq(category))
                 .limit(15)
                 .fetch();
     }

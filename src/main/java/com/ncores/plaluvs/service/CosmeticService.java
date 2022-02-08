@@ -31,20 +31,24 @@ public class CosmeticService {
 
     public List<SimpleCosmeticDto> cosmeticSimpleRecommends(UserDetailsImpl userDetails) throws PlaluvsException {
         SkinType dailySkinType = skinTypeRepository.findDailySkinTypeOrLatestSkinTypeNotException(userDetails);
+        Category category = categoryRepository.findById(618L).orElseThrow(
+                () -> new PlaluvsException(ErrorCode.CATEGORY_NOT_FOUND)
+        );
+
         if(dailySkinType == null){
-            List<SimpleCosmeticDto> result = cosmeticRepository.findCosmeticNoneWorry(userDetails.getUser());
+            List<SimpleCosmeticDto> result = cosmeticRepository.findCosmeticNoneWorry(userDetails.getUser(), category);
             naverUrl(result);
             return result;
         }
 
         else if (dailySkinType.getBouman().getName().equals("ORNT")){
-            List<SimpleCosmeticDto> result = cosmeticRepository.findCosmeticNoneWorry(userDetails.getUser());
+            List<SimpleCosmeticDto> result = cosmeticRepository.findCosmeticNoneWorry(userDetails.getUser(), category);
             naverUrl(result);
             return result;
         }
         else{
             List<Elements> elements = elementsRepository.findAllBySkinTypeGoodElements(dailySkinType);
-            List<SimpleCosmeticDto> result = cosmeticRepository.findAllbyBouman(userDetails, elements);
+            List<SimpleCosmeticDto> result = cosmeticRepository.findAllbyBouman(userDetails, elements, category);
             naverUrl(result);
             return result;
         }
@@ -136,22 +140,26 @@ public class CosmeticService {
 
         SkinType dailySkinType = skinTypeRepository.findDailySkinTypeOrLatestSkinTypeNotException(userDetails);
 
+        Category category = categoryRepository.findById(618L).orElseThrow(
+                () -> new PlaluvsException(ErrorCode.CATEGORY_NOT_FOUND)
+        );
+
         if(dailySkinType != null){
             List<SkinTrouble> skinTroubleList = dailySkinType.getSkinTroubleList();
             if(skinTroubleList.size() == 0){
-                List<SimpleCosmeticDto> result = cosmeticRepository.findCosmeticNoneWorry(userDetails.getUser());
+                List<SimpleCosmeticDto> result = cosmeticRepository.findCosmeticNoneWorry(userDetails.getUser(), category);
                 naverUrl(result);
                 return result;
             }
             else{
                 List<Elements> elements = elementsRepository.findAllBySkinTroubleCustom(skinTroubleList);
-                List<SimpleCosmeticDto> result = cosmeticRepository.findCosmeticWorry(elements, userDetails);
+                List<SimpleCosmeticDto> result = cosmeticRepository.findCosmeticWorry(elements, userDetails, category);
                 naverUrl(result);
                 return result;
             }
         }
         else{
-            List<SimpleCosmeticDto> result = cosmeticRepository.findCosmeticNoneWorry(userDetails.getUser());
+            List<SimpleCosmeticDto> result = cosmeticRepository.findCosmeticNoneWorry(userDetails.getUser(), category);
             naverUrl(result);
             return result;
         }
